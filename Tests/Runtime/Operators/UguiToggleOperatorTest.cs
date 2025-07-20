@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Operators
@@ -43,7 +42,7 @@ namespace TestHelper.Monkey.Operators
             var toggle = gameObject.AddComponent<Toggle>();
             toggle.isOn = state;
 
-            await _sut.OperateAsync(gameObject, new RaycastResult());
+            await _sut.OperateAsync(gameObject);
 
             Assert.That(toggle.isOn, Is.Not.EqualTo(state)); // flip
         }
@@ -58,7 +57,7 @@ namespace TestHelper.Monkey.Operators
             var toggle = gameObject.AddComponent<Toggle>();
             toggle.isOn = beforeState;
 
-            await _sut.OperateAsync(gameObject, new RaycastResult(), specifiedState);
+            await _sut.OperateAsync(gameObject, specifiedState);
 
             Assert.That(toggle.isOn, Is.EqualTo(specifiedState));
         }

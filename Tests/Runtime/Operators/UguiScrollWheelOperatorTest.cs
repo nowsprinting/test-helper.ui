@@ -9,7 +9,6 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.TestTools.Utils;
 using UnityEngine.UI;
 
@@ -33,20 +32,6 @@ namespace TestHelper.Monkey.Operators
 
             var scrollRect = _scrollView.GetComponent<ScrollRect>();
             scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f); // center the scroll view
-        }
-
-        private static RaycastResult CreateRaycastResult(GameObject gameObject)
-        {
-            Assume.That(Camera.main, Is.Not.Null);
-
-            var raycastResult = new RaycastResult
-            {
-                gameObject = gameObject,
-                worldPosition = gameObject.transform.position,
-                screenPosition = Camera.main.WorldToScreenPoint(gameObject.transform.position)
-            };
-
-            return raycastResult;
         }
 
         [Test]
@@ -152,8 +137,7 @@ namespace TestHelper.Monkey.Operators
                 beforePosition.z);
 
             var sut = new UguiScrollWheelOperator(ScrollSpeed);
-            var raycastResult = CreateRaycastResult(_scrollView);
-            var task = sut.OperateAsync(_scrollView, raycastResult, destination);
+            var task = sut.OperateAsync(_scrollView, destination);
             await UniTask.NextFrame();
 
             Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
@@ -176,10 +160,9 @@ namespace TestHelper.Monkey.Operators
                 beforePosition.z); // Cancelled position
 
             var sut = new UguiScrollWheelOperator(ScrollSpeed);
-            var raycastResult = CreateRaycastResult(_scrollView);
             var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
-            var task = sut.OperateAsync(_scrollView, raycastResult, destination, cancellationToken: cancellationToken);
+            var task = sut.OperateAsync(_scrollView, destination, cancellationToken: cancellationToken);
             await UniTask.NextFrame(cancellationToken);
 
             cancellationTokenSource.Cancel();
@@ -203,8 +186,7 @@ namespace TestHelper.Monkey.Operators
             var expectedPosition = new Vector3(beforePosition.x + x, beforePosition.y + y, beforePosition.z);
 
             var sut = new UguiScrollWheelOperator();
-            var raycastResult = CreateRaycastResult(_scrollView);
-            await sut.OperateAsync(_scrollView, raycastResult, destination);
+            await sut.OperateAsync(_scrollView, destination);
 
             Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
                 .Using(new Vector3EqualityComparer(1.0f)));
@@ -217,8 +199,7 @@ namespace TestHelper.Monkey.Operators
             var spyEventHandler = _scrollView.AddComponent<SpyOnScrollHandler>();
 
             var sut = new UguiScrollWheelOperator();
-            var raycastResult = CreateRaycastResult(_scrollView);
-            await sut.OperateAsync(_scrollView, raycastResult, new Vector2(2f, 3f));
+            await sut.OperateAsync(_scrollView, new Vector2(2f, 3f));
 
             Assert.That(spyEventHandler.WasScrolled, Is.True);
         }
@@ -230,8 +211,7 @@ namespace TestHelper.Monkey.Operators
             var spyEventHandler = _scrollView.AddComponent<SpyOnPointerEnterExitHandler>();
 
             var sut = new UguiScrollWheelOperator();
-            var raycastResult = CreateRaycastResult(_scrollView);
-            await sut.OperateAsync(_scrollView, raycastResult, new Vector2(2f, 3f));
+            await sut.OperateAsync(_scrollView, new Vector2(2f, 3f));
 
             Assert.That(spyEventHandler.WasPointerEntered, Is.True);
             Assert.That(spyEventHandler.WasPointerExited, Is.True);
@@ -245,8 +225,7 @@ namespace TestHelper.Monkey.Operators
             var beforePosition = scrollRect.normalizedPosition;
 
             var sut = new UguiScrollWheelOperator();
-            var raycastResult = CreateRaycastResult(_scrollView);
-            await sut.OperateAsync(_scrollView, raycastResult);
+            await sut.OperateAsync(_scrollView);
 
             var actual = scrollRect.normalizedPosition;
             Assert.That(actual, Is.Not.EqualTo(beforePosition));
@@ -259,8 +238,7 @@ namespace TestHelper.Monkey.Operators
             var spyLogger = new SpyLogger();
 
             var sut = new UguiScrollWheelOperator(logger: spyLogger);
-            var raycastResult = CreateRaycastResult(_scrollView);
-            await sut.OperateAsync(_scrollView, raycastResult);
+            await sut.OperateAsync(_scrollView);
 
             Assert.That(spyLogger.Messages, Is.Not.Empty);
         }
@@ -284,8 +262,7 @@ namespace TestHelper.Monkey.Operators
             };
 
             var sut = new UguiScrollWheelOperator(screenshotOptions: screenshotOptions);
-            var raycastResult = CreateRaycastResult(_scrollView);
-            await sut.OperateAsync(_scrollView, raycastResult);
+            await sut.OperateAsync(_scrollView);
 
             Assert.That(path, Does.Exist);
         }

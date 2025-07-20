@@ -56,7 +56,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
@@ -65,7 +65,7 @@ namespace TestHelper.Monkey.Operators
                 _random.Next(-distance, distance),
                 _random.Next(-distance, distance)
             );
-            await OperateAsync(gameObject, raycastResult, destination, logger, screenshotOptions, cancellationToken);
+            await OperateAsync(gameObject, destination, raycastResult, logger, screenshotOptions, cancellationToken);
         }
 
         private static int CalcMaxScrollDistance(GameObject gameObject)
@@ -80,7 +80,8 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult, Vector2 destination,
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+            RaycastResult raycastResult = default,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {

@@ -37,7 +37,7 @@ namespace TestHelper.Monkey.Operators
         /// <param name="logger">Logger set if you need</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <param name="cancellationToken">Cancellation token for operation (e.g., click and hold)</param>
-        UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
+        UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default);
     }

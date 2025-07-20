@@ -4,10 +4,8 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey.Operators
@@ -40,11 +38,9 @@ namespace TestHelper.Monkey.Operators
         {
             var gameObject = new GameObject("ClickTarget");
             gameObject.AddComponent<SpyOnPointerClickHandler>();
-            var position = TransformPositionStrategy.GetScreenPoint(gameObject);
-            var raycastResult = new RaycastResult { screenPosition = position };
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject, raycastResult);
+            await _sut.OperateAsync(gameObject);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.OnPointerClick");
         }
@@ -54,11 +50,9 @@ namespace TestHelper.Monkey.Operators
         {
             var gameObject = new GameObject("ClickTarget");
             gameObject.AddComponent<SpyPointerClickEventReceiver>();
-            var position = TransformPositionStrategy.GetScreenPoint(gameObject);
-            var raycastResult = new RaycastResult { screenPosition = position };
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject, raycastResult);
+            await _sut.OperateAsync(gameObject);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.ReceivePointerClick");
         }

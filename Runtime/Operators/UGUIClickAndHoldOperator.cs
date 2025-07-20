@@ -53,7 +53,7 @@ namespace TestHelper.Monkey.Operators
         /// <remarks>
         /// This method receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
         /// </remarks>
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
