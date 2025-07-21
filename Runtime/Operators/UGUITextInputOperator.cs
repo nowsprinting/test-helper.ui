@@ -63,25 +63,6 @@ namespace TestHelper.Monkey.Operators
 #endif
         }
 
-        [Obsolete(
-            "This method is deprecated. Use OperateAsync(GameObject, _, CancellationToken) and properties instead.")]
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult _,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
-            CancellationToken cancellationToken = default)
-        {
-            if (logger != null)
-            {
-                Logger = logger;
-            }
-
-            if (screenshotOptions != null)
-            {
-                ScreenshotOptions = screenshotOptions;
-            }
-
-            await OperateAsync(gameObject, _, cancellationToken);
-        }
-
         /// <inheritdoc />
         /// <remarks>
         /// This method does not require a <c>RaycastResult</c>.
@@ -108,26 +89,7 @@ namespace TestHelper.Monkey.Operators
             await OperateAsync(gameObject, text, cancellationToken);
         }
 
-        [Obsolete("Use OperateAsync(GameObject, string, CancellationToken) and properties instead.")]
-        public async UniTask OperateAsync(GameObject gameObject, string text,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
-            CancellationToken cancellationToken = default)
-        {
-            if (logger != null)
-            {
-                Logger = logger;
-            }
-
-            if (screenshotOptions != null)
-            {
-                ScreenshotOptions = screenshotOptions;
-            }
-
-            await OperateAsync(gameObject, text, cancellationToken);
-        }
-
         /// <inheritdoc />
-        [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
         public async UniTask OperateAsync(GameObject gameObject, string text,
             CancellationToken cancellationToken = default)
         {

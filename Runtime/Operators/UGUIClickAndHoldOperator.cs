@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -70,24 +69,6 @@ namespace TestHelper.Monkey.Operators
             {
                 await pointerClickSimulator.PointerClickAsync(_holdMillis, cancellationToken: cancellationToken);
             }
-        }
-
-        [Obsolete("Use OperateAsync(GameObject, RaycastResult, CancellationToken) and properties instead.")]
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
-            CancellationToken cancellationToken = default)
-        {
-            if (logger != null)
-            {
-                Logger = logger;
-            }
-
-            if (screenshotOptions != null)
-            {
-                ScreenshotOptions = screenshotOptions;
-            }
-
-            await OperateAsync(gameObject, raycastResult, cancellationToken);
         }
     }
 }

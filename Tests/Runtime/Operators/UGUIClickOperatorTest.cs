@@ -41,7 +41,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject, default, CancellationToken.None);
+            await _sut.OperateAsync(gameObject);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.OnPointerClick");
         }
@@ -53,7 +53,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<SpyPointerClickEventReceiver>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject, default, CancellationToken.None);
+            await _sut.OperateAsync(gameObject);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.ReceivePointerClick");
         }
