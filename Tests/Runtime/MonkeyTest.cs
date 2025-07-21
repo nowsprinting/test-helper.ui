@@ -52,7 +52,6 @@ namespace TestHelper.Monkey
             var (didAction, _) = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
-                config.Screenshots,
                 _interactableComponentsFinder,
                 config.IgnoreStrategy,
                 config.ReachableStrategy);
@@ -74,7 +73,6 @@ namespace TestHelper.Monkey
             var (didAction, _) = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
-                config.Screenshots,
                 _interactableComponentsFinder,
                 config.IgnoreStrategy,
                 config.ReachableStrategy);
@@ -322,9 +320,6 @@ namespace TestHelper.Monkey
         [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
         public class Screenshots
         {
-            private IEnumerable<IOperator> _operators;
-            private InteractableComponentsFinder _interactableComponentsFinder;
-
             private const int FileSizeThreshold = 5441;         // VGA size solid color file size
             private const int FileSizeThreshold2X = 100 * 1024; // Normal size is 80 to 90KB
             private readonly string _defaultOutputDirectory = CommandLineArgs.GetScreenshotDirectory();
@@ -334,14 +329,6 @@ namespace TestHelper.Monkey
             [SetUp]
             public void SetUp()
             {
-                _operators = new IOperator[]
-                {
-                    new UGUIClickOperator(),         // click
-                    new UGUIClickAndHoldOperator(1), // click and hold 1ms
-                    new UGUITextInputOperator()
-                };
-                _interactableComponentsFinder = new InteractableComponentsFinder(operators: _operators);
-
                 _filename = $"{TestContext.CurrentContext.Test.Name}_0001.png";
                 _path = Path.Combine(_defaultOutputDirectory, _filename);
 
@@ -351,20 +338,38 @@ namespace TestHelper.Monkey
                 }
             }
 
+            private MonkeyConfig CreateMonkeyConfig(ScreenshotOptions screenshotOptions)
+            {
+                var config = new MonkeyConfig
+                {
+                    Operators = new IOperator[] { new UGUIClickOperator() },
+                    Screenshots = screenshotOptions
+                };
+                foreach (var iOperator in config.Operators)
+                {
+                    iOperator.Logger = config.Logger;
+                    iOperator.ScreenshotOptions = config.Screenshots;
+                }
+
+                return config;
+            }
+
+            private InteractableComponentsFinder CreateInteractableComponentsFinder(MonkeyConfig config)
+            {
+                return new InteractableComponentsFinder(operators: config.Operators);
+            }
+
             [Test]
             [LoadScene(TestScene)]
             public async Task RunStep_withScreenshots_takeScreenshotsAndSaveToDefaultPath()
             {
-                var config = new MonkeyConfig
-                {
-                    Screenshots = new ScreenshotOptions(), // take screenshots and save files,
-                };
+                var config = CreateMonkeyConfig(new ScreenshotOptions());
+                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
 
                 await Monkey.RunStep(
                     config.Random,
                     config.Logger,
-                    config.Screenshots,
-                    _interactableComponentsFinder,
+                    interactableComponentsFinder,
                     config.IgnoreStrategy,
                     config.ReachableStrategy);
 
@@ -387,21 +392,18 @@ namespace TestHelper.Monkey
                 var filename = $"{filenamePrefix}_0001.png";
                 var path = Path.Combine(relativeDirectory, filename);
 
-                var config = new MonkeyConfig
+                var config = CreateMonkeyConfig(new ScreenshotOptions
                 {
-                    Screenshots = new ScreenshotOptions
-                    {
-                        Directory = relativeDirectory,
-                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
-                        SuperSize = 2,
-                    },
-                };
+                    Directory = relativeDirectory,
+                    FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
+                    SuperSize = 2,
+                });
+                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
 
                 await Monkey.RunStep(
                     config.Random,
                     config.Logger,
-                    config.Screenshots,
-                    _interactableComponentsFinder,
+                    interactableComponentsFinder,
                     config.IgnoreStrategy,
                     config.ReachableStrategy);
 
@@ -414,21 +416,16 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task RunStep_withScreenshots_superSize_takeScreenshotsSuperSize()
             {
-                var config = new MonkeyConfig
+                var config = CreateMonkeyConfig(new ScreenshotOptions
                 {
-                    Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                    DelayMillis = 1,                           // 1ms
-                    Screenshots = new ScreenshotOptions()
-                    {
-                        SuperSize = 2, // 2x size
-                    },
-                };
+                    SuperSize = 2, // 2x size
+                });
+                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
 
                 await Monkey.RunStep(
                     config.Random,
                     config.Logger,
-                    config.Screenshots,
-                    _interactableComponentsFinder,
+                    interactableComponentsFinder,
                     config.IgnoreStrategy,
                     config.ReachableStrategy);
 
@@ -443,21 +440,16 @@ namespace TestHelper.Monkey
             [Description("Is it a stereo screenshot? See for yourself! Be a witness!!")]
             public async Task RunStep_withScreenshots_stereo_takeScreenshotsStereo()
             {
-                var config = new MonkeyConfig
+                var config = CreateMonkeyConfig(new ScreenshotOptions
                 {
-                    Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                    DelayMillis = 1,                           // 1ms
-                    Screenshots = new ScreenshotOptions()
-                    {
-                        StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
-                    },
-                };
+                    StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
+                });
+                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
 
                 await Monkey.RunStep(
                     config.Random,
                     config.Logger,
-                    config.Screenshots,
-                    _interactableComponentsFinder,
+                    interactableComponentsFinder,
                     config.IgnoreStrategy,
                     config.ReachableStrategy);
 
@@ -470,18 +462,16 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_noInteractiveComponent_takeScreenshot()
             {
+                var config = CreateMonkeyConfig(new ScreenshotOptions());
+                config.Lifetime = TimeSpan.FromSeconds(2);          // 2sec
+                config.SecondsToErrorForNoInteractiveComponent = 1; // 1sec
+
                 // Make to no interactable objects
-                foreach (var component in _interactableComponentsFinder.FindInteractableComponents())
+                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
+                foreach (var component in interactableComponentsFinder.FindInteractableComponents())
                 {
                     component.gameObject.SetActive(false);
                 }
-
-                var config = new MonkeyConfig
-                {
-                    Lifetime = TimeSpan.FromSeconds(2),          // 2sec
-                    SecondsToErrorForNoInteractiveComponent = 1, // 1sec
-                    Screenshots = new ScreenshotOptions()        // take screenshots and save files
-                };
 
                 try
                 {
@@ -505,14 +495,10 @@ namespace TestHelper.Monkey
                 _filename = $"{TestContext.CurrentContext.Test.Name}_0011.png"; // 10 steps + 1
                 _path = Path.Combine(_defaultOutputDirectory, _filename);
 
-                var config = new MonkeyConfig
-                {
-                    Lifetime = TimeSpan.FromSeconds(2), // 2sec
-                    DelayMillis = 1,                    // 1ms
-                    BufferLengthForDetectLooping = 10,  // repeating 5-step sequences can be detected
-                    Operators = new IOperator[] { new UGUIClickOperator() },
-                    Screenshots = new ScreenshotOptions() // take screenshots and save files
-                };
+                var config = CreateMonkeyConfig(new ScreenshotOptions());
+                config.Lifetime = TimeSpan.FromSeconds(2); // 2sec
+                config.DelayMillis = 1;                    // 1ms
+                config.BufferLengthForDetectLooping = 10;  // repeating 5-step sequences can be detected
 
                 try
                 {

@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Extensions;
@@ -30,7 +31,6 @@ namespace TestHelper.Monkey.Operators
         /// This operator receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
         /// </remarks>
         public UniTask OperateAsync(GameObject gameObject, bool isOn, RaycastResult raycastResult = default,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
             var toggle = gameObject.GetComponent<Toggle>();
@@ -39,7 +39,25 @@ namespace TestHelper.Monkey.Operators
                 return UniTask.CompletedTask;
             }
 
-            return base.OperateAsync(gameObject, raycastResult, logger, screenshotOptions, cancellationToken);
+            return base.OperateAsync(gameObject, raycastResult, cancellationToken);
+        }
+
+        [Obsolete("Use OperateAsync(GameObject, bool, RaycastResult, CancellationToken) and properties instead.")]
+        public async UniTask OperateAsync(GameObject gameObject, bool isOn, RaycastResult raycastResult = default,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (logger != null)
+            {
+                Logger = logger;
+            }
+
+            if (screenshotOptions != null)
+            {
+                ScreenshotOptions = screenshotOptions;
+            }
+
+            await OperateAsync(gameObject, isOn, raycastResult, cancellationToken);
         }
     }
 }

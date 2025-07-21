@@ -96,8 +96,8 @@ namespace TestHelper.Monkey
             new UGUIClickOperator(),
             new UGUIClickAndHoldOperator(),
             new UguiDoubleClickOperator(),
-            new UguiScrollWheelOperator(10.0f), // Specify PRNG instance, if necessary
-            new UGUITextInputOperator(),        // Specify random text input strategy, if necessary
+            new UguiScrollWheelOperator(), // Specify PRNG instance, if necessary
+            new UGUITextInputOperator(),   // Specify random text input strategy, if necessary
         };
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -18,8 +19,11 @@ namespace TestHelper.Monkey.Operators
     /// </summary>
     public class UGUIClickOperator : IClickOperator
     {
-        private readonly ScreenshotOptions _screenshotOptions;
-        private readonly ILogger _logger;
+        /// <inheritdoc/>
+        public ILogger Logger { protected get; set; }
+
+        /// <inheritdoc/>
+        public ScreenshotOptions ScreenshotOptions { protected get; set; }
 
         /// <summary>
         /// Constructor.
@@ -28,8 +32,8 @@ namespace TestHelper.Monkey.Operators
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         public UGUIClickOperator(ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
-            _screenshotOptions = screenshotOptions;
-            _logger = logger ?? Debug.unityLogger;
+            Logger = logger ?? Debug.unityLogger;
+            ScreenshotOptions = screenshotOptions;
         }
 
         /// <inheritdoc />
@@ -48,22 +52,37 @@ namespace TestHelper.Monkey.Operators
         /// This method receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
         /// </remarks>
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            logger = logger ?? _logger;
-            screenshotOptions = screenshotOptions ?? _screenshotOptions;
-
             // Output log before the operation, after the shown effects
-            var operationLogger = new OperationLogger(gameObject, this, logger, screenshotOptions);
+            var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
             await operationLogger.Log();
 
             // Do operation
-            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, logger))
+            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, Logger))
             {
                 await pointerClickSimulator.PointerClickAsync(cancellationToken: cancellationToken);
             }
+        }
+
+        [Obsolete(
+            "Use OperateAsync(GameObject, RaycastResult, ILogger, ScreenshotOptions, CancellationToken) and properties instead.")]
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (logger != null)
+            {
+                Logger = logger;
+            }
+
+            if (screenshotOptions != null)
+            {
+                ScreenshotOptions = screenshotOptions;
+            }
+
+            await OperateAsync(gameObject, raycastResult, cancellationToken);
         }
     }
 }

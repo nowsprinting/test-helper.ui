@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -19,6 +20,16 @@ namespace TestHelper.Monkey.Operators
     public interface IOperator
     {
         /// <summary>
+        /// Logger set if you need.
+        /// </summary>
+        ILogger Logger { set; }
+
+        /// <summary>
+        /// Take screenshot options set if you need.
+        /// </summary>
+        ScreenshotOptions ScreenshotOptions { set; }
+
+        /// <summary>
         /// Returns if can operate target <c>GameObject</c> this Operator.
         /// </summary>
         /// <param name="gameObject">Operation target <c>GameObject</c></param>
@@ -34,9 +45,11 @@ namespace TestHelper.Monkey.Operators
         /// </remarks>
         /// <param name="gameObject">Operation target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>
-        /// <param name="logger">Logger set if you need</param>
-        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <param name="cancellationToken">Cancellation token for operation (e.g., click and hold)</param>
+        UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
+            CancellationToken cancellationToken = default);
+
+        [Obsolete("Use OperateAsync(GameObject, RaycastResult, CancellationToken) and properties instead.")]
         UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default);

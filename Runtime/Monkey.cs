@@ -52,6 +52,12 @@ namespace TestHelper.Monkey
                 GameViewControlHelper.SetGizmos(true);
             }
 
+            foreach (var iOperator in config.Operators)
+            {
+                iOperator.Logger = config.Logger;
+                iOperator.ScreenshotOptions = config.Screenshots;
+            }
+
             var interactableComponentsFinder =
                 new InteractableComponentsFinder(config.IsInteractable, config.Operators);
             var operationSequence = new List<int>(config.BufferLengthForDetectLooping);
@@ -65,7 +71,6 @@ namespace TestHelper.Monkey
                     var (didAction, instanceId) = await RunStep(
                         config.Random,
                         config.Logger,
-                        config.Screenshots,
                         interactableComponentsFinder,
                         config.IgnoreStrategy,
                         config.ReachableStrategy,
@@ -112,23 +117,36 @@ namespace TestHelper.Monkey
             }
         }
 
+        [Obsolete]
+        public static UniTask<(bool, int)> RunStep(
+            IRandom random,
+            ILogger logger,
+            ScreenshotOptions screenshotOptions,
+            InteractableComponentsFinder interactableComponentsFinder,
+            IIgnoreStrategy ignoreStrategy,
+            IReachableStrategy reachableStrategy,
+            bool verbose = false,
+            CancellationToken cancellationToken = default)
+        {
+            return RunStep(random, logger, interactableComponentsFinder, ignoreStrategy, reachableStrategy, verbose,
+                cancellationToken);
+        }
+
         /// <summary>
         /// Run a step of monkey testing.
         /// This method is internal by nature, called from <c cref="Run">Run</c> method.
         /// </summary>
         /// <param name="random">Random number generator from <c>MonkeyConfig</c></param>
         /// <param name="logger">Logger from <c>MonkeyConfig</c></param>
-        /// <param name="screenshotOptions">Take screenshots options from <c>MonkeyConfig</c></param>
         /// <param name="interactableComponentsFinder">InteractableComponentsFinder instance includes isInteractable and operators</param>
         /// <param name="ignoreStrategy">Strategy to examine whether <c>GameObject</c> should be ignored. from <c>MonkeyConfig</c></param>
         /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. from <c>MonkeyConfig</c></param>
         /// <param name="verbose">Output verbose logs</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True if any operator was executed, and the instance ID of operated <c>GameObject</c></returns>
-        public static async UniTask<(bool, int)> RunStep(
+        internal static async UniTask<(bool, int)> RunStep(
             IRandom random,
             ILogger logger,
-            ScreenshotOptions screenshotOptions,
             InteractableComponentsFinder interactableComponentsFinder,
             IIgnoreStrategy ignoreStrategy,
             IReachableStrategy reachableStrategy,
@@ -143,8 +161,7 @@ namespace TestHelper.Monkey
                 return (false, 0);
             }
 
-            await selectedOperator.OperateAsync(selectedObject, raycastResult, logger, screenshotOptions,
-                cancellationToken);
+            await selectedOperator.OperateAsync(selectedObject, raycastResult, cancellationToken);
 
             return (true, selectedObject.GetInstanceID());
         }
