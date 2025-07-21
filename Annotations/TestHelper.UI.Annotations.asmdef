@@ -1,6 +1,6 @@
 {
-    "name": "TestHelper.Monkey.Annotations",
-    "rootNamespace": "TestHelper.Monkey",
+    "name": "TestHelper.UI.Annotations",
+    "rootNamespace": "TestHelper.UI",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
