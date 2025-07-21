@@ -37,9 +37,9 @@ namespace TestHelper.UI
         {
             _operators = new IOperator[]
             {
-                new UGUIClickOperator(),         // click
-                new UGUIClickAndHoldOperator(1), // click and hold 1ms
-                new UGUITextInputOperator()
+                new UguiClickOperator(),         // click
+                new UguiClickAndHoldOperator(1), // click and hold 1ms
+                new UguiTextInputOperator()
             };
             _interactableComponentsFinder = new InteractableComponentsFinder(operators: _operators);
         }
@@ -221,16 +221,16 @@ namespace TestHelper.UI
 
             var expected = new List<string>
             {
-                "UsingOnPointerClickHandler|UGUIClickOperator",
-                "UsingPointerClickEventTrigger|UGUIClickOperator",
-                "UsingOnPointerDownUpHandler|UGUIClickAndHoldOperator",
-                "UsingPointerDownUpEventTrigger|UGUIClickAndHoldOperator",
-                "UsingMultipleEventTriggers|UGUIClickOperator",
-                "UsingMultipleEventTriggers|UGUIClickAndHoldOperator",
-                "DestroyItselfIfPointerDown|UGUIClickAndHoldOperator",
-                "InputField|UGUIClickOperator",
-                "InputField|UGUIClickAndHoldOperator",
-                "InputField|UGUITextInputOperator",
+                "UsingOnPointerClickHandler|UguiClickOperator",
+                "UsingPointerClickEventTrigger|UguiClickOperator",
+                "UsingOnPointerDownUpHandler|UguiClickAndHoldOperator",
+                "UsingPointerDownUpEventTrigger|UguiClickAndHoldOperator",
+                "UsingMultipleEventTriggers|UguiClickOperator",
+                "UsingMultipleEventTriggers|UguiClickAndHoldOperator",
+                "DestroyItselfIfPointerDown|UguiClickAndHoldOperator",
+                "InputField|UguiClickOperator",
+                "InputField|UguiClickAndHoldOperator",
+                "InputField|UguiTextInputOperator",
             };
 
             Assert.That(actual, Is.EquivalentTo(expected));
@@ -267,7 +267,7 @@ namespace TestHelper.UI
             cube.transform.position = new Vector3(0, 0, 0);
             cube.AddComponent<IgnoreAnnotation>(); // ignored
 
-            var operators = new List<(GameObject, IOperator)> { (cube, new UGUIClickOperator()), };
+            var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
             var random = new RandomWrapper();
             var actual = Monkey.LotteryOperator(operators, random,
                 new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
@@ -284,7 +284,7 @@ namespace TestHelper.UI
             cube.AddComponent<SpyOnPointerClickHandler>();
             cube.transform.position = new Vector3(0, 0, -20); // out of sight
 
-            var operators = new List<(GameObject, IOperator)> { (cube, new UGUIClickOperator()), };
+            var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
             var random = new RandomWrapper();
             var actual = Monkey.LotteryOperator(operators, random,
                 new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
@@ -299,7 +299,7 @@ namespace TestHelper.UI
         {
             var cube = GameObject.Find("Cube");
             cube.AddComponent<SpyOnPointerClickHandler>();
-            var clickOperator = new UGUIClickOperator();
+            var clickOperator = new UguiClickOperator();
 
             var operators = new List<(GameObject, IOperator)>()
             {
@@ -342,7 +342,7 @@ namespace TestHelper.UI
             {
                 var config = new MonkeyConfig
                 {
-                    Operators = new IOperator[] { new UGUIClickOperator() },
+                    Operators = new IOperator[] { new UguiClickOperator() },
                     Screenshots = screenshotOptions
                 };
                 foreach (var iOperator in config.Operators)
@@ -521,9 +521,9 @@ namespace TestHelper.UI
             {
                 var operators = new IOperator[]
                 {
-                    new UGUIClickOperator(),         // click
-                    new UGUIClickAndHoldOperator(1), // click and hold 1ms
-                    new UGUITextInputOperator()
+                    new UguiClickOperator(),         // click
+                    new UguiClickAndHoldOperator(1), // click and hold 1ms
+                    new UguiTextInputOperator()
                 };
                 return new InteractableComponentsFinder(operators: operators);
             }
@@ -552,16 +552,16 @@ namespace TestHelper.UI
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 // @formatter:off
                 Assert.That(spyLogger.Messages[0], Does.StartWith("Lottery entries: "));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\(\d+\):EventTrigger:UGUIClickOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\):SpyOnPointerDownUpHandler:UGUIClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\(\d+\):EventTrigger:UGUIClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerClickHandler\(\d+\):SpyOnPointerClickHandler:UGUIClickOperator")); // includes ignored objects
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UGUIClickOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UGUIClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"DestroyItselfIfPointerDown\(\d+\):StubDestroyingItselfWhenPointerDown:UGUIClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UGUIClickOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UGUIClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UGUITextInputOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\(\d+\):EventTrigger:UguiClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\):SpyOnPointerDownUpHandler:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\(\d+\):EventTrigger:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerClickHandler\(\d+\):SpyOnPointerClickHandler:UguiClickOperator")); // includes ignored objects
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UguiClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"DestroyItselfIfPointerDown\(\d+\):StubDestroyingItselfWhenPointerDown:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UguiClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UguiTextInputOperator"));
                 // @formatter:on
             }
 
@@ -601,7 +601,7 @@ namespace TestHelper.UI
                 cube.transform.position = new Vector3(0, 0, 0);
                 cube.AddComponent<IgnoreAnnotation>(); // ignored
 
-                var operators = new List<(GameObject, IOperator)> { (cube, new UGUIClickOperator()), };
+                var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
                 var random = new RandomWrapper();
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
@@ -621,7 +621,7 @@ namespace TestHelper.UI
                 cube.AddComponent<SpyOnPointerClickHandler>();
                 cube.transform.position = new Vector3(0, 0, -20); // out of sight
 
-                var operators = new List<(GameObject, IOperator)> { (cube, new UGUIClickOperator()), };
+                var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
                 var random = new RandomWrapper();
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
@@ -649,7 +649,7 @@ namespace TestHelper.UI
                     Lifetime = TimeSpan.FromSeconds(2), // 2sec
                     DelayMillis = 1,                    // 1ms
                     BufferLengthForDetectLooping = 10,  // repeating 5-step sequences can be detected
-                    Operators = new IOperator[] { new UGUIClickOperator() },
+                    Operators = new IOperator[] { new UguiClickOperator() },
                 };
 
                 try

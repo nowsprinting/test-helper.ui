@@ -8,7 +8,7 @@ using TestHelper.Attributes;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators;
 
-namespace TestHelper.UI.Samples.UGUIDemo
+namespace TestHelper.UI.Samples.UguiDemo
 {
     [TestFixture]
     public class ScenarioTest

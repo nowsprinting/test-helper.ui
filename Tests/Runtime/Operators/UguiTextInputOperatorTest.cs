@@ -11,14 +11,14 @@ using UnityEngine.UI;
 namespace TestHelper.UI.Operators
 {
     [TestFixture]
-    public class UGUITextInputOperatorTest
+    public class UguiTextInputOperatorTest
     {
         private ITextInputOperator _sut;
 
         [SetUp]
         public void SetUp()
         {
-            _sut = new UGUITextInputOperator(randomString: new StubRandomString("RANDOM"));
+            _sut = new UguiTextInputOperator(randomString: new StubRandomString("RANDOM"));
         }
 
         [Test]

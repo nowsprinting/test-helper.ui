@@ -67,7 +67,7 @@ Configurations in `MonkeyConfig`:
 - **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 - **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
 - **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **Operators**: A collection of `IOperator` that the monkey invokes. The default is `UGUIClickOperator`, `UGUIClickAndHoldOperator`, `UguiDoubleClickOperator`, `UguiScrollWheelOperator`, and `UGUITextInputOperator`. There is support for standard uGUI components.
+- **Operators**: A collection of `IOperator` that the monkey invokes. The default is `UguiClickOperator`, `UguiClickAndHoldOperator`, `UguiDoubleClickOperator`, `UguiScrollWheelOperator`, and `UguiTextInputOperator`. There is support for standard uGUI components.
 
 Class diagram for default strategies:
 
@@ -124,13 +124,13 @@ classDiagram
     }
 
     IOperator <|-- IClickOperator
-    IClickOperator <|-- UGUIClickOperator
+    IClickOperator <|-- UguiClickOperator
 
     IOperator <|-- IClickAndHoldOperator
-    IClickAndHoldOperator <|-- UGUIClickAndHoldOperator
+    IClickAndHoldOperator <|-- UguiClickAndHoldOperator
 
     IOperator <|-- ITextInputOperator
-    ITextInputOperator <|-- UGUITextInputOperator
+    ITextInputOperator <|-- UguiTextInputOperator
 ```
 
 
@@ -349,7 +349,7 @@ public class MyIntegrationTest
         var finder = new GameObjectFinder();
         var result = await finder.FindByNameAsync("StartButton", interactable: true);
 
-        var clickOperator = new UGUIClickOperator();
+        var clickOperator = new UguiClickOperator();
         await clickOperator.OperateAsync(result.GameObject);
     }
 }
@@ -489,11 +489,11 @@ If you want to disable this feature, specify `0`.
 #### Operation log message
 
 ```
-UGUIClickOperator operates to StartButton(-12345), screenshot=UGUIMonkeyAgent01_0001.png
+UguiClickOperator operates to StartButton(-12345), screenshot=UguiMonkeyAgent01_0001.png
 ```
 
-This log message is output just before the operator `UGUIClickOperator` operates on the `GameObject` named `StartButton`.
-"UGUIMonkeyAgent01_0001.png" is the screenshot file name taken just before the operation.
+This log message is output just before the operator `UguiClickOperator` operates on the `GameObject` named `StartButton`.
+"UguiMonkeyAgent01_0001.png" is the screenshot file name taken just before the operation.
 
 Screenshots are taken when the `MonkeyConfig.Screenshots` is set.
 
@@ -506,10 +506,10 @@ You can output details logs when the `MonkeyConfig.Verbose` is true.
 
 ```
 Lottery entries: [
-  StartButton(30502):Button:UGUIClickOperator,
-  StartButton(30502):Button:UGUIClickAndHoldOperator,
-  MenuButton(30668):Button:UGUIClickOperator,
-  MenuButton(30668):Button:UGUIClickAndHoldOperator
+  StartButton(30502):Button:UguiClickOperator,
+  StartButton(30502):Button:UguiClickAndHoldOperator,
+  MenuButton(30668):Button:UguiClickOperator,
+  MenuButton(30668):Button:UguiClickAndHoldOperator
 ]
 ```
 

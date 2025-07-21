@@ -12,9 +12,9 @@ using UnityEngine.TestTools;
 namespace TestHelper.UI.Operators
 {
     [TestFixture]
-    public class UGUIClickOperatorTest
+    public class UguiClickOperatorTest
     {
-        private readonly IOperator _sut = new UGUIClickOperator();
+        private readonly IOperator _sut = new UguiClickOperator();
 
         [Test]
         public void CanOperate_CanNotClick_ReturnFalse()

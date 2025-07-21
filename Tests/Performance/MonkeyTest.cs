@@ -8,7 +8,7 @@ using TestHelper.Attributes;
 using Unity.PerformanceTesting;
 using UnityEngine.TestTools;
 
-namespace TestHelper.UI.Tests.Performance
+namespace TestHelper.UI.Performance
 {
     public class MonkeyTest
     {

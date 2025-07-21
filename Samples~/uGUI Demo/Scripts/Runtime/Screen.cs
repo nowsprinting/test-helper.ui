@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.UI.Samples.UGUIDemo
+namespace TestHelper.UI.Samples.UguiDemo
 {
     public class Screen : MonoBehaviour
     {

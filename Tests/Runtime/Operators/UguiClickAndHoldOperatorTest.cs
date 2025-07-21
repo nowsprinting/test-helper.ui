@@ -14,9 +14,9 @@ using UnityEngine.TestTools;
 namespace TestHelper.UI.Operators
 {
     [TestFixture]
-    public class UGUIClickAndHoldOperatorTest
+    public class UguiClickAndHoldOperatorTest
     {
-        private readonly IOperator _sut = new UGUIClickAndHoldOperator(holdMillis: 500);
+        private readonly IOperator _sut = new UguiClickAndHoldOperator(holdMillis: 500);
 
         [Test]
         public void CanOperate_CanNotTouchAndHold_ReturnFalse()

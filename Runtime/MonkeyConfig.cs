@@ -93,11 +93,11 @@ namespace TestHelper.UI
         /// </summary>
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {
-            new UGUIClickOperator(),
-            new UGUIClickAndHoldOperator(),
+            new UguiClickOperator(),
+            new UguiClickAndHoldOperator(),
             new UguiDoubleClickOperator(),
             new UguiScrollWheelOperator(), // Specify PRNG instance, if necessary
-            new UGUITextInputOperator(),   // Specify random text input strategy, if necessary
+            new UguiTextInputOperator(),   // Specify random text input strategy, if necessary
         };
     }
 }

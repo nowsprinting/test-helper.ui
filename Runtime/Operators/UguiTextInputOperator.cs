@@ -24,7 +24,7 @@ namespace TestHelper.UI.Operators
     /// <summary>
     /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.
     /// </summary>
-    public class UGUITextInputOperator : ITextInputOperator
+    public class UguiTextInputOperator : ITextInputOperator
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
@@ -42,7 +42,7 @@ namespace TestHelper.UI.Operators
         /// <param name="randomString">Random string generator</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        public UGUITextInputOperator(
+        public UguiTextInputOperator(
             Func<GameObject, RandomStringParameters> randomStringParams = null, IRandomString randomString = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {

@@ -18,7 +18,7 @@ namespace TestHelper.UI.Operators.Utils
         {
             var gameObject = new GameObject("Target");
             gameObject.AddComponent<FakeComponent>();
-            var @operator = new UGUIClickOperator();
+            var @operator = new UguiClickOperator();
             _spyLogger = new SpyLogger();
             return new OperationLogger(gameObject, @operator, _spyLogger, screenshotOptions);
         }
@@ -31,7 +31,7 @@ namespace TestHelper.UI.Operators.Utils
             await sut.Log();
 
             Assume.That(_spyLogger.Messages, Has.Count.EqualTo(1));
-            Assert.That(_spyLogger.Messages[0], Does.Match(@"UGUIClickOperator operates to Target\(-?\d+\)"));
+            Assert.That(_spyLogger.Messages[0], Does.Match(@"UguiClickOperator operates to Target\(-?\d+\)"));
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace TestHelper.UI.Operators.Utils
 
             Assume.That(_spyLogger.Messages, Has.Count.EqualTo(1));
             Assert.That(_spyLogger.Messages[0], Is.EqualTo(
-                $"UGUIClickOperator operates to Target(foo), bar=baz, screenshot={screenshotOptions.FilenameStrategy.GetFilename()}"));
+                $"UguiClickOperator operates to Target(foo), bar=baz, screenshot={screenshotOptions.FilenameStrategy.GetFilename()}"));
 
             var path = Path.Combine(screenshotOptions.Directory, screenshotOptions.FilenameStrategy.GetFilename());
             Assert.That(path, Does.Exist.IgnoreDirectories);
@@ -62,7 +62,7 @@ namespace TestHelper.UI.Operators.Utils
         {
             var sut = CreateOperationLogger();
             var actual = sut.BuildMessage();
-            Assert.That(actual, Does.Match(@"UGUIClickOperator operates to Target\(-?\d+\)"));
+            Assert.That(actual, Does.Match(@"UguiClickOperator operates to Target\(-?\d+\)"));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace TestHelper.UI.Operators.Utils
 
             var actual = sut.BuildMessage();
 
-            Assert.That(actual, Is.EqualTo("UGUIClickOperator operates to Target(foo)"));
+            Assert.That(actual, Is.EqualTo("UguiClickOperator operates to Target(foo)"));
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace TestHelper.UI.Operators.Utils
 
             var actual = sut.BuildMessage();
 
-            Assert.That(actual, Is.EqualTo("UGUIClickOperator operates to Target(foo, bar)"));
+            Assert.That(actual, Is.EqualTo("UguiClickOperator operates to Target(foo, bar)"));
         }
 
         [Test]
@@ -96,7 +96,7 @@ namespace TestHelper.UI.Operators.Utils
 
             var actual = sut.BuildMessage();
 
-            Assert.That(actual, Does.Match(@"UGUIClickOperator operates to Target\(-?\d+\), bar=baz"));
+            Assert.That(actual, Does.Match(@"UguiClickOperator operates to Target\(-?\d+\), bar=baz"));
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace TestHelper.UI.Operators.Utils
             var actual = sut.BuildMessage();
 
             Assert.That(actual, Does.Match(
-                @"UGUIClickOperator operates to Target\(-?\d+\), screen-pos=\(1,2\), world-pos=\(-3.00,4.00,5.68\)"));
+                @"UguiClickOperator operates to Target\(-?\d+\), screen-pos=\(1,2\), world-pos=\(-3.00,4.00,5.68\)"));
             // Note: screen-pos is formatted as an integer because the screen position
         }
     }

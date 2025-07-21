@@ -9,7 +9,7 @@ using TestHelper.UI.ScreenshotFilenameStrategies;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.UI.Samples.UGUIDemo
+namespace TestHelper.UI.Samples.UguiDemo
 {
     /// <summary>
     /// Run/ Stop monkey testing.
@@ -60,9 +60,9 @@ namespace TestHelper.UI.Samples.UGUIDemo
                         : null,
                     Operators = new IOperator[]
                     {
-                        new UGUIClickOperator(),
-                        new UGUIClickAndHoldOperator(holdMillis: touchAndHoldDelayMillis),
-                        new UGUITextInputOperator(),
+                        new UguiClickOperator(),
+                        new UguiClickAndHoldOperator(holdMillis: touchAndHoldDelayMillis),
+                        new UguiTextInputOperator(),
                     },
                 };
 

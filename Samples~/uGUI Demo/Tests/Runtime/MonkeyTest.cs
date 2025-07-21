@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 
-namespace TestHelper.UI.Samples.UGUIDemo
+namespace TestHelper.UI.Samples.UguiDemo
 {
     [TestFixture]
     [GameViewResolution(GameViewResolution.VGA)]
