@@ -86,8 +86,7 @@ namespace TestHelper.Monkey.Operators
             }
         }
 
-        [Obsolete(
-            "Use OperateAsync(GameObject, RaycastResult, ILogger, ScreenshotOptions, CancellationToken) and properties instead.")]
+        [Obsolete("Use OperateAsync(GameObject, RaycastResult, CancellationToken) and properties instead.")]
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
