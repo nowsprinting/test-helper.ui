@@ -120,7 +120,7 @@ classDiagram
 
     class IOperator {
         +CanOperate(GameObject) bool*
-        +OperateAsync(GameObject, RaycastResult, ILogger, ScreenshotOptions, CancellationToken) UniTask*
+        +OperateAsync(GameObject, RaycastResult, CancellationToken) UniTask*
     }
 
     IOperator <|-- IClickOperator
@@ -350,10 +350,13 @@ public class MyIntegrationTest
         var result = await finder.FindByNameAsync("StartButton", interactable: true);
 
         var clickOperator = new UGUIClickOperator();
-        await clickOperator.OperateAsync(result.GameObject, result.RaycastResult);
+        await clickOperator.OperateAsync(result.GameObject);
     }
 }
 ```
+
+> [!TIP]  
+> You can set the `Logger` and `ScreenshotOptions` instance via the constructor arguments or properties if needed.
 
 
 
