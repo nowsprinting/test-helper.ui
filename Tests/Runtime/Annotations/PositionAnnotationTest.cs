@@ -8,7 +8,7 @@ using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Strategies;
 using UnityEngine;
 
 namespace TestHelper.Monkey.Annotations

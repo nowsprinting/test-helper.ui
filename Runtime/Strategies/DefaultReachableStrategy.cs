@@ -8,7 +8,7 @@ using TestHelper.Monkey.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.DefaultStrategies
+namespace TestHelper.Monkey.Strategies
 {
     /// <summary>
     /// Default strategy to examine whether <c>GameObject</c> is reachable from the user.

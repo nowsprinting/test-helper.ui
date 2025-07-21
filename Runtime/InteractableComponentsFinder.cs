@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
+using TestHelper.Monkey.Strategies;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

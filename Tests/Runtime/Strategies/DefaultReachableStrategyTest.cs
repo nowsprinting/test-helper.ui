@@ -13,7 +13,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 #endif
 
-namespace TestHelper.Monkey.DefaultStrategies
+namespace TestHelper.Monkey.Strategies
 {
     [TestFixture]
     public class DefaultReachableStrategyTest

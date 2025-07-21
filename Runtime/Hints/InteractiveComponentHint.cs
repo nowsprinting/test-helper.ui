@@ -3,8 +3,8 @@
 
 using System.Collections.Generic;
 using System.Text;
-using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.Strategies;
 using UnityEngine;
 
 namespace TestHelper.Monkey.Hints

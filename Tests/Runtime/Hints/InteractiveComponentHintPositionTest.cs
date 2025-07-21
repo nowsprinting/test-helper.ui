@@ -4,7 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Strategies;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools.Utils;

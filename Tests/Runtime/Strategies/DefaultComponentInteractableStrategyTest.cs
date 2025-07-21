@@ -5,7 +5,7 @@ using NUnit.Framework;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
 
-namespace TestHelper.Monkey.DefaultStrategies
+namespace TestHelper.Monkey.Strategies
 {
     [TestFixture]
     public class DefaultComponentInteractableStrategyTest

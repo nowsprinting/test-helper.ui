@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Operators;
+using TestHelper.Monkey.Strategies;
 using UnityEngine;
 
 namespace TestHelper.Monkey.Extensions

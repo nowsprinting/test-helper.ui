@@ -3,9 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.Operators;
+using TestHelper.Monkey.Strategies;
 using TestHelper.Random;
 using UnityEngine;
 

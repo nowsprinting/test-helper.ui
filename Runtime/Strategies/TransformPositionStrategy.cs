@@ -4,7 +4,7 @@
 using TestHelper.Monkey.Extensions;
 using UnityEngine;
 
-namespace TestHelper.Monkey.DefaultStrategies
+namespace TestHelper.Monkey.Strategies
 {
     /// <summary>
     /// Screen point strategy that don't care any annotations.

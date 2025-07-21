@@ -6,7 +6,7 @@ using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Extensions;
 using UnityEngine;
 
-namespace TestHelper.Monkey.DefaultStrategies
+namespace TestHelper.Monkey.Strategies
 {
     /// <summary>
     /// Default screen point strategy.

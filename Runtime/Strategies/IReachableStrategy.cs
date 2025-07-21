@@ -4,7 +4,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.DefaultStrategies
+namespace TestHelper.Monkey.Strategies
 {
     /// <summary>
     /// Strategy to examine whether <c>GameObject</c> is reachable from the user.
