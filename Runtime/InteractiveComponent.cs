@@ -161,7 +161,8 @@ namespace TestHelper.Monkey
         /// Click component.
         /// </summary>
         [Obsolete]
-        public void Click() => GetOperatorsByType<IClickOperator>().First().OperateAsync(component.gameObject, default);
+        public void Click() => GetOperatorsByType<IClickOperator>().First()
+            .OperateAsync(component.gameObject, default, CancellationToken.None);
 
         [Obsolete]
         public bool CanTap() => CanClick();
@@ -203,7 +204,7 @@ namespace TestHelper.Monkey
         /// </summary>
         [Obsolete]
         public void TextInput() => GetOperatorsByType<ITextInputOperator>().First()
-            .OperateAsync(component.gameObject, default(RaycastResult));
+            .OperateAsync(component.gameObject, default(RaycastResult), CancellationToken.None);
 
         /// <summary>
         /// Input specified text.
@@ -212,7 +213,7 @@ namespace TestHelper.Monkey
         public void TextInput(string text)
         {
             var textInputOperator = GetOperatorsByType<ITextInputOperator>().First();
-            textInputOperator.OperateAsync(component.gameObject, text);
+            textInputOperator.OperateAsync(component.gameObject, text, CancellationToken.None);
         }
     }
 }

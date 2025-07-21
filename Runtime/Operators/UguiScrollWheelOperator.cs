@@ -17,21 +17,25 @@ namespace TestHelper.Monkey.Operators
     /// </summary>
     public class UguiScrollWheelOperator : IScrollWheelOperator
     {
-        private readonly float _scrollSpeed;
-        private readonly ILogger _logger;
+        /// <inheritdoc/>
+        public ILogger Logger { private get; set; }
+
+        /// <inheritdoc/>
+        public ScreenshotOptions ScreenshotOptions { private get; set; }
+
         private readonly IRandom _random;
-        private readonly ScreenshotOptions _screenshotOptions;
+        private readonly float _scrollSpeed;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="scrollSpeed">Scroll amount per frame (must be positive)</param>
-        /// <param name="logger">Logger, if omitted, use Debug.unityLogger</param>
         /// <param name="random">PRNG instance</param>
+        /// <param name="logger">Logger, if omitted, use Debug.unityLogger</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <exception cref="ArgumentException">Thrown when scrollPerFrame is zero or negative</exception>
-        public UguiScrollWheelOperator(float scrollSpeed = 10.0f, ILogger logger = null, IRandom random = null,
-            ScreenshotOptions screenshotOptions = null)
+        public UguiScrollWheelOperator(float scrollSpeed = 10.0f, IRandom random = null,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             if (scrollSpeed <= 0)
             {
@@ -39,9 +43,9 @@ namespace TestHelper.Monkey.Operators
             }
 
             _scrollSpeed = scrollSpeed;
-            _logger = logger ?? Debug.unityLogger;
             _random = random ?? new RandomWrapper();
-            _screenshotOptions = screenshotOptions;
+            Logger = logger ?? Debug.unityLogger;
+            ScreenshotOptions = screenshotOptions;
         }
 
         /// <inheritdoc />
@@ -55,9 +59,26 @@ namespace TestHelper.Monkey.Operators
             return gameObject.TryGetEnabledComponent<IScrollHandler>(out _);
         }
 
-        /// <inheritdoc />
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
+        [Obsolete("Use OperateAsync(GameObject, RaycastResult, CancellationToken) and properties instead.")]
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (logger != null)
+            {
+                Logger = logger;
+            }
+
+            if (screenshotOptions != null)
+            {
+                ScreenshotOptions = screenshotOptions;
+            }
+
+            await OperateAsync(gameObject, raycastResult, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
             var distance = CalcMaxScrollDistance(gameObject);
@@ -65,7 +86,7 @@ namespace TestHelper.Monkey.Operators
                 _random.Next(-distance, distance),
                 _random.Next(-distance, distance)
             );
-            await OperateAsync(gameObject, raycastResult, destination, logger, screenshotOptions, cancellationToken);
+            await OperateAsync(gameObject, destination, raycastResult, cancellationToken);
         }
 
         private static int CalcMaxScrollDistance(GameObject gameObject)
@@ -79,16 +100,31 @@ namespace TestHelper.Monkey.Operators
             return (int)Math.Max(rectTransform.rect.width, rectTransform.rect.height);
         }
 
-        /// <inheritdoc />
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult, Vector2 destination,
+        [Obsolete("Use OperateAsync(GameObject, Vector2, RaycastResult, CancellationToken) and properties instead.")]
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+            RaycastResult raycastResult = default,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            logger = logger ?? _logger;
-            screenshotOptions = screenshotOptions ?? _screenshotOptions;
+            if (logger != null)
+            {
+                Logger = logger;
+            }
 
+            if (screenshotOptions != null)
+            {
+                ScreenshotOptions = screenshotOptions;
+            }
+
+            await OperateAsync(gameObject, destination, raycastResult, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+            RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
+        {
             // Output log before the operation
-            var operationLogger = new OperationLogger(gameObject, this, logger, screenshotOptions);
+            var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("destination", destination);
             await operationLogger.Log();
 

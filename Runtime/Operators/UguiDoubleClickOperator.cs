@@ -19,9 +19,13 @@ namespace TestHelper.Monkey.Operators
     /// </summary>
     public class UguiDoubleClickOperator : IDoubleClickOperator
     {
+        /// <inheritdoc/>
+        public ILogger Logger { private get; set; }
+
+        /// <inheritdoc/>
+        public ScreenshotOptions ScreenshotOptions { private get; set; }
+
         private readonly int _intervalMillis;
-        private readonly ScreenshotOptions _screenshotOptions;
-        private readonly ILogger _logger;
 
         /// <summary>
         /// Constructor.
@@ -29,8 +33,8 @@ namespace TestHelper.Monkey.Operators
         /// <param name="intervalMillis">Double click interval in milliseconds. Must be positive.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        public UguiDoubleClickOperator(int intervalMillis = 100, ILogger logger = null,
-            ScreenshotOptions screenshotOptions = null)
+        public UguiDoubleClickOperator(int intervalMillis = 100,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             if (intervalMillis <= 0)
             {
@@ -38,8 +42,8 @@ namespace TestHelper.Monkey.Operators
             }
 
             _intervalMillis = intervalMillis;
-            _screenshotOptions = screenshotOptions;
-            _logger = logger ?? Debug.unityLogger;
+            Logger = logger ?? Debug.unityLogger;
+            ScreenshotOptions = screenshotOptions;
         }
 
         /// <inheritdoc />
@@ -62,8 +66,7 @@ namespace TestHelper.Monkey.Operators
         /// <remarks>
         /// This method receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
         /// </remarks>
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
             if (gameObject == null)
@@ -71,19 +74,34 @@ namespace TestHelper.Monkey.Operators
                 throw new ArgumentNullException(nameof(gameObject));
             }
 
-            logger = logger ?? _logger;
-            screenshotOptions = screenshotOptions ?? _screenshotOptions;
-
             // Output log before the operation, after the shown effects
-            var operationLogger = new OperationLogger(gameObject, this, logger, screenshotOptions);
+            var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
             await operationLogger.Log();
 
             // Do double click using the new multiple click method
-            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, logger))
+            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, Logger))
             {
                 await pointerClickSimulator.PointerClickAsync(0, 2, _intervalMillis, cancellationToken);
             }
+        }
+
+        [Obsolete("Use OperateAsync(GameObject, RaycastResult, CancellationToken) and properties instead.")]
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (logger != null)
+            {
+                Logger = logger;
+            }
+
+            if (screenshotOptions != null)
+            {
+                ScreenshotOptions = screenshotOptions;
+            }
+
+            await OperateAsync(gameObject, raycastResult, cancellationToken);
         }
     }
 }
