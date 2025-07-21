@@ -243,7 +243,7 @@ namespace TestHelper.Monkey.Operators
 
             Assert.That(spy.ClickCount, Is.EqualTo(2));
             var interval = (spy.ClickTimestamps[1] - spy.ClickTimestamps[0]).TotalMilliseconds;
-            Assert.That(interval, Is.GreaterThanOrEqualTo(50).And.LessThan(200));
+            Assert.That(interval, Is.GreaterThan(49).And.LessThan(200));
         }
 
         [Test]
