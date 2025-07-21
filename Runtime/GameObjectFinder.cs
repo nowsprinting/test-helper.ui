@@ -149,7 +149,7 @@ namespace TestHelper.Monkey
                      select scene.GetRootGameObjects()
                      into rootGameObjects
                      from rootGameObject in rootGameObjects
-                     from foundObject in FindRecursive(rootGameObject, matcher)
+                     from foundObject in FindGameObjectRecursive(rootGameObject, matcher)
                      select foundObject)
             {
                 yield return foundObject;
@@ -170,16 +170,21 @@ namespace TestHelper.Monkey
             return s_dontDestroyOnLoadScene;
         }
 
-        private static IEnumerable<GameObject> FindRecursive(GameObject current, IGameObjectMatcher matcher)
+        private static IEnumerable<GameObject> FindGameObjectRecursive(GameObject current, IGameObjectMatcher matcher)
         {
-            if (current.activeInHierarchy && matcher.IsMatch(current))
+            if (!current.activeInHierarchy)
+            {
+                yield break;
+            }
+
+            if (matcher.IsMatch(current))
             {
                 yield return current;
             }
 
             foreach (Transform childTransform in current.transform)
             {
-                foreach (var found in FindRecursive(childTransform.gameObject, matcher))
+                foreach (var found in FindGameObjectRecursive(childTransform.gameObject, matcher))
                 {
                     yield return found;
                 }
