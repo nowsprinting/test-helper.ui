@@ -50,6 +50,56 @@ namespace TestHelper.Monkey
             _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
         }
 
+        private static Scene GetDontDestroyOnLoadScene()
+        {
+            if (s_dontDestroyOnLoadScene.IsValid())
+            {
+                return s_dontDestroyOnLoadScene;
+            }
+
+            var gameObject = new GameObject("DontDestroyOnLoad Object, Created by GameObjectFinder");
+            Object.DontDestroyOnLoad(gameObject);
+            s_dontDestroyOnLoadScene = gameObject.scene;
+
+            return s_dontDestroyOnLoadScene;
+        }
+
+        private static List<Scene> GetAllScenes()
+        {
+            var scenes = new List<Scene> { GetDontDestroyOnLoadScene() };
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                if (scene.isLoaded)
+                {
+                    scenes.Add(scene);
+                }
+            }
+
+            return scenes;
+        }
+
+        private static IEnumerable<GameObject> FindGameObjectRecursive(GameObject current, IGameObjectMatcher matcher)
+        {
+            if (!current.activeInHierarchy)
+            {
+                yield break;
+            }
+
+            if (matcher.IsMatch(current))
+            {
+                yield return current;
+            }
+
+            foreach (Transform childTransform in current.transform)
+            {
+                foreach (var found in FindGameObjectRecursive(childTransform.gameObject, matcher))
+                {
+                    yield return found;
+                }
+            }
+        }
+
         private enum Reason
         {
             NotFound,
@@ -60,9 +110,13 @@ namespace TestHelper.Monkey
         }
 
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
-            bool reachable, bool interactable)
+            bool reachable, bool interactable, Scene scene = default)
         {
-            var foundObjects = FindInAllScenes(matcher).ToList();
+            var scenes = scene != default ? new List<Scene> { scene } : GetAllScenes();
+            var foundObjects = scenes.Select(x => x.GetRootGameObjects())
+                .SelectMany(objects => objects, (objects, r) => new { rootGameObjects = objects, rootGameObject = r })
+                .SelectMany(t => FindGameObjectRecursive(t.rootGameObject, matcher)).ToList();
+
             if (!foundObjects.Any())
             {
                 return (null, default, Reason.NotFound);
@@ -131,64 +185,6 @@ namespace TestHelper.Monkey
             }
 
             return (null, default, lastMeaningfulReason);
-        }
-
-        private static IEnumerable<GameObject> FindInAllScenes(IGameObjectMatcher matcher)
-        {
-            var scenes = new List<Scene> { GetDontDestroyOnLoadScene() };
-            for (var i = 0; i < SceneManager.sceneCount; i++)
-            {
-                var scene = SceneManager.GetSceneAt(i);
-                if (scene.isLoaded)
-                {
-                    scenes.Add(scene);
-                }
-            }
-
-            foreach (var foundObject in from scene in scenes
-                     select scene.GetRootGameObjects()
-                     into rootGameObjects
-                     from rootGameObject in rootGameObjects
-                     from foundObject in FindGameObjectRecursive(rootGameObject, matcher)
-                     select foundObject)
-            {
-                yield return foundObject;
-            }
-        }
-
-        private static Scene GetDontDestroyOnLoadScene()
-        {
-            if (s_dontDestroyOnLoadScene.IsValid())
-            {
-                return s_dontDestroyOnLoadScene;
-            }
-
-            var gameObject = new GameObject("DontDestroyOnLoad Object, Created by GameObjectFinder");
-            Object.DontDestroyOnLoad(gameObject);
-            s_dontDestroyOnLoadScene = gameObject.scene;
-
-            return s_dontDestroyOnLoadScene;
-        }
-
-        private static IEnumerable<GameObject> FindGameObjectRecursive(GameObject current, IGameObjectMatcher matcher)
-        {
-            if (!current.activeInHierarchy)
-            {
-                yield break;
-            }
-
-            if (matcher.IsMatch(current))
-            {
-                yield return current;
-            }
-
-            foreach (Transform childTransform in current.transform)
-            {
-                foreach (var found in FindGameObjectRecursive(childTransform.gameObject, matcher))
-                {
-                    yield return found;
-                }
-            }
         }
 
         /// <summary>
