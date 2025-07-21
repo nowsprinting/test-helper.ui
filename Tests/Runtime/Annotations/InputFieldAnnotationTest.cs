@@ -16,7 +16,7 @@ namespace TestHelper.UI.Annotations
     [TestFixture]
     public class InputFieldAnnotationTest
     {
-        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/InputFields.unity";
+        private const string TestScene = "../../Scenes/InputFields.unity";
         private GameObject _annotationAttachedGameObject;
         private MonkeyConfig _config;
 

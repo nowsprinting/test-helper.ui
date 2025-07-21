@@ -1,10 +1,10 @@
-# Monkey Test Helper
+# UI Test Helper
 
-[![Meta file check](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/metacheck.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/metacheck.yml)
-[![Test](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml)
-[![openupm](https://img.shields.io/npm/v/com.nowsprinting.test-helper.monkey?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.nowsprinting.test-helper.monkey/)
+[![Meta file check](https://github.com/nowsprinting/test-helper.ui/actions/workflows/metacheck.yml/badge.svg)](https://github.com/nowsprinting/test-helper.ui/actions/workflows/metacheck.yml)
+[![Test](https://github.com/nowsprinting/test-helper.ui/actions/workflows/test.yml/badge.svg)](https://github.com/nowsprinting/test-helper.ui/actions/workflows/test.yml)
+[![openupm](https://img.shields.io/npm/v/com.nowsprinting.test-helper.ui?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.nowsprinting.test-helper.ui/)
 
-Object-based [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI) monkey testing and API for custom implementation.
+A library for object-based monkey and UI testing.
 
 This library can be used in runtime code because it does **NOT** depend on the [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest).  
 Required Unity 2019 LTS or later.
@@ -17,7 +17,7 @@ Required Unity 2019 LTS or later.
 
 #### Monkey.Run
 
-Runs monkey tests for uGUI (2D, 3D, and UI) elements.
+Runs monkey tests for [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI)  2D, 3D, and UI elements.
 `Monkey.Run` method operates on randomly selected objects. It does not use screen points.
 
 Usage:
@@ -631,7 +631,7 @@ You can choose from two typical installation methods.
    2. **URL:** `https://package.openupm.com`
    3. **Scope(s):** `com.nowsprinting` and `com.cysharp`
 3. Open the Package Manager window (**Window > Package Manager**) and select **My Registries** in registries drop-down list (figure 2.)
-4. Click **Install** button on the `com.nowsprinting.test-helper.monkey` package
+4. Click **Install** button on the `com.nowsprinting.test-helper.ui` package
 
 > [!NOTE]  
 > Do not forget to add `com.cysharp` into scopes. These are used within this package.
@@ -652,7 +652,7 @@ You can choose from two typical installation methods.
 If you installed [openupm-cli](https://github.com/openupm/openupm-cli), run the command below:
 
 ```bash
-openupm add com.nowsprinting.test-helper.monkey
+openupm add com.nowsprinting.test-helper.ui
 ```
 
 
@@ -685,7 +685,7 @@ See [PR Labeler settings](.github/pr-labeler.yml) for automatically labeling fro
 Add this repository as a submodule to the Packages/ directory in your project.
 
 ```bash
-git submodule add git@github.com:nowsprinting/test-helper.monkey.git Packages/com.nowsprinting.test-helper.monkey
+git submodule add git@github.com:nowsprinting/test-helper.ui.git Packages/com.nowsprinting.test-helper.ui
 ```
 
 > [!WARNING]  
