@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
@@ -193,7 +194,7 @@ namespace TestHelper.Monkey.Operators
 
             var sut = new UguiDoubleClickOperator();
             Assume.That(sut.CanOperate(gameObject), Is.True);
-            await sut.OperateAsync(gameObject);
+            await sut.OperateAsync(gameObject, default, CancellationToken.None);
 
             Assert.That(spy.ClickCount, Is.EqualTo(2));
         }
@@ -210,7 +211,7 @@ namespace TestHelper.Monkey.Operators
 
             var stopwatch = Stopwatch.StartNew();
             var sut = new UguiDoubleClickOperator(intervalMillis);
-            await sut.OperateAsync(gameObject);
+            await sut.OperateAsync(gameObject, default, CancellationToken.None);
             stopwatch.Stop();
 
             Assert.That(spy.ClickCount, Is.EqualTo(2));
@@ -225,7 +226,7 @@ namespace TestHelper.Monkey.Operators
             var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             var sut = new UguiDoubleClickOperator();
-            await sut.OperateAsync(gameObject);
+            await sut.OperateAsync(gameObject, default, CancellationToken.None);
 
             Assert.That(spy.WasClicked, Is.True);
         }
@@ -238,7 +239,7 @@ namespace TestHelper.Monkey.Operators
             var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             var sut = new UguiDoubleClickOperator(50);
-            await sut.OperateAsync(gameObject);
+            await sut.OperateAsync(gameObject, default, CancellationToken.None);
 
             Assert.That(spy.ClickCount, Is.EqualTo(2));
             var interval = (spy.ClickTimestamps[1] - spy.ClickTimestamps[0]).TotalMilliseconds;
@@ -254,7 +255,7 @@ namespace TestHelper.Monkey.Operators
             var spyLogger = new SpyLogger();
 
             var sut = new UguiDoubleClickOperator(100, spyLogger);
-            await sut.OperateAsync(gameObject);
+            await sut.OperateAsync(gameObject, default, CancellationToken.None);
 
             Assert.That(spyLogger.Messages, Is.Not.Empty);
         }
@@ -280,7 +281,7 @@ namespace TestHelper.Monkey.Operators
             };
 
             var sut = new UguiDoubleClickOperator(100, null, screenshotOptions);
-            await sut.OperateAsync(gameObject);
+            await sut.OperateAsync(gameObject, default, CancellationToken.None);
 
             Assert.That(path, Does.Exist);
         }
@@ -293,7 +294,7 @@ namespace TestHelper.Monkey.Operators
 
             try
             {
-                await sut.OperateAsync(null, raycastResult);
+                await sut.OperateAsync(null, raycastResult, CancellationToken.None);
                 Assert.Fail("Expected ArgumentNullException");
             }
             catch (ArgumentNullException exception)
@@ -314,7 +315,7 @@ namespace TestHelper.Monkey.Operators
 
             try
             {
-                await sut.OperateAsync(gameObject);
+                await sut.OperateAsync(gameObject, default, CancellationToken.None);
                 Assert.Fail("Expected exception for destroyed GameObject");
             }
             catch (Exception)

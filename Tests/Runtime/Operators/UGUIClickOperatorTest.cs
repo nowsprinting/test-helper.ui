@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
@@ -40,7 +41,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject);
+            await _sut.OperateAsync(gameObject, default, CancellationToken.None);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.OnPointerClick");
         }
@@ -52,7 +53,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<SpyPointerClickEventReceiver>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject);
+            await _sut.OperateAsync(gameObject, default, CancellationToken.None);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.ReceivePointerClick");
         }

@@ -137,7 +137,7 @@ namespace TestHelper.Monkey.Operators
                 beforePosition.z);
 
             var sut = new UguiScrollWheelOperator(ScrollSpeed);
-            var task = sut.OperateAsync(_scrollView, destination);
+            var task = sut.OperateAsync(_scrollView, destination, default, CancellationToken.None);
             await UniTask.NextFrame();
 
             Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
@@ -162,7 +162,7 @@ namespace TestHelper.Monkey.Operators
             var sut = new UguiScrollWheelOperator(ScrollSpeed);
             var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
-            var task = sut.OperateAsync(_scrollView, destination, cancellationToken: cancellationToken);
+            var task = sut.OperateAsync(_scrollView, destination, default, cancellationToken: cancellationToken);
             await UniTask.NextFrame(cancellationToken);
 
             cancellationTokenSource.Cancel();
@@ -186,7 +186,7 @@ namespace TestHelper.Monkey.Operators
             var expectedPosition = new Vector3(beforePosition.x + x, beforePosition.y + y, beforePosition.z);
 
             var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView, destination);
+            await sut.OperateAsync(_scrollView, destination, default, CancellationToken.None);
 
             Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
                 .Using(new Vector3EqualityComparer(1.0f)));
@@ -199,7 +199,7 @@ namespace TestHelper.Monkey.Operators
             var spyEventHandler = _scrollView.AddComponent<SpyOnScrollHandler>();
 
             var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView, new Vector2(2f, 3f));
+            await sut.OperateAsync(_scrollView, new Vector2(2f, 3f), default, CancellationToken.None);
 
             Assert.That(spyEventHandler.WasScrolled, Is.True);
         }
@@ -211,7 +211,7 @@ namespace TestHelper.Monkey.Operators
             var spyEventHandler = _scrollView.AddComponent<SpyOnPointerEnterExitHandler>();
 
             var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView, new Vector2(2f, 3f));
+            await sut.OperateAsync(_scrollView, new Vector2(2f, 3f), default, CancellationToken.None);
 
             Assert.That(spyEventHandler.WasPointerEntered, Is.True);
             Assert.That(spyEventHandler.WasPointerExited, Is.True);
@@ -225,7 +225,7 @@ namespace TestHelper.Monkey.Operators
             var beforePosition = scrollRect.normalizedPosition;
 
             var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView);
+            await sut.OperateAsync(_scrollView, default, CancellationToken.None);
 
             var actual = scrollRect.normalizedPosition;
             Assert.That(actual, Is.Not.EqualTo(beforePosition));
@@ -238,7 +238,7 @@ namespace TestHelper.Monkey.Operators
             var spyLogger = new SpyLogger();
 
             var sut = new UguiScrollWheelOperator(logger: spyLogger);
-            await sut.OperateAsync(_scrollView);
+            await sut.OperateAsync(_scrollView, default, CancellationToken.None);
 
             Assert.That(spyLogger.Messages, Is.Not.Empty);
         }
@@ -262,7 +262,7 @@ namespace TestHelper.Monkey.Operators
             };
 
             var sut = new UguiScrollWheelOperator(screenshotOptions: screenshotOptions);
-            await sut.OperateAsync(_scrollView);
+            await sut.OperateAsync(_scrollView, default, CancellationToken.None);
 
             Assert.That(path, Does.Exist);
         }
