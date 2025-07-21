@@ -15,9 +15,6 @@ namespace TestHelper.Monkey.DefaultStrategies
     /// </summary>
     public class DefaultReachableStrategy : IReachableStrategy
     {
-        [Obsolete]
-        private static Func<GameObject, Vector2> GetScreenPoint => DefaultScreenPointStrategy.GetScreenPoint;
-
         private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly ILogger _verboseLogger;
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
@@ -102,65 +99,6 @@ namespace TestHelper.Monkey.DefaultStrategies
             }
 
             return _cachedPointerEventData;
-        }
-
-        /// <summary>
-        /// Make sure the <c>GameObject</c> is reachable from user.
-        /// Hit test using raycaster
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="pointerEventData">Specify this if you want to avoid GC memory allocation. It contains an <c>EventSystem</c> instance, so don't cache it carelessly.</param>
-        /// <param name="results">Specify this if you want to avoid GC memory allocation</param>
-        /// <param name="verboseLogger">Logger set if you need verbose output</param>
-        /// <returns>True if this GameObject is reachable from user</returns>
-        [Obsolete("Use instance method instead")]
-        public static bool IsReachable(GameObject gameObject,
-            PointerEventData pointerEventData = null,
-            List<RaycastResult> results = null,
-            ILogger verboseLogger = null)
-        {
-            pointerEventData = pointerEventData ?? new PointerEventData(EventSystem.current);
-            pointerEventData.position = GetScreenPoint.Invoke(gameObject);
-
-            results = results ?? new List<RaycastResult>();
-            results.Clear();
-
-            if (EventSystem.current == null)
-            {
-                Debug.LogError("EventSystem is not found.");
-                return false;
-            }
-
-            EventSystem.current.RaycastAll(pointerEventData, results);
-            if (results.Count == 0)
-            {
-                if (verboseLogger != null)
-                {
-                    var message = new StringBuilder(CreateMessage(gameObject, pointerEventData.position));
-                    message.Append(" Raycast is not hit.");
-                    verboseLogger.Log(message.ToString());
-                }
-
-                return false;
-            }
-
-            var isSameOrChildObject = IsSameOrChildObject(gameObject, results[0].gameObject.transform);
-            if (!isSameOrChildObject && verboseLogger != null)
-            {
-                var message = new StringBuilder(CreateMessage(gameObject, pointerEventData.position));
-                message.Append(" Raycast hit other objects: {");
-                foreach (var result in results)
-                {
-                    message.Append(result.gameObject.name);
-                    message.Append(", ");
-                }
-
-                message.Remove(message.Length - 2, 2);
-                message.Append("}");
-                verboseLogger.Log(message.ToString());
-            }
-
-            return isSameOrChildObject;
         }
 
         private static bool IsSameOrChildObject(GameObject target, Transform hitObjectTransform)

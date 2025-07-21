@@ -7,8 +7,6 @@ using System.Linq;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Operators;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey.Extensions
 {
@@ -60,75 +58,6 @@ namespace TestHelper.Monkey.Extensions
         }
 
         /// <summary>
-        /// Hit test using raycaster
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
-        /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
-        /// <param name="pointerEventData">Specify if avoid GC memory allocation</param>
-        /// <param name="raycastResults">Specify if avoid GC memory allocation</param>
-        /// <returns>true: this object can control by user</returns>
-        [Obsolete("Use DefaultReachableStrategy instead.")]
-        public static bool IsReachable(this GameObject gameObject,
-            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
-            PointerEventData pointerEventData = null,
-            List<RaycastResult> raycastResults = null)
-        {
-            Assert.IsNotNull(EventSystem.current);
-
-            isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
-            pointerEventData = pointerEventData ?? new PointerEventData(EventSystem.current);
-            raycastResults = raycastResults ?? new List<RaycastResult>();
-
-            raycastResults.Clear();
-            return isReachable.Invoke(gameObject, pointerEventData, raycastResults, null);
-        }
-
-        /// <summary>
-        /// Make sure the <c>GameObject</c> is reachable from user.
-        /// Hit test using raycaster
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="screenPointStrategy">Function returns the screen position where raycast for the specified GameObject</param>
-        /// <param name="eventData">Specify if avoid GC memory allocation</param>
-        /// <param name="results">Specify if avoid GC memory allocation</param>
-        /// <returns>True if this GameObject is reachable from user</returns>
-        [Obsolete("Use DefaultReachableStrategy instead.")]
-        public static bool IsReachable(this GameObject gameObject,
-            Func<GameObject, Vector2> screenPointStrategy = null,
-            PointerEventData eventData = null,
-            List<RaycastResult> results = null)
-        {
-            Assert.IsNotNull(EventSystem.current);
-
-            screenPointStrategy = screenPointStrategy ?? DefaultScreenPointStrategy.GetScreenPoint;
-
-            eventData = eventData ?? new PointerEventData(EventSystem.current);
-            eventData.position = screenPointStrategy(gameObject);
-
-            results = results ?? new List<RaycastResult>();
-            results.Clear();
-
-            EventSystem.current.RaycastAll(eventData, results);
-            return results.Count > 0 && IsSameOrChildObject(gameObject, results[0].gameObject.transform);
-        }
-
-        private static bool IsSameOrChildObject(GameObject target, Transform hitObjectTransform)
-        {
-            while (hitObjectTransform != null)
-            {
-                if (hitObjectTransform == target.transform)
-                {
-                    return true;
-                }
-
-                hitObjectTransform = hitObjectTransform.transform.parent;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Return interactable components.
         /// </summary>
         /// <param name="gameObject"></param>
@@ -140,24 +69,6 @@ namespace TestHelper.Monkey.Extensions
             isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
 
             return gameObject.GetComponents<Component>().Where(x => isComponentInteractable.Invoke(x));
-        }
-
-        /// <summary>
-        /// Make sure the <c>GameObject</c> is interactable.
-        ///
-        /// If any of the following is true:
-        /// <list type="number">
-        ///   <item> Attached <c>Selectable</c> component and <c>interactable</c> property is true</item>
-        ///   <item>Attached <c>EventTrigger</c> component</item>
-        ///   <item>Attached component Implements <c>IEventSystemHandler</c> interface</item>
-        /// </list>
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns>True if this GameObject is interactable</returns>
-        [Obsolete("Use DefaultGameObjectInteractableStrategy instead.")]
-        public static bool IsInteractable(this GameObject gameObject)
-        {
-            return gameObject.GetComponents<MonoBehaviour>().Any(x => x.IsInteractable());
         }
 
         /// <summary>

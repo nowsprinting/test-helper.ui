@@ -43,7 +43,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<SpyOnPointerDownUpHandler>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject, default, CancellationToken.None);
+            await _sut.OperateAsync(gameObject);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerUp");
@@ -56,7 +56,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<SpyPointerDownUpEventReceiver>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject, default, CancellationToken.None);
+            await _sut.OperateAsync(gameObject);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.ReceivePointerDown");
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.ReceivePointerUp");
@@ -69,7 +69,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<StubDestroyingItselfWhenPointerDown>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            await _sut.OperateAsync(gameObject, default, CancellationToken.None);
+            await _sut.OperateAsync(gameObject);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.Destroy");
@@ -86,7 +86,7 @@ namespace TestHelper.Monkey.Operators
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                _sut.OperateAsync(gameObject, raycastResult: default, cancellationTokenSource.Token).Forget();
+                _sut.OperateAsync(gameObject, cancellationToken: cancellationTokenSource.Token).Forget();
                 await UniTask.NextFrame();
 
                 cancellationTokenSource.Cancel(); // Not output LogError from StubLogErrorWhenOnPointerUp

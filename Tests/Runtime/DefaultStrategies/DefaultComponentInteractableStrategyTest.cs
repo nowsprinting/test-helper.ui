@@ -10,8 +10,6 @@ namespace TestHelper.Monkey.DefaultStrategies
     [TestFixture]
     public class DefaultComponentInteractableStrategyTest
     {
-        private const string TestScene = "../../Scenes/PhysicsRaycasterSandbox.unity";
-
         [Test]
         public void IsInteractable_NotInteractableComponent_ReturnsFalse()
         {

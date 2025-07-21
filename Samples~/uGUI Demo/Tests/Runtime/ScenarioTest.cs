@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
@@ -32,7 +31,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var startButton = await _finder.FindByNameAsync("StartButton", interactable: true);
             var startButtonObject = startButton.GameObject;
             var startOperator = startButtonObject.SelectOperators<IClickOperator>(_config.Operators).First();
-            await startOperator.OperateAsync(startButtonObject, startButton.RaycastResult, CancellationToken.None);
+            await startOperator.OperateAsync(startButtonObject);
 
             await _finder.FindByNameAsync("Home");
 
@@ -40,7 +39,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var targetButton = await _finder.FindByNameAsync($"{target}Button", interactable: true);
             var targetObject = targetButton.GameObject;
             var targetOperator = targetObject.SelectOperators<IClickOperator>(_config.Operators).First();
-            await targetOperator.OperateAsync(targetObject, targetButton.RaycastResult, CancellationToken.None);
+            await targetOperator.OperateAsync(targetObject);
 
             await _finder.FindByNameAsync(target);
 
@@ -48,7 +47,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var backButton = await _finder.FindByPathAsync($"**/{target}/BackButton", interactable: true);
             var backObject = backButton.GameObject;
             var backOperator = backObject.SelectOperators<IClickOperator>(_config.Operators).First();
-            await backOperator.OperateAsync(backObject, backButton.RaycastResult, CancellationToken.None);
+            await backOperator.OperateAsync(backObject);
 
             await _finder.FindByNameAsync("Home");
         }

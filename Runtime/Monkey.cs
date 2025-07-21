@@ -117,7 +117,7 @@ namespace TestHelper.Monkey
             }
         }
 
-        [Obsolete]
+        [Obsolete("The public release of RunStep will be discontinued in the future.")]
         public static UniTask<(bool, int)> RunStep(
             IRandom random,
             ILogger logger,

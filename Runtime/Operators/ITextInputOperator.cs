@@ -1,7 +1,6 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -22,10 +21,5 @@ namespace TestHelper.Monkey.Operators
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         UniTask OperateAsync(GameObject gameObject, string text, CancellationToken cancellationToken = default);
-
-        [Obsolete("Use OperateAsync(GameObject, string, CancellationToken) and properties instead.")]
-        UniTask OperateAsync(GameObject gameObject, string text,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
-            CancellationToken cancellationToken = default);
     }
 }

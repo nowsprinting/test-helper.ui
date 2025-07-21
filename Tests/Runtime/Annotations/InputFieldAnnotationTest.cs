@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 namespace TestHelper.Monkey.Annotations
 {
     [TestFixture]
-    public partial class InputFieldAnnotationTest
+    public class InputFieldAnnotationTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/InputFields.unity";
         private GameObject _annotationAttachedGameObject;

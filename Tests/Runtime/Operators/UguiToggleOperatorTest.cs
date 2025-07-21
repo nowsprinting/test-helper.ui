@@ -1,7 +1,6 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
@@ -43,7 +42,7 @@ namespace TestHelper.Monkey.Operators
             var toggle = gameObject.AddComponent<Toggle>();
             toggle.isOn = state;
 
-            await _sut.OperateAsync(gameObject, default, CancellationToken.None);
+            await _sut.OperateAsync(gameObject);
 
             Assert.That(toggle.isOn, Is.Not.EqualTo(state)); // flip
         }
@@ -58,7 +57,7 @@ namespace TestHelper.Monkey.Operators
             var toggle = gameObject.AddComponent<Toggle>();
             toggle.isOn = beforeState;
 
-            await _sut.OperateAsync(gameObject, specifiedState, default, CancellationToken.None);
+            await _sut.OperateAsync(gameObject, specifiedState);
 
             Assert.That(toggle.isOn, Is.EqualTo(specifiedState));
         }

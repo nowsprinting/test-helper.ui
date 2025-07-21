@@ -20,7 +20,7 @@ namespace TestHelper.Monkey
         public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
             var config = new MonkeyConfig();
-            var interactableComponentsFinder = new InteractableComponentsFinder(config);
+            var interactableComponentsFinder = new InteractableComponentsFinder(config.IsInteractable, config.Operators);
 
             Measure.Method(() =>
                 {
@@ -39,7 +39,7 @@ namespace TestHelper.Monkey
         public void LotteryOperator_BingoReachableComponent()
         {
             var config = new MonkeyConfig();
-            var interactableComponentsFinder = new InteractableComponentsFinder(config);
+            var interactableComponentsFinder = new InteractableComponentsFinder(config.IsInteractable, config.Operators);
             var operators = Monkey.GetLotteryEntries(interactableComponentsFinder);
 
             Measure.Method(() =>
@@ -58,14 +58,13 @@ namespace TestHelper.Monkey
         public IEnumerator RunStep_finish()
         {
             var config = new MonkeyConfig();
-            var interactableComponentsFinder = new InteractableComponentsFinder(config);
+            var interactableComponentsFinder = new InteractableComponentsFinder(config.IsInteractable, config.Operators);
 
             using (Measure.Frames().Scope())
             {
                 yield return Monkey.RunStep(
                         config.Random,
                         config.Logger,
-                        config.Screenshots,
                         interactableComponentsFinder,
                         config.IgnoreStrategy,
                         config.ReachableStrategy)

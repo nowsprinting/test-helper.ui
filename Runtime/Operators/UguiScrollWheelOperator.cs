@@ -59,24 +59,6 @@ namespace TestHelper.Monkey.Operators
             return gameObject.TryGetEnabledComponent<IScrollHandler>(out _);
         }
 
-        [Obsolete("Use OperateAsync(GameObject, RaycastResult, CancellationToken) and properties instead.")]
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
-            CancellationToken cancellationToken = default)
-        {
-            if (logger != null)
-            {
-                Logger = logger;
-            }
-
-            if (screenshotOptions != null)
-            {
-                ScreenshotOptions = screenshotOptions;
-            }
-
-            await OperateAsync(gameObject, raycastResult, cancellationToken: cancellationToken);
-        }
-
         /// <inheritdoc />
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
@@ -98,25 +80,6 @@ namespace TestHelper.Monkey.Operators
             }
 
             return (int)Math.Max(rectTransform.rect.width, rectTransform.rect.height);
-        }
-
-        [Obsolete("Use OperateAsync(GameObject, Vector2, RaycastResult, CancellationToken) and properties instead.")]
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
-            RaycastResult raycastResult = default,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
-            CancellationToken cancellationToken = default)
-        {
-            if (logger != null)
-            {
-                Logger = logger;
-            }
-
-            if (screenshotOptions != null)
-            {
-                ScreenshotOptions = screenshotOptions;
-            }
-
-            await OperateAsync(gameObject, destination, raycastResult, cancellationToken);
         }
 
         /// <inheritdoc />

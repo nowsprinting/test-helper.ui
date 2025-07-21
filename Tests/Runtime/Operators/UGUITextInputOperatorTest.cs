@@ -1,13 +1,11 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Threading;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.TestDoubles;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Operators
@@ -48,7 +46,7 @@ namespace TestHelper.Monkey.Operators
             var inputField = gameObject.AddComponent<InputField>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject, default(RaycastResult), CancellationToken.None);
+            _sut.OperateAsync(gameObject);
 
             Assert.That(inputField.text, Is.EqualTo("RANDOM"));
         }
@@ -60,7 +58,7 @@ namespace TestHelper.Monkey.Operators
             var inputField = gameObject.AddComponent<InputField>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject, "SPECIFIED", CancellationToken.None);
+            _sut.OperateAsync(gameObject, "SPECIFIED");
 
             Assert.That(inputField.text, Is.EqualTo("SPECIFIED"));
         }
@@ -72,7 +70,7 @@ namespace TestHelper.Monkey.Operators
             var inputField = gameObject.AddComponent<TMP_InputField>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject, default(RaycastResult), CancellationToken.None);
+            _sut.OperateAsync(gameObject);
 
             Assert.That(inputField.text, Is.EqualTo("RANDOM"));
         }
@@ -84,7 +82,7 @@ namespace TestHelper.Monkey.Operators
             var inputField = gameObject.AddComponent<TMP_InputField>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject, "SPECIFIED", CancellationToken.None);
+            _sut.OperateAsync(gameObject, "SPECIFIED");
 
             Assert.That(inputField.text, Is.EqualTo("SPECIFIED"));
         }
