@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Operators.Utils
+namespace TestHelper.UI.Operators.Utils
 {
     /// <summary>
     /// Build and output log message with a screenshot for operation.

@@ -4,12 +4,12 @@
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Strategies;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools.Utils;
 
-namespace TestHelper.Monkey.Hints
+namespace TestHelper.UI.Hints
 {
     [TestFixture]
     public class InteractiveComponentHintPositionTest

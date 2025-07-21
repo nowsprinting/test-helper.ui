@@ -4,12 +4,12 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.ScreenshotFilenameStrategies;
+using TestHelper.UI.Operators;
+using TestHelper.UI.ScreenshotFilenameStrategies;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Samples.UGUIDemo
+namespace TestHelper.UI.Samples.UGUIDemo
 {
     /// <summary>
     /// Run/ Stop monkey testing.

@@ -5,10 +5,10 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Annotations;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.Operators.Utils;
-using TestHelper.Monkey.Random;
+using TestHelper.UI.Annotations;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.Operators.Utils;
+using TestHelper.UI.Random;
 using TestHelper.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,7 +19,7 @@ using TMPro;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.

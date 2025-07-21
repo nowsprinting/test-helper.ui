@@ -1,10 +1,10 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.Annotations.Enums;
+using TestHelper.UI.Annotations.Enums;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Annotations
+namespace TestHelper.UI.Annotations
 {
     [DisallowMultipleComponent]
     public class InputFieldAnnotation : MonoBehaviour

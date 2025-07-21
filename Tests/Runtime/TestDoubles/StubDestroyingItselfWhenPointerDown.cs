@@ -4,7 +4,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.TestDoubles
+namespace TestHelper.UI.TestDoubles
 {
     /// <summary>
     /// Pointer down event handler

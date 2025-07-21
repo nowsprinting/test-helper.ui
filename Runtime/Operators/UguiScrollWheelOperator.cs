@@ -4,13 +4,13 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.Operators.Utils;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.Operators.Utils;
 using TestHelper.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Scroll wheel operator for Unity UI (uGUI) components that implements IScrollHandler.

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.TestDoubles
+namespace TestHelper.UI.TestDoubles
 {
     /// <summary>
     /// Pointer down/up event receiver using EventTrigger

@@ -3,12 +3,12 @@
 
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     [TestFixture]
     public class UGUITextInputOperatorTest

@@ -4,10 +4,10 @@
 using System.IO;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Operators.Utils
+namespace TestHelper.UI.Operators.Utils
 {
     [TestFixture]
     public class OperationLoggerTest

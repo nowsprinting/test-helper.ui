@@ -1,11 +1,11 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.Annotations;
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Annotations;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Strategies
+namespace TestHelper.UI.Strategies
 {
     /// <summary>
     /// Default strategy to examine whether <c>GameObject</c> should be ignored.

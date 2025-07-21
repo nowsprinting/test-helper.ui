@@ -5,13 +5,13 @@ using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Annotations.Enums;
-using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.Annotations.Enums;
+using TestHelper.UI.Operators;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace TestHelper.Monkey.Annotations
+namespace TestHelper.UI.Annotations
 {
     [TestFixture]
     public class InputFieldAnnotationTest

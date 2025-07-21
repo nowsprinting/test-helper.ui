@@ -2,7 +2,7 @@
 // This software is released under the MIT License.
 
 using NUnit.Framework;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.UI;
 #if !UNITY_2023_1_OR_NEWER
@@ -10,7 +10,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 #endif
 
-namespace TestHelper.Monkey.Extensions
+namespace TestHelper.UI.Extensions
 {
     [TestFixture]
     public class GameObjectExtensionsTest

@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.Strategies;
+using TestHelper.UI.Operators;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Extensions
+namespace TestHelper.UI.Extensions
 {
     /// <summary>
     /// A utility to select Camera

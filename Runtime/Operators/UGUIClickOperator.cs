@@ -4,12 +4,12 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.Operators.Utils;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Click (tap) operator for Unity UI (uGUI) components.

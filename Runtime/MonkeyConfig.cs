@@ -3,13 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using TestHelper.Monkey.Exceptions;
-using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.Strategies;
+using TestHelper.UI.Exceptions;
+using TestHelper.UI.Operators;
+using TestHelper.UI.Strategies;
 using TestHelper.Random;
 using UnityEngine;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     /// <summary>
     /// Run configuration for monkey testing

@@ -11,17 +11,17 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Annotations;
-using TestHelper.Monkey.Exceptions;
-using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.Strategies;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.Annotations;
+using TestHelper.UI.Exceptions;
+using TestHelper.UI.Operators;
+using TestHelper.UI.Strategies;
+using TestHelper.UI.TestDoubles;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     [TestFixture]
     [SuppressMessage("ReSharper", "MethodSupportsCancellation")]

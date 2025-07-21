@@ -26,7 +26,7 @@ Usage:
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using TestHelper.Monkey;
+using TestHelper.UI;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -137,7 +137,7 @@ classDiagram
 #### Annotations for Monkey's behavior
 
 You can control the Monkey's behavior by attaching the annotation components to the `GameObject`.
-Use the `TestHelper.Monkey.Annotations` assembly by adding it to the Assembly Definition References.
+Use the `TestHelper.UI.Annotations` assembly by adding it to the Assembly Definition References.
 Please note that this will be included in the release build due to the way it works.
 
 > [!NOTE]  
@@ -199,7 +199,7 @@ Usage:
 
 ```csharp
 using NUnit.Framework;
-using TestHelper.Monkey;
+using TestHelper.UI;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -230,7 +230,7 @@ Usage:
 
 ```csharp
 using NUnit.Framework;
-using TestHelper.Monkey;
+using TestHelper.UI;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -266,8 +266,8 @@ Usage:
 
 ```csharp
 using NUnit.Framework;
-using TestHelper.Monkey;
-using TestHelper.Monkey.GameObjectMatchers;
+using TestHelper.UI;
+using TestHelper.UI.GameObjectMatchers;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -305,9 +305,9 @@ Usage:
 
 ```csharp
 using NUnit.Framework;
-using TestHelper.Monkey;
-using TestHelper.Monkey.GameObjectMatchers;
-using TestHelper.Monkey.Paginators;
+using TestHelper.UI;
+using TestHelper.UI.GameObjectMatchers;
+using TestHelper.UI.Paginators;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -338,7 +338,7 @@ Usage:
 
 ```csharp
 using NUnit.Framework;
-using TestHelper.Monkey;
+using TestHelper.UI;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -374,7 +374,7 @@ Usage:
 ```csharp
 using System.Linq;
 using NUnit.Framework;
-using TestHelper.Monkey;
+using TestHelper.UI;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -659,7 +659,7 @@ openupm add com.nowsprinting.test-helper.monkey
 ### Add assembly reference
 
 1. Open your test assembly definition file (.asmdef) in **Inspector** window
-2. Add **TestHelper.Monkey** into **Assembly Definition References**
+2. Add **TestHelper.UI** into **Assembly Definition References**
 
 
 

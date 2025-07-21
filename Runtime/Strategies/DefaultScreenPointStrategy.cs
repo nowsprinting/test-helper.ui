@@ -2,11 +2,11 @@
 // This software is released under the MIT License.
 
 using System.Linq;
-using TestHelper.Monkey.Annotations;
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Annotations;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Strategies
+namespace TestHelper.UI.Strategies
 {
     /// <summary>
     /// Default screen point strategy.

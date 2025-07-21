@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.Strategies
+namespace TestHelper.UI.Strategies
 {
     /// <summary>
     /// Strategy to examine whether <c>GameObject</c> should be ignored.

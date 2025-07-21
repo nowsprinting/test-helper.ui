@@ -1,9 +1,9 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.Annotations.Enums;
+using TestHelper.UI.Annotations.Enums;
 
-namespace TestHelper.Monkey.Random
+namespace TestHelper.UI.Random
 {
     /// <summary>
     /// Parameters for random string generation.

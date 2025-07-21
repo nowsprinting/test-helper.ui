@@ -1,11 +1,11 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.Annotations;
+using TestHelper.UI.Annotations;
 using UnityEditor;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Editor.UI.Annotations
+namespace TestHelper.UI.Editor.UI.Annotations
 {
     /// <summary>
     /// Editor GUI for WorldPositionAnnotation

@@ -3,9 +3,9 @@
 
 using System;
 using NUnit.Framework;
-using TestHelper.Monkey.Random;
+using TestHelper.UI.Random;
 
-namespace TestHelper.Monkey.TestDoubles
+namespace TestHelper.UI.TestDoubles
 {
     public class StubRandomString : IRandomString
     {

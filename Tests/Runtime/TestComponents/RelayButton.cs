@@ -4,7 +4,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.TestComponents
+namespace TestHelper.UI.TestComponents
 {
     [RequireComponent(typeof(Button))]
     [AddComponentMenu("/")] // Hide from "Add Component" picker

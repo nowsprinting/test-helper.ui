@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Operators.Utils
+namespace TestHelper.UI.Operators.Utils
 {
     /// <summary>
     /// Simulator class to reproduce pointer events.

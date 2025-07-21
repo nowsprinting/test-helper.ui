@@ -1,7 +1,7 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-namespace TestHelper.Monkey.ScreenshotFilenameStrategies
+namespace TestHelper.UI.ScreenshotFilenameStrategies
 {
     public interface IScreenshotFilenameStrategy
     {

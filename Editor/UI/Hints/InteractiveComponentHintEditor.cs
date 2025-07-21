@@ -1,11 +1,11 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.Hints;
+using TestHelper.UI.Hints;
 using UnityEditor;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Editor.UI.Hints
+namespace TestHelper.UI.Editor.UI.Hints
 {
     /// <summary>
     /// Custom editor for <c cref="InteractiveComponentHint">InteractiveComponentHint</c>.

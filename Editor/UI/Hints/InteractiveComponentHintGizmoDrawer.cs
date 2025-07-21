@@ -1,12 +1,12 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey;
-using TestHelper.Monkey.Hints;
+using TestHelper.UI;
+using TestHelper.UI.Hints;
 using UnityEditor;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Editor.UI.Hints
+namespace TestHelper.UI.Editor.UI.Hints
 {
     /// <summary>
     /// Gizmo Drawer for <c cref="InteractiveComponentHint">InteractiveComponentHint</c>.

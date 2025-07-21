@@ -5,7 +5,7 @@ using System;
 using NUnit.Framework;
 using TestHelper.Random;
 
-namespace TestHelper.Monkey.TestDoubles
+namespace TestHelper.UI.TestDoubles
 {
     public class StubRandom : RandomImpl
     {

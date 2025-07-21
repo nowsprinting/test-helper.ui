@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     [TestFixture]
     public class UGUIClickOperatorTest

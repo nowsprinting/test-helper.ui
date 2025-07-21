@@ -5,7 +5,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.Operators.Utils
+namespace TestHelper.UI.Operators.Utils
 {
     /// <summary>
     /// Class that simulates the pointer-down state of <see cref="PointerEventData"/>.

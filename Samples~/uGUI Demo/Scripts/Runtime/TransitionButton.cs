@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Samples.UGUIDemo
+namespace TestHelper.UI.Samples.UGUIDemo
 {
     [RequireComponent(typeof(Button))]
     public class TransitionButton : MonoBehaviour

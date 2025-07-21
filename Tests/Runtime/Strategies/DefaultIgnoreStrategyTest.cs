@@ -3,10 +3,10 @@
 
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Annotations;
+using TestHelper.UI.Annotations;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Strategies
+namespace TestHelper.UI.Strategies
 {
     [TestFixture]
     public class DefaultIgnoreStrategyTest

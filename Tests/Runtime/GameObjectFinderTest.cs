@@ -6,12 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Exceptions;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.GameObjectMatchers;
-using TestHelper.Monkey.Paginators;
-using TestHelper.Monkey.Strategies;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.Exceptions;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.GameObjectMatchers;
+using TestHelper.UI.Paginators;
+using TestHelper.UI.Strategies;
+using TestHelper.UI.TestDoubles;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,7 +24,7 @@ using System.IO;
 using Cysharp.Threading.Tasks;
 #endif
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     [TestFixture]
     public class GameObjectFinderTest

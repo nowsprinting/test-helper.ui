@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Strategies
+namespace TestHelper.UI.Strategies
 {
     /// <summary>
     /// Screen point strategy that don't care any annotations.

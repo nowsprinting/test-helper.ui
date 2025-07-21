@@ -7,7 +7,7 @@ using TestHelper.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     [TestFixture]
     public class UguiToggleOperatorTest

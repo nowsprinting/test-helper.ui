@@ -2,10 +2,10 @@
 // This software is released under the MIT License.
 
 using NUnit.Framework;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Strategies
+namespace TestHelper.UI.Strategies
 {
     [TestFixture]
     public class DefaultComponentInteractableStrategyTest

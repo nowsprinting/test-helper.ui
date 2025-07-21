@@ -4,13 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.Strategies;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.Operators;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     /// <summary>
     /// Find interactable components on the scene.
