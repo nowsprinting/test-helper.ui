@@ -1,9 +1,9 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.ScreenshotFilenameStrategies;
+using TestHelper.UI.ScreenshotFilenameStrategies;
 
-namespace TestHelper.Monkey.TestDoubles
+namespace TestHelper.UI.TestDoubles
 {
     public class StubScreenshotFilenameStrategy : IScreenshotFilenameStrategy
     {

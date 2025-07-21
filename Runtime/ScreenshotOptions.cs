@@ -1,10 +1,10 @@
 // Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.ScreenshotFilenameStrategies;
+using TestHelper.UI.ScreenshotFilenameStrategies;
 using UnityEngine;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     /// <summary>
     /// Take screenshots options.

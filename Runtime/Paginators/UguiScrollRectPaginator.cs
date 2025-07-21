@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Paginators
+namespace TestHelper.UI.Paginators
 {
     /// <summary>
     /// Paginator implementation for <see cref="ScrollRect"/>.

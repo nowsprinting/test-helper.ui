@@ -8,10 +8,10 @@ using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Annotations
+namespace TestHelper.UI.Annotations
 {
     [TestFixture]
     public class PositionAnnotationTest

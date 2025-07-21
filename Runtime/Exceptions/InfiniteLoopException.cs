@@ -3,7 +3,7 @@
 
 using System;
 
-namespace TestHelper.Monkey.Exceptions
+namespace TestHelper.UI.Exceptions
 {
     /// <summary>
     /// Detected an infinite loop in monkey testing.

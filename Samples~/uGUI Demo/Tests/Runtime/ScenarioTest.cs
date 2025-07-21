@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.Operators;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.Operators;
 
-namespace TestHelper.Monkey.Samples.UGUIDemo
+namespace TestHelper.UI.Samples.UguiDemo
 {
     [TestFixture]
     public class ScenarioTest

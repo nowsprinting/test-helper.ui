@@ -1,11 +1,11 @@
 {
-    "name": "TestHelper.Monkey.Performance.Tests",
-    "rootNamespace": "TestHelper.Monkey",
+    "name": "TestHelper.UI.Performance.Tests",
+    "rootNamespace": "TestHelper.UI",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Unity.PerformanceTesting",
-        "TestHelper.Monkey",
+        "TestHelper.UI",
         "TestHelper",
         "TestHelper.Random",
         "UniTask"

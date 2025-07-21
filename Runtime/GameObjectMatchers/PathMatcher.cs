@@ -1,10 +1,10 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 
-namespace TestHelper.Monkey.GameObjectMatchers
+namespace TestHelper.UI.GameObjectMatchers
 {
     /// <summary>
     /// <see cref="GameObject"/> matcher that matchers by hierarchy path.

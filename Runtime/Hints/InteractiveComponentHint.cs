@@ -3,11 +3,11 @@
 
 using System.Collections.Generic;
 using System.Text;
-using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Hints
+namespace TestHelper.UI.Hints
 {
     /// <summary>
     /// Component to make operation positions visible

@@ -3,22 +3,22 @@
 
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     [TestFixture]
-    public class UGUITextInputOperatorTest
+    public class UguiTextInputOperatorTest
     {
         private ITextInputOperator _sut;
 
         [SetUp]
         public void SetUp()
         {
-            _sut = new UGUITextInputOperator(randomString: new StubRandomString("RANDOM"));
+            _sut = new UguiTextInputOperator(randomString: new StubRandomString("RANDOM"));
         }
 
         [Test]

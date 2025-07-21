@@ -3,13 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Exceptions;
-using TestHelper.Monkey.Operators;
+using TestHelper.UI.Exceptions;
+using TestHelper.UI.Operators;
+using TestHelper.UI.Strategies;
 using TestHelper.Random;
 using UnityEngine;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     /// <summary>
     /// Run configuration for monkey testing
@@ -93,11 +93,11 @@ namespace TestHelper.Monkey
         /// </summary>
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {
-            new UGUIClickOperator(),
-            new UGUIClickAndHoldOperator(),
+            new UguiClickOperator(),
+            new UguiClickAndHoldOperator(),
             new UguiDoubleClickOperator(),
             new UguiScrollWheelOperator(), // Specify PRNG instance, if necessary
-            new UGUITextInputOperator(),   // Specify random text input strategy, if necessary
+            new UguiTextInputOperator(),   // Specify random text input strategy, if necessary
         };
     }
 }

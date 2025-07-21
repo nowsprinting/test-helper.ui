@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Interface for the toggle UI component operator.

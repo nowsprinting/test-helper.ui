@@ -5,7 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace TestHelper.Monkey.GameObjectMatchers
+namespace TestHelper.UI.GameObjectMatchers
 {
     [TestFixture]
     public class PathMatcherTest

@@ -6,7 +6,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace TestHelper.Monkey.Operators.Utils
+namespace TestHelper.UI.Operators.Utils
 {
     [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP017:Prefer using")]
     public class SimulatedPointerEventDataTest

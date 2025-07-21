@@ -1,7 +1,7 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-namespace TestHelper.Monkey.Annotations.Enums
+namespace TestHelper.UI.Annotations.Enums
 {
     /// <summary>
     /// Character kind.

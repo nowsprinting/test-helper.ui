@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     [TestFixture]
-    public class UGUIClickAndHoldOperatorTest
+    public class UguiClickAndHoldOperatorTest
     {
-        private readonly IOperator _sut = new UGUIClickAndHoldOperator(holdMillis: 500);
+        private readonly IOperator _sut = new UguiClickAndHoldOperator(holdMillis: 500);
 
         [Test]
         public void CanOperate_CanNotTouchAndHold_ReturnFalse()

@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     /// <summary>
     /// Return value of <see cref="GameObjectFinder.FindByNameAsync"/> and <see cref="GameObjectFinder.FindByPathAsync"/>.

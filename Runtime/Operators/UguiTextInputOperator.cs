@@ -5,10 +5,10 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Annotations;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.Operators.Utils;
-using TestHelper.Monkey.Random;
+using TestHelper.UI.Annotations;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.Operators.Utils;
+using TestHelper.UI.Random;
 using TestHelper.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,12 +19,12 @@ using TMPro;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.
     /// </summary>
-    public class UGUITextInputOperator : ITextInputOperator
+    public class UguiTextInputOperator : ITextInputOperator
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
@@ -42,7 +42,7 @@ namespace TestHelper.Monkey.Operators
         /// <param name="randomString">Random string generator</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        public UGUITextInputOperator(
+        public UguiTextInputOperator(
             Func<GameObject, RandomStringParameters> randomStringParams = null, IRandomString randomString = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {

@@ -7,13 +7,13 @@ using System.IO;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     [TestFixture]
     public class UguiDoubleClickOperatorTest

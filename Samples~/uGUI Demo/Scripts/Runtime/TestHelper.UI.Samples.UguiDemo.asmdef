@@ -1,8 +1,8 @@
 {
-    "name": "TestHelper.Monkey.Samples.UGUIDemo",
+    "name": "TestHelper.UI.Samples.UguiDemo",
     "rootNamespace": "",
     "references": [
-        "TestHelper.Monkey",
+        "TestHelper.UI",
         "UniTask"
     ],
     "includePlatforms": [],

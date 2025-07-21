@@ -5,13 +5,13 @@ using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Annotations.Enums;
-using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.Annotations.Enums;
+using TestHelper.UI.Operators;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace TestHelper.Monkey.Annotations
+namespace TestHelper.UI.Annotations
 {
     [TestFixture]
     public class InputFieldAnnotationTest
@@ -30,7 +30,7 @@ namespace TestHelper.Monkey.Annotations
                 Lifetime = TimeSpan.FromMilliseconds(500), // 500ms
                 DelayMillis = 1,                           // 1ms
                 BufferLengthForDetectLooping = 0,          // disable loop operation detection
-                Operators = new[] { new UGUITextInputOperator() }
+                Operators = new[] { new UguiTextInputOperator() }
             };
         }
 

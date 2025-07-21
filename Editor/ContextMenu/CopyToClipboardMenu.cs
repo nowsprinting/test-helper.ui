@@ -1,10 +1,10 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Extensions;
 using UnityEditor;
 
-namespace TestHelper.Monkey.Editor.ContextMenu
+namespace TestHelper.UI.Editor.ContextMenu
 {
     public static class CopyToClipboardMenu
     {

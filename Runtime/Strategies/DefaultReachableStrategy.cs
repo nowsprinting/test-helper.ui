@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.DefaultStrategies
+namespace TestHelper.UI.Strategies
 {
     /// <summary>
     /// Default strategy to examine whether <c>GameObject</c> is reachable from the user.

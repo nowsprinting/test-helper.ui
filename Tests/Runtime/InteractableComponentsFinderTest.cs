@@ -6,7 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     [TestFixture]
     public class InteractableComponentsFinderTest

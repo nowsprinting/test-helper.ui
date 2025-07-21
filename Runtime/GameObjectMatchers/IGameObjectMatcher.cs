@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.GameObjectMatchers
+namespace TestHelper.UI.GameObjectMatchers
 {
     /// <summary>
     /// An interface that provides a custom logic for determining whether a <see cref="GameObject"/> matches certain criteria.

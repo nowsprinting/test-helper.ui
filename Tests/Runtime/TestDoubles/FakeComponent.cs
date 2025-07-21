@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.TestDoubles
+namespace TestHelper.UI.TestDoubles
 {
     [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class FakeComponent : MonoBehaviour

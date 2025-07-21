@@ -4,7 +4,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace TestHelper.Monkey.Paginators
+namespace TestHelper.UI.Paginators
 {
     /// <summary>
     /// Interface for pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).

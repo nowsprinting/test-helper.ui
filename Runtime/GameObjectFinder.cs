@@ -6,17 +6,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Exceptions;
-using TestHelper.Monkey.GameObjectMatchers;
-using TestHelper.Monkey.Paginators;
+using TestHelper.UI.Exceptions;
+using TestHelper.UI.GameObjectMatchers;
+using TestHelper.UI.Paginators;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     /// <summary>
     /// Find <c>GameObject</c> by name or path (glob). Wait until they appear.

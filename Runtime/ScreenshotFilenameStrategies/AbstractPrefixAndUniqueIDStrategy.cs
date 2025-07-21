@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using NUnit.Framework;
 #endif
 
-namespace TestHelper.Monkey.ScreenshotFilenameStrategies
+namespace TestHelper.UI.ScreenshotFilenameStrategies
 {
     /// <summary>
     /// An abstract class for screenshot filename strategies. This class generates a file path from a directory path

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
-namespace TestHelper.Monkey.ScreenshotFilenameStrategies
+namespace TestHelper.UI.ScreenshotFilenameStrategies
 {
     [TestFixture]
     public class CounterBasedStrategyTest

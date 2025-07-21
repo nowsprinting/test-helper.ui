@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Extensions
+namespace TestHelper.UI.Extensions
 {
     [TestFixture]
     public class TransformExtensionsTest

@@ -4,7 +4,7 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.TestDoubles;
+using TestHelper.UI.TestDoubles;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -13,7 +13,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 #endif
 
-namespace TestHelper.Monkey.DefaultStrategies
+namespace TestHelper.UI.Strategies
 {
     [TestFixture]
     public class DefaultReachableStrategyTest

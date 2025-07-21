@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.Annotations
+namespace TestHelper.UI.Annotations
 {
     /// <summary>
     /// An annotation class that indicate the world position that where monkey operators operate on

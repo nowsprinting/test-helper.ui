@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Extensions
+namespace TestHelper.UI.Extensions
 {
     public static class TransformExtensions
     {

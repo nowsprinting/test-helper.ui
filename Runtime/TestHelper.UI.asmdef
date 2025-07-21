@@ -1,8 +1,8 @@
 {
-    "name": "TestHelper.Monkey",
-    "rootNamespace": "TestHelper.Monkey",
+    "name": "TestHelper.UI",
+    "rootNamespace": "TestHelper.UI",
     "references": [
-        "TestHelper.Monkey.Annotations",
+        "TestHelper.UI.Annotations",
         "TestHelper.RuntimeInternals",
         "TestHelper.Random",
         "UniTask",

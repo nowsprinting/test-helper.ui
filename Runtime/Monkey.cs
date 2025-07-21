@@ -8,15 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Exceptions;
-using TestHelper.Monkey.Operators;
+using TestHelper.UI.Exceptions;
+using TestHelper.UI.Operators;
+using TestHelper.UI.Strategies;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey
+namespace TestHelper.UI
 {
     /// <summary>
     /// Reference implementation of the monkey testing.

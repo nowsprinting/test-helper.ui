@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.Hints
+namespace TestHelper.UI.Hints
 {
     /// <summary>
     /// Utility for calculating position for interactive component hints

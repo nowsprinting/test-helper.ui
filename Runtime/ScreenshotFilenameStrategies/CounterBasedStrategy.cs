@@ -3,7 +3,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace TestHelper.Monkey.ScreenshotFilenameStrategies
+namespace TestHelper.UI.ScreenshotFilenameStrategies
 {
     /// <summary>
     ///     Sequential number based screenshot file path strategy.

@@ -1,7 +1,7 @@
 // Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Flick operator interface.

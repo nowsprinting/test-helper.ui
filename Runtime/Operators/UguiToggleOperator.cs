@@ -3,18 +3,18 @@
 
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Toggle operator for <see cref="Toggle"/> component.
     /// You can click to turn it on/off, or you can specify the on/off state.
     /// </summary>
-    public class UguiToggleOperator : UGUIClickOperator, IToggleOperator
+    public class UguiToggleOperator : UguiClickOperator, IToggleOperator
     {
         /// <inheritdoc />
         /// <remarks>The <c>new</c> keyword is specified because we want it to work with the casted type.</remarks>

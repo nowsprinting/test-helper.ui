@@ -1,9 +1,9 @@
 {
-    "name": "TestHelper.Monkey.Editor",
-    "rootNamespace": "TestHelper.Monkey",
+    "name": "TestHelper.UI.Editor",
+    "rootNamespace": "TestHelper.UI",
     "references": [
-        "TestHelper.Monkey.Annotations",
-        "TestHelper.Monkey"
+        "TestHelper.UI.Annotations",
+        "TestHelper.UI"
     ],
     "includePlatforms": [
         "Editor"

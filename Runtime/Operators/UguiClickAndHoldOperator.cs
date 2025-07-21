@@ -4,18 +4,18 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.Operators.Utils;
+using TestHelper.UI.Extensions;
+using TestHelper.UI.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.Operators
+namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Click and hold operator for Unity UI (uGUI) components.
     /// a.k.a. touch and hold, long press.
     /// </summary>
-    public class UGUIClickAndHoldOperator : IClickAndHoldOperator
+    public class UguiClickAndHoldOperator : IClickAndHoldOperator
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
@@ -31,7 +31,7 @@ namespace TestHelper.Monkey.Operators
         /// <param name="holdMillis">Hold time in milliseconds</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        public UGUIClickAndHoldOperator(int holdMillis = 1000,
+        public UguiClickAndHoldOperator(int holdMillis = 1000,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             _holdMillis = holdMillis;

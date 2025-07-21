@@ -1,12 +1,16 @@
 {
-    "name": "TestHelper.Monkey.Samples.UGUIDemo.Tests",
-    "rootNamespace": "",
+    "name": "TestHelper.UI.Tests",
+    "rootNamespace": "TestHelper.UI",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "TestHelper.Monkey",
+        "Unity.TextMeshPro",
+        "UniTask",
+        "TestHelper.UI.Annotations",
+        "TestHelper.UI",
         "TestHelper",
-        "UniTask"
+        "TestHelper.RuntimeInternals",
+        "TestHelper.Random"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -4,7 +4,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey.TestDoubles
+namespace TestHelper.UI.TestDoubles
 {
     /// <summary>
     /// Write LogError when OnPointerUp is called.

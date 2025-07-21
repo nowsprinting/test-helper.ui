@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.GameObjectMatchers
+namespace TestHelper.UI.GameObjectMatchers
 {
     /// <summary>
     /// <see cref="GameObject"/> matcher that matchers by name.

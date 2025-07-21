@@ -7,7 +7,7 @@ using TestHelper.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Paginators
+namespace TestHelper.UI.Paginators
 {
     [TestFixture]
     public class UguiScrollRectPaginatorTest

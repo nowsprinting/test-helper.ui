@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.Annotations
+namespace TestHelper.UI.Annotations
 {
     /// <summary>
     /// Ignore any operations from the Monkey Testing

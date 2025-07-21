@@ -3,14 +3,14 @@
 
 using System;
 using System.Text;
-using TestHelper.Monkey.Extensions;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 #if ENABLE_TMP
 using TMPro;
 #endif
 
-namespace TestHelper.Monkey.GameObjectMatchers
+namespace TestHelper.UI.GameObjectMatchers
 {
     /// <summary>
     /// <see cref="GameObject"/> matcher that matchers by <c>Button</c> component properties.
