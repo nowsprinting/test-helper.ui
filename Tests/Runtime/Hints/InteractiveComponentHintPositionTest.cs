@@ -14,7 +14,7 @@ namespace TestHelper.UI.Hints
     [TestFixture]
     public class InteractiveComponentHintPositionTest
     {
-        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Hints.unity";
+        private const string TestScene = "../../Scenes/Hints.unity";
 
         [TestCase("Left Cube", -1f, 0, 0)]
         [TestCase("Right Cube", 2f, 0, 0)]
