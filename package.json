@@ -1,18 +1,18 @@
 {
-  "name": "com.nowsprinting.test-helper.monkey",
-  "description": "Object-based Unity UI (uGUI) monkey testing and API for custom implementation.",
+  "name": "com.nowsprinting.test-helper.ui",
+  "description": "A library for object-based monkey and UI testing.",
   "version": "1.0.0",
   "author": "Koji Hasegawa <hasegawa@hubsys.co.jp> (https://github.com/nowsprinting)",
   "category": "Unity Test Framework",
-  "changelogUrl": "https://github.com/nowsprinting/test-helper.monkey/releases",
+  "changelogUrl": "https://github.com/nowsprinting/test-helper.ui/releases",
   "dependencies": {
     "com.cysharp.unitask": "2.3.3",
     "com.nowsprinting.test-helper": "1.1.1",
     "com.nowsprinting.test-helper.random": "0.3.1",
     "com.unity.ugui": "1.0.0"
   },
-  "displayName": "Monkey Test Helper",
-  "documentationUrl": "https://nowsprinting.github.io/test-helper.monkey/",
+  "displayName": "UI Test Helper",
+  "documentationUrl": "https://nowsprinting.github.io/test-helper.ui/",
   "files": [
     "Annotations/",
     "Annotations.meta",
@@ -29,14 +29,16 @@
     "README.md*"
   ],
   "keywords": [
+    "Unity",
     "TestFramework",
-    "integration testing",
+    "testing",
+    "integration tests",
     "monkey testing",
-    "test"
+    "UI testing"
   ],
   "license": "MIT",
-  "licensesUrl": "https://github.com/nowsprinting/test-helper.monkey/blob/master/LICENSE.md",
-  "repository": "https://github.com/nowsprinting/test-helper.monkey",
+  "licensesUrl": "https://github.com/nowsprinting/test-helper.ui/blob/master/LICENSE.md",
+  "repository": "https://github.com/nowsprinting/test-helper.ui",
   "samples": [
     {
       "displayName": "uGUI Demo",
