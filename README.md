@@ -6,6 +6,7 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nowsprinting/test-helper.ui)
 
 A library for object-based monkey and UI testing.
+(Formerly known as Monkey Test Helper)
 
 This library can be used in runtime code because it does **NOT** depend on the [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest).  
 Required Unity 2019 LTS or later.
@@ -13,166 +14,6 @@ Required Unity 2019 LTS or later.
 
 
 ## Features
-
-### Monkey testing
-
-#### Monkey.Run
-
-Runs monkey tests for [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI)  2D, 3D, and UI elements.
-`Monkey.Run` method operates on randomly selected objects. It does not use screen points.
-
-Usage:
-
-```csharp
-using System;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using TestHelper.UI;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public async Task MonkeyTesting()
-    {
-        var config = new MonkeyConfig
-        {
-            Lifetime = TimeSpan.FromMinutes(2),
-            DelayMillis = 200,
-            SecondsToErrorForNoInteractiveComponent = 5,
-        };
-
-        await Monkey.Run(config);
-    }
-}
-```
-
-
-#### MonkeyConfig
-
-Configurations in `MonkeyConfig`:
-
-- **Lifetime**: Running time
-- **DelayMillis**: Delay time between operations
-- **SecondsToErrorForNoInteractiveComponent**: Seconds after which a `TimeoutException` is thrown if no interactive component is found; default is 5 seconds
-- **BufferLengthForDetectLooping**: An `InfiniteLoopException` is thrown if a repeating operation is detected within the specified buffer length; default length is 10
-- **Random**: Pseudo-random number generator
-- **Logger**: Logger
-- **Verbose**: Output verbose log if true
-- **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
-- **Screenshots**: Take screenshots during running the monkey test if set a `ScreenshotOptions` instance.
-    - **Directory**: Directory to save screenshots. If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used. If the command line argument is also omitted, `Application.persistentDataPath` + "/TestHelper/Screenshots/" is used.
-    - **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
-    - **SuperSize**: The factor to increase resolution with. Default is 1.
-    - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
-- **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
-- **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
-- **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **Operators**: A collection of `IOperator` that the monkey invokes. The default is `UguiClickOperator`, `UguiClickAndHoldOperator`, `UguiDoubleClickOperator`, `UguiScrollWheelOperator`, and `UguiTextInputOperator`. There is support for standard uGUI components.
-
-Class diagram for default strategies:
-
-```mermaid
-classDiagram
-    class MonkeyConfig {
-        +Func&lt;Component, bool&gt; IsInteractable
-        +IIgnoreStrategy IgnoreStrategy
-        +IReachableStrategy ReachableStrategy
-        +IOperator[] Operators
-    }
-
-    MonkeyConfig --> DefaultComponentInteractableStrategy
-
-    class DefaultComponentInteractableStrategy {
-        +IsInteractable(Component) bool$
-    }
-
-    MonkeyConfig --> IIgnoreStrategy
-    IIgnoreStrategy <|-- DefaultIgnoreStrategy
-
-    class IIgnoreStrategy {
-        +IsIgnored(GameObject, ILogger) bool*
-    }
-
-    MonkeyConfig --> IReachableStrategy
-    IReachableStrategy <|-- DefaultReachableStrategy
-    DefaultReachableStrategy --> DefaultScreenPointStrategy
-    DefaultScreenPointStrategy --> DefaultTransformPositionStrategy
-
-    class IReachableStrategy {
-        +IsReachable(GameObject, out RaycastResult, ILogger) bool*
-    }
-
-    class DefaultReachableStrategy {
-        +DefaultReachableStrategy(Func&lt;GameObject, Vector2&gt;, ILogger)
-        +IsReachable(GameObject, out RaycastResult, ILogger) bool
-    }
-
-    class DefaultScreenPointStrategy {
-        +GetScreenPoint(GameObject) Vector2$
-    }
-
-    class DefaultTransformPositionStrategy {
-        +GetScreenPoint(GameObjct) Vector2$
-        +GetScreenPointByWorldPosition(GameObject, Vector3) Vector2$
-    }
-
-    MonkeyConfig --> "*" IOperator
-
-    class IOperator {
-        +CanOperate(GameObject) bool*
-        +OperateAsync(GameObject, RaycastResult, CancellationToken) UniTask*
-    }
-
-    IOperator <|-- IClickOperator
-    IClickOperator <|-- UguiClickOperator
-
-    IOperator <|-- IClickAndHoldOperator
-    IClickAndHoldOperator <|-- UguiClickAndHoldOperator
-
-    IOperator <|-- ITextInputOperator
-    ITextInputOperator <|-- UguiTextInputOperator
-```
-
-
-#### Annotations for Monkey's behavior
-
-You can control the Monkey's behavior by attaching the annotation components to the `GameObject`.
-Use the `TestHelper.UI.Annotations` assembly by adding it to the Assembly Definition References.
-Please note that this will be included in the release build due to the way it works.
-
-> [!NOTE]  
-> Even if the annotations assembly is removed from the release build, the link to the annotation component will remain Scenes and Prefabs in the asset bundle built.
-> Therefore, a warning log will be output during instantiate.
-> To avoid this, annotations assembly are included in release builds.
-
-##### IgnoreAnnotation
-
-Monkey will not operate objects with `IgnoreAnnotation` attached.
-
-##### InputFieldAnnotation
-
-Specify the character kind and length input into `InputField` with `InputFieldAnnotation`.
-
-##### ScreenOffsetAnnotation
-
-Specify the screen position offset where Monkey operators operate.
-Respects `CanvasScaler` but does not calculate the aspect ratio.
-
-##### ScreenPositionAnnotation
-
-Specify the screen position where Monkey operators operate.
-Respects `CanvasScaler` but does not calculate the aspect ratio.
-
-##### WorldOffsetAnnotation
-
-Specify the world position offset where Monkey operators operate.
-
-##### WorldPositionAnnotation
-
-Specify the world position where Monkey operators operate.
-
-
 
 ### Find and operate GameObject
 
@@ -361,19 +202,18 @@ public class MyIntegrationTest
 
 
 
-### Find interactable components on the scene
+### Monkey Testing
 
-`InteractableComponentsFinder` is a class that collects interactable components on the scene.
+#### Monkey.Run
 
-Constructor arguments:
-
-- **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
-- **operators**: A collection of `IOperator` used in the `FindInteractableComponentsAndOperators` method. The default is empty.
+Runs monkey tests for [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI)  2D, 3D, and UI elements.
+`Monkey.Run` method operates on randomly selected objects. It does not use screen points.
 
 Usage:
 
 ```csharp
-using System.Linq;
+using System;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.UI;
 
@@ -381,13 +221,144 @@ using TestHelper.UI;
 public class MyIntegrationTest
 {
     [Test]
-    public void MyTestMethod()
+    public async Task MonkeyTesting()
     {
-        var finder = new InteractableComponentsFinder();
-        var components = finder.FindInteractableComponents();
+        var config = new MonkeyConfig
+        {
+            Lifetime = TimeSpan.FromMinutes(2),
+            DelayMillis = 200,
+            SecondsToErrorForNoInteractiveComponent = 5,
+        };
+
+        await Monkey.Run(config);
     }
 }
 ```
+
+
+#### MonkeyConfig
+
+Configurations in `MonkeyConfig`:
+
+- **Lifetime**: Running time
+- **DelayMillis**: Delay time between operations
+- **SecondsToErrorForNoInteractiveComponent**: Seconds after which a `TimeoutException` is thrown if no interactive component is found; default is 5 seconds
+- **BufferLengthForDetectLooping**: An `InfiniteLoopException` is thrown if a repeating operation is detected within the specified buffer length; default length is 10
+- **Random**: Pseudo-random number generator
+- **Logger**: Logger
+- **Verbose**: Output verbose log if true
+- **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
+- **Screenshots**: Take screenshots during running the monkey test if set a `ScreenshotOptions` instance.
+    - **Directory**: Directory to save screenshots. If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used. If the command line argument is also omitted, `Application.persistentDataPath` + "/TestHelper/Screenshots/" is used.
+    - **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
+    - **SuperSize**: The factor to increase resolution with. Default is 1.
+    - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
+- **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
+- **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
+- **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
+- **Operators**: A collection of `IOperator` that the monkey invokes. The default is `UguiClickOperator`, `UguiClickAndHoldOperator`, `UguiDoubleClickOperator`, `UguiScrollWheelOperator`, and `UguiTextInputOperator`. There is support for standard uGUI components.
+
+Class diagram for default strategies:
+
+```mermaid
+classDiagram
+    class MonkeyConfig {
+        +Func&lt;Component, bool&gt; IsInteractable
+        +IIgnoreStrategy IgnoreStrategy
+        +IReachableStrategy ReachableStrategy
+        +IOperator[] Operators
+    }
+
+    MonkeyConfig --> DefaultComponentInteractableStrategy
+
+    class DefaultComponentInteractableStrategy {
+        +IsInteractable(Component) bool$
+    }
+
+    MonkeyConfig --> IIgnoreStrategy
+    IIgnoreStrategy <|-- DefaultIgnoreStrategy
+
+    class IIgnoreStrategy {
+        +IsIgnored(GameObject, ILogger) bool*
+    }
+
+    MonkeyConfig --> IReachableStrategy
+    IReachableStrategy <|-- DefaultReachableStrategy
+    DefaultReachableStrategy --> DefaultScreenPointStrategy
+    DefaultScreenPointStrategy --> DefaultTransformPositionStrategy
+
+    class IReachableStrategy {
+        +IsReachable(GameObject, out RaycastResult, ILogger) bool*
+    }
+
+    class DefaultReachableStrategy {
+        +DefaultReachableStrategy(Func&lt;GameObject, Vector2&gt;, ILogger)
+        +IsReachable(GameObject, out RaycastResult, ILogger) bool
+    }
+
+    class DefaultScreenPointStrategy {
+        +GetScreenPoint(GameObject) Vector2$
+    }
+
+    class DefaultTransformPositionStrategy {
+        +GetScreenPoint(GameObjct) Vector2$
+        +GetScreenPointByWorldPosition(GameObject, Vector3) Vector2$
+    }
+
+    MonkeyConfig --> "*" IOperator
+
+    class IOperator {
+        +CanOperate(GameObject) bool*
+        +OperateAsync(GameObject, RaycastResult, CancellationToken) UniTask*
+    }
+
+    IOperator <|-- IClickOperator
+    IClickOperator <|-- UguiClickOperator
+
+    IOperator <|-- IClickAndHoldOperator
+    IClickAndHoldOperator <|-- UguiClickAndHoldOperator
+
+    IOperator <|-- ITextInputOperator
+    ITextInputOperator <|-- UguiTextInputOperator
+```
+
+
+#### Annotations for Monkey's behavior
+
+You can control the Monkey's behavior by attaching the annotation components to the `GameObject`.
+Use the `TestHelper.UI.Annotations` assembly by adding it to the Assembly Definition References.
+Please note that this will be included in the release build due to the way it works.
+
+> [!NOTE]  
+> Even if the annotations assembly is removed from the release build, the link to the annotation component will remain Scenes and Prefabs in the asset bundle built.
+> Therefore, a warning log will be output during instantiate.
+> To avoid this, annotations assembly are included in release builds.
+
+##### IgnoreAnnotation
+
+Monkey will not operate objects with `IgnoreAnnotation` attached.
+
+##### InputFieldAnnotation
+
+Specify the character kind and length input into `InputField` with `InputFieldAnnotation`.
+
+##### ScreenOffsetAnnotation
+
+Specify the screen position offset where Monkey operators operate.
+Respects `CanvasScaler` but does not calculate the aspect ratio.
+
+##### ScreenPositionAnnotation
+
+Specify the screen position where Monkey operators operate.
+Respects `CanvasScaler` but does not calculate the aspect ratio.
+
+##### WorldOffsetAnnotation
+
+Specify the world position offset where Monkey operators operate.
+
+##### WorldPositionAnnotation
+
+Specify the world position where Monkey operators operate.
 
 
 
@@ -448,7 +419,65 @@ An operator must implement the `CanOperate` method to determine whether an opera
 
 
 
+## Run on player build
+
+The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE` in this package's assembly definition files, so it is generally excluded from player builds.
+
+To use the feature in player builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` to the scripting symbols at build time.
+
+> [!TIP]  
+> How to set custom scripting symbols, see below:  
+> [Manual: Custom scripting symbols](https://docs.unity3d.com/Manual/custom-scripting-symbols.html)
+
+
+
 ## Troubleshooting
+
+### GameObjectFinder
+
+#### Thrown TimeoutException
+
+##### Not found
+
+If no `GameObject` is found with the specified name, path, or matcher, throw `TimeoutException` with the following message:
+
+```
+GameObject (NameMatcher: Target) is not found.
+```
+
+Or for path:
+
+```
+GameObject (PathMatcher: Path/To/Target) is not found.
+```
+
+##### Not reachable
+
+If `GameObject` is found with the specified name, path, or matcher but not reachable, throw `TimeoutException` with the following message:
+
+```
+GameObject (NameMatcher: Target) is found, but not reachable.
+```
+
+If you need detailed logs, pass an `ILogger` instance to the constructor of `GameObjectFinder`.
+
+##### Not interactable
+
+If `GameObject` is found with the specified name, path, or matcher but not interactable, throw `TimeoutException` with the following message:
+
+```
+GameObject (NameMatcher: Target) is found, but not interactable.
+```
+
+#### Thrown MultipleGameObjectsMatchingException
+
+If multiple `GameObjects` matching the condition are found, throw `MultipleGameObjectsMatchingException` with the following message:
+
+```
+Multiple GameObjects matching the condition (NameMatcher: Target) were found.
+```
+
+
 
 ### Monkey
 
@@ -562,64 +591,6 @@ Lottery entries are empty or all of not reachable.
 
 
 
-### GameObjectFinder
-
-#### Thrown TimeoutException
-
-##### Not found
-
-If no `GameObject` is found with the specified name, path, or matcher, throw `TimeoutException` with the following message:
-
-```
-GameObject (NameMatcher: Target) is not found.
-```
-
-Or for path:
-
-```
-GameObject (PathMatcher: Path/To/Target) is not found.
-```
-
-##### Not reachable
-
-If `GameObject` is found with the specified name, path, or matcher but not reachable, throw `TimeoutException` with the following message:
-
-```
-GameObject (NameMatcher: Target) is found, but not reachable.
-```
-
-If you need detailed logs, pass an `ILogger` instance to the constructor of `GameObjectFinder`.
-
-##### Not interactable
-
-If `GameObject` is found with the specified name, path, or matcher but not interactable, throw `TimeoutException` with the following message:
-
-```
-GameObject (NameMatcher: Target) is found, but not interactable.
-```
-
-#### Thrown MultipleGameObjectsMatchingException
-
-If multiple `GameObjects` matching the condition are found, throw `MultipleGameObjectsMatchingException` with the following message:
-
-```
-Multiple GameObjects matching the condition (NameMatcher: Target) were found.
-```
-
-
-
-## Run on player build
-
-The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE` in this package's assembly definition files, so it is generally excluded from player builds.
-
-To use the feature in player builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` to the scripting symbols at build time.
-
-> [!TIP]  
-> How to set custom scripting symbols, see below:  
-> [Manual: Custom scripting symbols](https://docs.unity3d.com/Manual/custom-scripting-symbols.html)
-
-
-
 ## Installation
 
 You can choose from two typical installation methods.
@@ -646,15 +617,6 @@ You can choose from two typical installation methods.
 
 ![](Documentation~/PackageManager_Dark.png#gh-dark-mode-only)
 ![](Documentation~/PackageManager_Light.png#gh-light-mode-only)
-
-
-### Install via OpenUPM-CLI
-
-If you installed [openupm-cli](https://github.com/openupm/openupm-cli), run the command below:
-
-```bash
-openupm add com.nowsprinting.test-helper.ui
-```
 
 
 ### Add assembly reference
