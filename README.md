@@ -3,6 +3,7 @@
 [![Meta file check](https://github.com/nowsprinting/test-helper.ui/actions/workflows/metacheck.yml/badge.svg)](https://github.com/nowsprinting/test-helper.ui/actions/workflows/metacheck.yml)
 [![Test](https://github.com/nowsprinting/test-helper.ui/actions/workflows/test.yml/badge.svg)](https://github.com/nowsprinting/test-helper.ui/actions/workflows/test.yml)
 [![openupm](https://img.shields.io/npm/v/com.nowsprinting.test-helper.ui?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.nowsprinting.test-helper.ui/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nowsprinting/test-helper.ui)
 
 A library for object-based monkey and UI testing.
 
