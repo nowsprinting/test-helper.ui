@@ -7,7 +7,7 @@ using TestHelper.Random;
 
 namespace TestHelper.UI.TestDoubles
 {
-    public class StubRandom : RandomImpl
+    public class StubRandom : RandomWrapper
     {
         private readonly int[] _returnValues;
         private int _returnValueIndex;
