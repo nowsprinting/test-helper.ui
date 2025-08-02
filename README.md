@@ -6,6 +6,7 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nowsprinting/test-helper.ui)
 
 A library for object-based monkey and UI testing.
+(Formerly known as Monkey Test Helper)
 
 This library can be used in runtime code because it does **NOT** depend on the [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest).  
 Required Unity 2019 LTS or later.
@@ -14,12 +15,222 @@ Required Unity 2019 LTS or later.
 
 ## Features
 
-### Monkey testing
+### Find GameObject
+
+`GameObjectFinder` is a class that finds `GameObject` by name, path, or custom matcher.
+
+Constructor arguments:
+
+- **timeoutSeconds**: Seconds to wait until `GameObject` appears. The default is 1 second.
+- **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
+- **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
+
+
+#### Find GameObject by name
+
+Find a `GameObject` by name; if not found, poll until a timeout.
+If the timeout, a `TimeoutException` is thrown.
+
+Arguments:
+
+- **name**: Find `GameObject` name
+- **reachable**: Find only reachable object. Default is true
+- **interactable**: Find only interactable object. Default is false
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.UI;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public async Task MyTestMethod()
+    {
+        var finder = new GameObjectFinder();
+        var result = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
+        var dialog = result.GameObject;
+    }
+}
+```
+
+
+#### Find GameObject by path
+
+Find a `GameObject` by path; if not found, poll until a timeout.
+If the timeout, a `TimeoutException` is thrown.
+
+Arguments:
+
+- **path**: Find `GameObject` hierarchy path separated by `/`. Can specify wildcards of [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern (`?`, `*`, and `**`).
+- **reachable**: Find only reachable object. Default is true
+- **interactable**: Find only interactable object. Default is false
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.UI;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public async Task MyTestMethod()
+    {
+        var finder = new GameObjectFinder(5d); // 5 seconds timeout
+        var result = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
+        var cancelButton = result.GameObject;
+    }
+}
+```
+
+
+#### Find GameObject by matcher
+
+Find a `GameObject` by custom `IGameObjectMatcher`; if not found, poll until a timeout.
+If the timeout, a `TimeoutException` is thrown.
+
+Arguments:
+
+- **matcher**: Custom `IGameObjectMatcher` implementation
+- **reachable**: Find only reachable object. Default is true
+- **interactable**: Find only interactable object. Default is false
+
+Built-in matchers:
+
+- `ButtonMatcher`: Matches `UnityEngine.UI.Button` components by `name`, `path`, `text`, or `texture`
+- `ToggleMatcher`: Matches `UnityEngine.UI.Toggle` components by `name`, `path`, or `text`
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.UI;
+using TestHelper.UI.GameObjectMatchers;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public async Task MyTestMethod()
+    {
+        var finder = new GameObjectFinder();
+        var matcher = new ButtonMatcher(text: "Click Me");
+        var result = await finder.FindByMatcherAsync(matcher, reachable: true, interactable: false);
+        var button = result.GameObject;
+    }
+}
+```
+
+
+#### Find GameObject in pageable component
+
+Find a `GameObject` in pageable (or scrollable) UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
+A paginator provides step-by-step navigation through pageable content, allowing users to find objects that are not currently visible in the viewport.
+
+Arguments:
+
+- **matcher**: Custom `IGameObjectMatcher` implementation
+- **reachable**: Find only reachable object. Default is true
+- **interactable**: Find only interactable object. Default is false
+- **paginator**: `IPaginator` implementation for controlling pageable components
+
+Built-in paginators:
+
+- `UguiScrollRectPaginator`: Used to find `GameObjects` that are on `ScrollRect`
+- `UguiScrollbarPaginator`: Used to find `GameObjects` that are on a scrollable component with a `ScrollBar`
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.UI;
+using TestHelper.UI.GameObjectMatchers;
+using TestHelper.UI.Paginators;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public async Task FindButtonInScrollView()
+    {
+        var finder = new GameObjectFinder();
+        var matcher = new NameMatcher("Button_10");
+
+        var scrollView = GameObject.Find("Scroll View");
+        var scrollRect = scrollView.GetComponent<ScrollRect>();
+        var paginator = new UguiScrollRectPaginator(scrollRect);
+
+        var result = await finder.FindByMatcherAsync(matcher, paginator: paginator);
+        var button = result.GameObject;
+    }
+}
+```
+
+
+
+### Operate GameObject
+
+You can perform any operation on [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI) 2D, 3D, and UI elements.
+
+Operators implement the `IOperator` interface. It has an `OperateAsync` method that operates on the component.
+For example, `UguiClickOperator` implementation will perform the click.
+
+Built-in operators:
+
+- `UguiClickOperator`: Performs the click.
+- `UguiClickAndHoldOperator`: Performs the click and hold; hold time can be specified.
+- `UguiDoubleClickOperator`: Performs the double click; interval between clicks can be specified.
+- `UguiScrollWheelOperator`: Performs the scroll; scroll speed and destination can be specified. If omitted, it will be random.
+- `UguiTextInputOperator`: Inputs text into `InputField` or `TMP_InputField`; text can be specified. If omitted, it will be randomized text.
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.UI;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public async Task SendMessage()
+    {
+        var finder = new GameObjectFinder();
+
+        var message = await finder.FindByNameAsync("Message", interactable: true);
+        var inputOperator = new UguiTextInputOperator();
+        await inputOperator.OperateAsync(message.GameObject, "Hello, Hurry?");
+
+        var submit = await finder.FindByNameAsync("SubmitButton", interactable: true);
+        var clickOperator = new UguiClickOperator();
+        await clickOperator.OperateAsync(submit.GameObject);
+    }
+}
+```
+
+> [!TIP]  
+> You can set the `Logger` and `ScreenshotOptions` instance via the constructor arguments or properties if needed.
+
+
+
+### Monkey Testing
 
 #### Monkey.Run
 
-Runs monkey tests for [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI)  2D, 3D, and UI elements.
-`Monkey.Run` method operates on randomly selected objects. It does not use screen points.
+You can run monkey testing for [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI) 2D, 3D, and UI elements.
+`Monkey.Run` method operates on a randomly selected `GameObject`. It does not use screen points.
+
+The target `GameObject` and `Operator` will be determined by lottery in the following order:
+
+1. List all interactable `GameObjects` on the screen (including those that are ignored and not reachable)
+2. Join the `Operators` that can operate each `GameObject`
+3. Lottery from the list of `GameObjects` and `Operators`
+4. Check if the `GameObject` is ignored; If ignored, a re-lottery will be held
+5. Check if the `GameObject` is reachable; If not reachable, a re-lottery will be held
 
 Usage:
 
@@ -174,223 +385,6 @@ Specify the world position where Monkey operators operate.
 
 
 
-### Find and operate GameObject
-
-`GameObjectFinder` is a class that finds `GameObject` by name, path, or custom matcher.
-
-Constructor arguments:
-
-- **timeoutSeconds**: Seconds to wait until `GameObject` appears. The default is 1 second.
-- **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
-
-
-#### Find GameObject by name
-
-Find a `GameObject` by name; if not found, poll until a timeout.
-If the timeout, a `TimeoutException` is thrown.
-
-Arguments:
-
-- **name**: Find `GameObject` name
-- **reachable**: Find only reachable object. Default is true
-- **interactable**: Find only interactable object. Default is false
-
-Usage:
-
-```csharp
-using NUnit.Framework;
-using TestHelper.UI;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public async Task MyTestMethod()
-    {
-        var finder = new GameObjectFinder();
-        var result = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
-        var dialog = result.GameObject;
-    }
-}
-```
-
-
-#### Find GameObject by path
-
-Find a `GameObject` by path; if not found, poll until a timeout.
-If the timeout, a `TimeoutException` is thrown.
-
-Arguments:
-
-- **path**: Find `GameObject` hierarchy path separated by `/`. Can specify wildcards of [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern (`?`, `*`, and `**`).
-- **reachable**: Find only reachable object. Default is true
-- **interactable**: Find only interactable object. Default is false
-
-Usage:
-
-```csharp
-using NUnit.Framework;
-using TestHelper.UI;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public async Task MyTestMethod()
-    {
-        var finder = new GameObjectFinder(5d); // 5 seconds timeout
-        var result = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
-        var cancelButton = result.GameObject;
-    }
-}
-```
-
-
-#### Find GameObject by matcher
-
-Find a `GameObject` by custom `IGameObjectMatcher`; if not found, poll until a timeout.
-If the timeout, a `TimeoutException` is thrown.
-
-Arguments:
-
-- **matcher**: Custom `IGameObjectMatcher` implementation
-- **reachable**: Find only reachable object. Default is true
-- **interactable**: Find only interactable object. Default is false
-
-Built-in matchers:
-
-- `ButtonMatcher`: Matches `UnityEngine.UI.Button` components by `name`, `path`, `text`, or `texture`
-- `ToggleMatcher`: Matches `UnityEngine.UI.Toggle` components by `name`, `path`, or `text`
-
-Usage:
-
-```csharp
-using NUnit.Framework;
-using TestHelper.UI;
-using TestHelper.UI.GameObjectMatchers;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public async Task MyTestMethod()
-    {
-        var finder = new GameObjectFinder();
-        var matcher = new ButtonMatcher(text: "Click Me");
-        var result = await finder.FindByMatcherAsync(matcher, reachable: true, interactable: false);
-        var button = result.GameObject;
-    }
-}
-```
-
-
-#### Find GameObject in pageable component
-
-Find a `GameObject` in pageable (or scrollable) UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
-A paginator provides step-by-step navigation through pageable content, allowing users to find objects that are not currently visible in the viewport.
-
-Arguments:
-
-- **matcher**: Custom `IGameObjectMatcher` implementation
-- **reachable**: Find only reachable object. Default is true
-- **interactable**: Find only interactable object. Default is false
-- **paginator**: `IPaginator` implementation for controlling pageable components
-
-Built-in paginators:
-
-- `UguiScrollRectPaginator`: For `ScrollRect`
-- `UguiScrollbarPaginator`: For `Scrollbar`
-
-Usage:
-
-```csharp
-using NUnit.Framework;
-using TestHelper.UI;
-using TestHelper.UI.GameObjectMatchers;
-using TestHelper.UI.Paginators;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public async Task FindButtonInScrollView()
-    {
-        var finder = new GameObjectFinder();
-        var matcher = new NameMatcher("Button_10");
-
-        var scrollView = GameObject.Find("Scroll View");
-        var scrollRect = scrollView.GetComponent<ScrollRect>();
-        var paginator = new UguiScrollRectPaginator(scrollRect);
-
-        var result = await finder.FindByMatcherAsync(matcher, paginator: paginator);
-        var button = result.GameObject;
-    }
-}
-```
-
-
-#### Operate GameObject
-
-`SelectOperators` and `SelectOperators<T>` are extensions of `GameObject` that return available operators.
-Operators implement the `IOperator` interface. It has an `OperateAsync` method that operates on the component.
-
-Usage:
-
-```csharp
-using NUnit.Framework;
-using TestHelper.UI;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public async Task ClickStartButton()
-    {
-        var finder = new GameObjectFinder();
-        var result = await finder.FindByNameAsync("StartButton", interactable: true);
-
-        var clickOperator = new UguiClickOperator();
-        await clickOperator.OperateAsync(result.GameObject);
-    }
-}
-```
-
-> [!TIP]  
-> You can set the `Logger` and `ScreenshotOptions` instance via the constructor arguments or properties if needed.
-
-
-
-### Find interactable components on the scene
-
-`InteractableComponentsFinder` is a class that collects interactable components on the scene.
-
-Constructor arguments:
-
-- **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
-- **operators**: A collection of `IOperator` used in the `FindInteractableComponentsAndOperators` method. The default is empty.
-
-Usage:
-
-```csharp
-using System.Linq;
-using NUnit.Framework;
-using TestHelper.UI;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public void MyTestMethod()
-    {
-        var finder = new InteractableComponentsFinder();
-        var components = finder.FindInteractableComponents();
-    }
-}
-```
-
-
-
 ### Editor Extensions
 
 #### Copy Hierarchy Path to Clipboard
@@ -407,10 +401,10 @@ Select any `GameObject` in the Hierarchy window and right-click to open the cont
 
 ### Functions for the strategy pattern
 
-If your game title uses a custom UI framework that is not uGUI compatible and/or requires special operating, you can customize the monkey's behavior using the following:
+If your game title uses a custom UI framework that is not uGUI compatible and/or requires special operating, you can customize the `GameObjectFinder` and `Monkey` behavior using the following:
 
 
-#### IsInteractable
+#### IsInteractable function
 
 Returns whether the `Component` is interactable or not.
 `DefaultComponentInteractableStrategy.IsInteractable()` returns true if the component is a uGUI compatible component and its `interactable` property is true.
@@ -418,37 +412,103 @@ Returns whether the `Component` is interactable or not.
 You should replace this when you want to control special components that comprise your game title.
 
 
-#### IgnoreStrategy
+#### IsIgnored method
 
-`IsIgnored()` method returns whether the `GameObject` is ignored or not.
+`IIgnoreStrategy.IsIgnored()` method returns whether the `GameObject` is ignored or not from `Monkey`.
 `DefaultIgnoreStrategy.IsIgnored()` returns true if the `GameObject` has `IgnoreAnnotation` attached.
 
 You should replace this when you want to ignore specific objects (e.g., by name and/or path) in your game title.
 
 
-#### ReachableStrategy
+#### IsReachable method
 
-`IsReachable()` method returns whether the `GameObject` is reachable from the user or not.
-`DefaultReachableStrategy.IsReachable()` returns true if it can raycast from `Camera.main` to the pivot position.
+`IReachableStrategy.IsReachable()` method returns whether the `GameObject` is reachable from the user or not.
+`DefaultReachableStrategy.IsReachable()` returns true if it can raycast from `Camera.main` to the pivot position of `GameObject`.
 
 You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).
 
 
-#### Operators
 
-Operators are a collection of `IOperator` that the monkey invokes.
+### IGameObjectMatcher interface
 
-You should replace this when you want to operate special components that comprise your game title (e.g., custom UI component, special click position).
+If your game title uses a custom UI framework that is not uGUI compatible and/or requires custom conditions for searching, you can implement the `IGameObjectMatcher` interface.
+The custom matcher can be specified as an argument to the `GameObjectFinder.FindByMatcherAsync` method.
+
+For example, the built-in `ButtonMatcher` class's `IsMatch` method returns `true` for `GameObjects` that match the specified button element `name`, `path`, `text`, and `texture`.
+
+
+
+### IOperator interface
+
+If your game title uses a custom UI framework that is not uGUI compatible, you can implement the `IOperator` interface.
 
 A sub-interface of the `IOperator` (e.g., `IClickOperator`) must be implemented to represent the type of operator.
-An operator must implement the `CanOperate` method to determine whether an operation such as click is possible and the `OperateAsync` method to execute the operation.
+An operator must implement the `CanOperate` method to determine whether an operation, such as a click, is possible and the `OperateAsync` method to execute the operation.
 
 > [!IMPORTANT]  
 > Until test-helper.monkey v0.14.0, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
 
 
 
+## Run on player build
+
+The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE` in this package's assembly definition files, so it is generally excluded from player builds.
+
+To use the feature in player builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` to the scripting symbols at build time.
+
+> [!TIP]  
+> How to set custom scripting symbols, see below:  
+> [Manual: Custom scripting symbols](https://docs.unity3d.com/Manual/custom-scripting-symbols.html)
+
+
+
 ## Troubleshooting
+
+### GameObjectFinder
+
+#### Thrown TimeoutException
+
+##### Not found
+
+If no `GameObject` is found with the specified name, path, or matcher, throw `TimeoutException` with the following message:
+
+```
+GameObject (NameMatcher: Target) is not found.
+```
+
+Or for path:
+
+```
+GameObject (PathMatcher: Path/To/Target) is not found.
+```
+
+##### Not reachable
+
+If `GameObject` is found with the specified name, path, or matcher but not reachable, throw `TimeoutException` with the following message:
+
+```
+GameObject (NameMatcher: Target) is found, but not reachable.
+```
+
+If you need detailed logs, pass an `ILogger` instance to the constructor of `GameObjectFinder`.
+
+##### Not interactable
+
+If `GameObject` is found with the specified name, path, or matcher but not interactable, throw `TimeoutException` with the following message:
+
+```
+GameObject (NameMatcher: Target) is found, but not interactable.
+```
+
+#### Thrown MultipleGameObjectsMatchingException
+
+If multiple `GameObjects` matching the condition are found, throw `MultipleGameObjectsMatchingException` with the following message:
+
+```
+Multiple GameObjects matching the condition (NameMatcher: Target) were found.
+```
+
+
 
 ### Monkey
 
@@ -562,64 +622,6 @@ Lottery entries are empty or all of not reachable.
 
 
 
-### GameObjectFinder
-
-#### Thrown TimeoutException
-
-##### Not found
-
-If no `GameObject` is found with the specified name, path, or matcher, throw `TimeoutException` with the following message:
-
-```
-GameObject (NameMatcher: Target) is not found.
-```
-
-Or for path:
-
-```
-GameObject (PathMatcher: Path/To/Target) is not found.
-```
-
-##### Not reachable
-
-If `GameObject` is found with the specified name, path, or matcher but not reachable, throw `TimeoutException` with the following message:
-
-```
-GameObject (NameMatcher: Target) is found, but not reachable.
-```
-
-If you need detailed logs, pass an `ILogger` instance to the constructor of `GameObjectFinder`.
-
-##### Not interactable
-
-If `GameObject` is found with the specified name, path, or matcher but not interactable, throw `TimeoutException` with the following message:
-
-```
-GameObject (NameMatcher: Target) is found, but not interactable.
-```
-
-#### Thrown MultipleGameObjectsMatchingException
-
-If multiple `GameObjects` matching the condition are found, throw `MultipleGameObjectsMatchingException` with the following message:
-
-```
-Multiple GameObjects matching the condition (NameMatcher: Target) were found.
-```
-
-
-
-## Run on player build
-
-The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE` in this package's assembly definition files, so it is generally excluded from player builds.
-
-To use the feature in player builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` to the scripting symbols at build time.
-
-> [!TIP]  
-> How to set custom scripting symbols, see below:  
-> [Manual: Custom scripting symbols](https://docs.unity3d.com/Manual/custom-scripting-symbols.html)
-
-
-
 ## Installation
 
 You can choose from two typical installation methods.
@@ -646,15 +648,6 @@ You can choose from two typical installation methods.
 
 ![](Documentation~/PackageManager_Dark.png#gh-dark-mode-only)
 ![](Documentation~/PackageManager_Light.png#gh-light-mode-only)
-
-
-### Install via OpenUPM-CLI
-
-If you installed [openupm-cli](https://github.com/openupm/openupm-cli), run the command below:
-
-```bash
-openupm add com.nowsprinting.test-helper.ui
-```
 
 
 ### Add assembly reference
