@@ -15,7 +15,7 @@ Required Unity 2019 LTS or later.
 
 ## Features
 
-### Find and operate GameObject
+### Find GameObject
 
 `GameObjectFinder` is a class that finds `GameObject` by name, path, or custom matcher.
 
@@ -140,8 +140,8 @@ Arguments:
 
 Built-in paginators:
 
-- `UguiScrollRectPaginator`: For `ScrollRect`
-- `UguiScrollbarPaginator`: For `Scrollbar`
+- `UguiScrollRectPaginator`: Used to find `GameObjects` that are on `ScrollRect`
+- `UguiScrollbarPaginator`: Used to find `GameObjects` that are on a scrollable component with a `ScrollBar`
 
 Usage:
 
@@ -171,10 +171,21 @@ public class MyIntegrationTest
 ```
 
 
-#### Operate GameObject
 
-`SelectOperators` and `SelectOperators<T>` are extensions of `GameObject` that return available operators.
+### Operate GameObject
+
+You can perform any operation on [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI) 2D, 3D, and UI elements.
+
 Operators implement the `IOperator` interface. It has an `OperateAsync` method that operates on the component.
+For example, `UguiClickOperator` implementation will perform the click.
+
+Built-in operators:
+
+- `UguiClickOperator`: Performs the click.
+- `UguiClickAndHoldOperator`: Performs the click and hold; hold time can be specified.
+- `UguiDoubleClickOperator`: Performs the double click; interval between clicks can be specified.
+- `UguiScrollWheelOperator`: Performs the scroll; scroll speed and destination can be specified. If omitted, it will be random.
+- `UguiTextInputOperator`: Inputs text into `InputField` or `TMP_InputField`; text can be specified. If omitted, it will be randomized text.
 
 Usage:
 
@@ -186,13 +197,17 @@ using TestHelper.UI;
 public class MyIntegrationTest
 {
     [Test]
-    public async Task ClickStartButton()
+    public async Task SendMessage()
     {
         var finder = new GameObjectFinder();
-        var result = await finder.FindByNameAsync("StartButton", interactable: true);
 
+        var message = await finder.FindByNameAsync("Message", interactable: true);
+        var inputOperator = new UguiTextInputOperator();
+        await inputOperator.OperateAsync(message.GameObject, "Hello, Hurry?");
+
+        var submit = await finder.FindByNameAsync("SubmitButton", interactable: true);
         var clickOperator = new UguiClickOperator();
-        await clickOperator.OperateAsync(result.GameObject);
+        await clickOperator.OperateAsync(submit.GameObject);
     }
 }
 ```
@@ -206,8 +221,16 @@ public class MyIntegrationTest
 
 #### Monkey.Run
 
-Runs monkey tests for [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI)  2D, 3D, and UI elements.
-`Monkey.Run` method operates on randomly selected objects. It does not use screen points.
+You can run monkey testing for [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI) 2D, 3D, and UI elements.
+`Monkey.Run` method operates on a randomly selected `GameObject`. It does not use screen points.
+
+The target `GameObject` and `Operator` will be determined by lottery in the following order:
+
+1. List all interactable `GameObjects` on the screen (including those that are ignored and not reachable)
+2. Join the `Operators` that can operate each `GameObject`
+3. Lottery from the list of `GameObjects` and `Operators`
+4. Check if the `GameObject` is ignored; If ignored, a re-lottery will be held
+5. Check if the `GameObject` is reachable; If not reachable, a re-lottery will be held
 
 Usage:
 
@@ -378,10 +401,10 @@ Select any `GameObject` in the Hierarchy window and right-click to open the cont
 
 ### Functions for the strategy pattern
 
-If your game title uses a custom UI framework that is not uGUI compatible and/or requires special operating, you can customize the monkey's behavior using the following:
+If your game title uses a custom UI framework that is not uGUI compatible and/or requires special operating, you can customize the `GameObjectFinder` and `Monkey` behavior using the following:
 
 
-#### IsInteractable
+#### IsInteractable function
 
 Returns whether the `Component` is interactable or not.
 `DefaultComponentInteractableStrategy.IsInteractable()` returns true if the component is a uGUI compatible component and its `interactable` property is true.
@@ -389,30 +412,38 @@ Returns whether the `Component` is interactable or not.
 You should replace this when you want to control special components that comprise your game title.
 
 
-#### IgnoreStrategy
+#### IsIgnored method
 
-`IsIgnored()` method returns whether the `GameObject` is ignored or not.
+`IIgnoreStrategy.IsIgnored()` method returns whether the `GameObject` is ignored or not from `Monkey`.
 `DefaultIgnoreStrategy.IsIgnored()` returns true if the `GameObject` has `IgnoreAnnotation` attached.
 
 You should replace this when you want to ignore specific objects (e.g., by name and/or path) in your game title.
 
 
-#### ReachableStrategy
+#### IsReachable method
 
-`IsReachable()` method returns whether the `GameObject` is reachable from the user or not.
-`DefaultReachableStrategy.IsReachable()` returns true if it can raycast from `Camera.main` to the pivot position.
+`IReachableStrategy.IsReachable()` method returns whether the `GameObject` is reachable from the user or not.
+`DefaultReachableStrategy.IsReachable()` returns true if it can raycast from `Camera.main` to the pivot position of `GameObject`.
 
 You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).
 
 
-#### Operators
 
-Operators are a collection of `IOperator` that the monkey invokes.
+### IGameObjectMatcher interface
 
-You should replace this when you want to operate special components that comprise your game title (e.g., custom UI component, special click position).
+If your game title uses a custom UI framework that is not uGUI compatible and/or requires custom conditions for searching, you can implement the `IGameObjectMatcher` interface.
+The custom matcher can be specified as an argument to the `GameObjectFinder.FindByMatcherAsync` method.
+
+For example, the built-in `ButtonMatcher` class's `IsMatch` method returns `true` for `GameObjects` that match the specified button element `name`, `path`, `text`, and `texture`.
+
+
+
+### IOperator interface
+
+If your game title uses a custom UI framework that is not uGUI compatible, you can implement the `IOperator` interface.
 
 A sub-interface of the `IOperator` (e.g., `IClickOperator`) must be implemented to represent the type of operator.
-An operator must implement the `CanOperate` method to determine whether an operation such as click is possible and the `OperateAsync` method to execute the operation.
+An operator must implement the `CanOperate` method to determine whether an operation, such as a click, is possible and the `OperateAsync` method to execute the operation.
 
 > [!IMPORTANT]  
 > Until test-helper.monkey v0.14.0, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
