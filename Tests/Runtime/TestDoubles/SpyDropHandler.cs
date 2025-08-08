@@ -8,16 +8,18 @@ using UnityEngine.UI;
 namespace TestHelper.UI.TestDoubles
 {
     [RequireComponent(typeof(Image))]
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class SpyDropHandler : MonoBehaviour, IDropHandler
     {
         public bool WasDrop { get; private set; }
 
         private Image _image;
 
-        private void Start()
+        private void Awake()
         {
             _image = GetComponent<Image>();
             _image.color = UnityEngine.Random.ColorHSV();
+            _image.raycastTarget = true;
         }
 
         public void OnDrop(PointerEventData eventData)
