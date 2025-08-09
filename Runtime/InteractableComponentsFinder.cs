@@ -8,6 +8,8 @@ using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace TestHelper.UI
@@ -34,13 +36,15 @@ namespace TestHelper.UI
         }
 
         /// <summary>
-        /// Find components attached EventTrigger or implements IEventSystemHandler in scene.
-        /// Includes UI elements that inherit from the Selectable class, such as Button.
-        ///
-        /// Note: If you only need UI elements, using UnityEngine.UI.Selectable.allSelectablesArray is faster.
+        /// Find components attached <see cref="EventTrigger"/> or implements <see cref="IEventSystemHandler"/> in the scene.
+        /// Includes UI elements that inherit from the <see cref="Selectable"/> class, such as the <see cref="Button"/>.
+        /// <p/>
+        /// Note: If you only need uGUI elements, use <see cref="UnityEngine.UI.Selectable.allSelectablesArray"/> is faster.
+        /// <br/>
+        /// Note: Does not check if reachable by user. 
         /// </summary>
         /// <returns>Interactable components</returns>
-        public IEnumerable<Component> FindInteractableComponents()
+        public IEnumerable<MonoBehaviour> FindInteractableComponents()
         {
             foreach (var component in FindMonoBehaviours())
             {
@@ -53,13 +57,39 @@ namespace TestHelper.UI
 
         /// <summary>
         /// Returns tuple of interactable component and operator.
-        /// Note: Not check reachable from user.
+        /// <p/>
+        /// Note: Does not check if reachable by user. 
         /// </summary>
         /// <returns>Tuple of interactable component and operator</returns>
-        public IEnumerable<(Component, IOperator)> FindInteractableComponentsAndOperators()
+        public IEnumerable<(MonoBehaviour, IOperator)> FindInteractableComponentsAndOperators()
         {
             return FindInteractableComponents()
                 .SelectMany(x => x.gameObject.SelectOperators(_operators), (x, o) => (x, o));
+        }
+
+        /// <summary>
+        /// Find components that can handle the specified event handler in the scene.
+        /// <p/>
+        /// Note: Does not check if reachable by user.
+        /// </summary>
+        /// <typeparam name="T">Event handler type</typeparam>
+        /// <returns>Components can handle the specified event handler</returns>
+        public IEnumerable<MonoBehaviour> FindEventHandlers<T>() where T : IEventSystemHandler
+        {
+            foreach (var component in FindMonoBehaviours().Where(x => x.isActiveAndEnabled))
+            {
+                if (component is EventTrigger eventTrigger)
+                {
+                    if (eventTrigger.CanHandle<T>())
+                    {
+                        yield return component;
+                    }
+                }
+                else if (component is T)
+                {
+                    yield return component;
+                }
+            }
         }
 
         private static IEnumerable<MonoBehaviour> FindMonoBehaviours()
