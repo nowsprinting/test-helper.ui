@@ -74,32 +74,52 @@ namespace TestHelper.UI.Operators
                 return false;
             }
 
-            return gameObject.TryGetEnabledComponent<IDragHandler>(out _) &&
-                   gameObject.TryGetEnabledComponent<IPointerDownHandler>(out _) &&
-                   gameObject.TryGetEnabledComponent<IPointerUpHandler>(out _);
+            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
+            {
+                if (eventTrigger.CanHandle<IInitializePotentialDragHandler>() &&
+                    eventTrigger.CanHandle<IBeginDragHandler>() &&
+                    eventTrigger.CanHandle<IEndDragHandler>() &&
+                    eventTrigger.CanHandle<IDragHandler>())
+                {
+                    return true;
+                }
+            }
+
+            return gameObject.TryGetEnabledComponent<IInitializePotentialDragHandler>(out _) &&
+                   gameObject.TryGetEnabledComponent<IBeginDragHandler>(out _) &&
+                   gameObject.TryGetEnabledComponent<IEndDragHandler>(out _) &&
+                   gameObject.TryGetEnabledComponent<IDragHandler>(out _);
         }
 
         /// <inheritdoc />
         /// <remarks>
         /// The drop positions are determined in the following order:
         /// 1. Drop to the position that <c>GameObject</c> with <see cref="DropAnnotation"/> component if it exists. It will be random if there are multiple.
-        /// 2. Drop to the random screen position.
+        /// 2. Drop to the position that <c>GameObject</c> with implement <see cref="IDropHandler"/> component if it exists. It will be random if there are multiple.
+        /// 3. Drop to the random screen position.
         /// </remarks>
         public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
-            var dropAnnotations = FindDropAnnotations();
+            var dropAnnotations = FindDropAnnotations() as Component[];
             var dropAnnotation = LotteryComponent(dropAnnotations);
             if (dropAnnotation != null)
             {
                 return OperateAsync(gameObject, dropAnnotation.gameObject, raycastResult, cancellationToken);
             }
 
+            var dropHandlers = new InteractableComponentsFinder().FindEventHandlers<IDropHandler>() as Component[];
+            var dropHandler = LotteryComponent(dropHandlers);
+            if (dropHandler != null)
+            {
+                return OperateAsync(gameObject, dropHandler.gameObject, raycastResult, cancellationToken);
+            }
+
             var destination = _random.NextScreenPosition();
             return OperateAsync(gameObject, destination, raycastResult, cancellationToken);
         }
 
-        private static DropAnnotation[] FindDropAnnotations()
+        private static IEnumerable<DropAnnotation> FindDropAnnotations()
         {
 #if UNITY_2022_3_OR_NEWER
             return Object.FindObjectsByType<DropAnnotation>(FindObjectsSortMode.None);
@@ -109,9 +129,14 @@ namespace TestHelper.UI.Operators
 #endif
         }
 
-        internal Component LotteryComponent(Component[] annotations)
+        internal Component LotteryComponent(Component[] components)
         {
-            var list = new List<Component>(annotations);
+            if (components == null)
+            {
+                return null;
+            }
+
+            var list = new List<Component>(components);
             while (list.Count > 0)
             {
                 var index = _random.Next(list.Count);

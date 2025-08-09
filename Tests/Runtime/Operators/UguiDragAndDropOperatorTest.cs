@@ -134,8 +134,26 @@ namespace TestHelper.UI.Operators
         public async Task OperateAsync_ExistDropAnnotation_DropOnTarget()
         {
             var dragHandler = CreateSpyDragHandler();
+            var dropHandler = CreateSpyDropHandler(); // dummy
+            var dropHandlerWithAnnotation = CreateSpyDropHandler();
+            dropHandlerWithAnnotation.gameObject.AddComponent<DropAnnotation>();
+
+            await UniTask.NextFrame(); // wait ready for raycaster
+
+            var sut = new UguiDragAndDropOperator();
+            await sut.OperateAsync(dragHandler.gameObject,
+                new RaycastResult { screenPosition = dragHandler.transform.position });
+
+            Assert.That(dropHandler.WasDrop, Is.False);
+            Assert.That(dropHandlerWithAnnotation.WasDrop, Is.True);
+        }
+
+        [Test]
+        [LoadScene("../../Scenes/Canvas.unity")]
+        public async Task OperateAsync_ExistDropHandlerObject_DropOnTarget()
+        {
+            var dragHandler = CreateSpyDragHandler();
             var dropHandler = CreateSpyDropHandler();
-            dropHandler.gameObject.AddComponent<DropAnnotation>();
 
             await UniTask.NextFrame(); // wait ready for raycaster
 
