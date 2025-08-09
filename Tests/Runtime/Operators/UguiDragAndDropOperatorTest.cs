@@ -79,37 +79,37 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        public void LotteryDropAnnotation_Empty_ReturnsNull()
+        public void LotteryComponent_Empty_ReturnsNull()
         {
-            var annotations = Array.Empty<DropAnnotation>();
+            var components = Array.Empty<Component>();
             var sut = new UguiDragAndDropOperator();
-            var actual = sut.LotteryDropAnnotation(annotations);
+            var actual = sut.LotteryComponent(components);
 
             Assert.That(actual, Is.Null);
         }
 
         [Test]
         [LoadScene("../../Scenes/Canvas.unity")]
-        public async Task LotteryDropAnnotation_OnlyNotReachable_ReturnsNull()
+        public async Task LotteryComponent_OnlyNotReachable_ReturnsNull()
         {
             var notReachableHandler = CreateSpyDropHandler();
             var notReachableAnnotation = notReachableHandler.gameObject.AddComponent<DropAnnotation>();
             var blocker = CreateSpyDropHandler();
             blocker.transform.position = notReachableHandler.transform.position;
-            var annotations = new[] { notReachableAnnotation };
+            var components = new Component[] { notReachableAnnotation };
 
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
-            var actual = sut.LotteryDropAnnotation(annotations);
+            var actual = sut.LotteryComponent(components);
 
             Assert.That(actual, Is.Null);
         }
 
         [Test]
-        [Repeat(10)]
         [LoadScene("../../Scenes/Canvas.unity")]
-        public async Task LotteryDropAnnotation_IncludeValidAnnotation_ReturnsDropAnnotation()
+        [Repeat(5)]
+        public async Task LotteryComponent_IncludeValidComponent_ReturnsComponent()
         {
             var notReachableHandler = CreateSpyDropHandler();
             var notReachableAnnotation = notReachableHandler.gameObject.AddComponent<DropAnnotation>();
@@ -118,19 +118,20 @@ namespace TestHelper.UI.Operators
 
             var reachableHandler = CreateSpyDropHandler();
             var reachableAnnotation = reachableHandler.gameObject.AddComponent<DropAnnotation>();
-            var annotations = new[] { notReachableAnnotation, reachableAnnotation };
+            var components = new Component[] { notReachableAnnotation, reachableAnnotation };
 
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
-            var actual = sut.LotteryDropAnnotation(annotations);
+            var actual = sut.LotteryComponent(components);
 
             Assert.That(actual, Is.EqualTo(reachableAnnotation));
         }
 
         [Test]
         [LoadScene("../../Scenes/Canvas.unity")]
-        public async Task OperateAsync_WithDropAnnotation_DropOnTarget()
+        [Repeat(5)]
+        public async Task OperateAsync_ExistDropAnnotation_DropOnTarget()
         {
             var dragHandler = CreateSpyDragHandler();
             var dropHandler = CreateSpyDropHandler();
@@ -147,7 +148,27 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene("../../Scenes/Canvas.unity")]
-        public async Task OperateAsync_WithDropTargetObject_DropOnTarget()
+        public async Task OperateAsync_NotExistDropTarget_DropOnRandomScreenPoint()
+        {
+            var dragHandler = CreateSpyDragHandler();
+
+            await UniTask.NextFrame(); // wait ready for raycaster
+
+            var sut = new UguiDragAndDropOperator();
+            await sut.OperateAsync(dragHandler.gameObject,
+                new RaycastResult { screenPosition = dragHandler.transform.position });
+
+            Assert.That(dragHandler.WasPointerDown, Is.True);
+            Assert.That(dragHandler.WasInitializePotentialDrag, Is.True);
+            Assert.That(dragHandler.WasBeginDrag, Is.True);
+            Assert.That(dragHandler.WasPointerUp, Is.True);
+            Assert.That(dragHandler.WasEndDrag, Is.True);
+            Assert.That(dragHandler.LastDragPosition, Is.Not.EqualTo(default(Vector2)));
+        }
+
+        [Test]
+        [LoadScene("../../Scenes/Canvas.unity")]
+        public async Task OperateAsync_SpecifyDropTargetObject_DropOnTarget()
         {
             var dragHandler = CreateSpyDragHandler();
             var dropHandler = CreateSpyDropHandler();
@@ -163,7 +184,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene("../../Scenes/Canvas.unity")]
-        public async Task OperateAsync_WithDropTargetPoint_DropOnTarget()
+        public async Task OperateAsync_SpecifyDropTargetPoint_DropOnTarget()
         {
             var dragHandler = CreateSpyDragHandler();
             var dropHandler = CreateSpyDropHandler();
@@ -175,26 +196,6 @@ namespace TestHelper.UI.Operators
                 new RaycastResult { screenPosition = dragHandler.transform.position });
 
             Assert.That(dropHandler.WasDrop, Is.True);
-        }
-
-        [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
-        public async Task OperateAsync_WithoutDropTarget_DropOnRandomScreenPoint()
-        {
-            var dragHandler = CreateSpyDragHandler();
-
-            await UniTask.NextFrame(); // wait ready for raycaster
-
-            var sut = new UguiDragAndDropOperator();
-            await sut.OperateAsync(dragHandler.gameObject,
-                new RaycastResult { screenPosition = dragHandler.transform.position });
-
-            Assert.That(dragHandler.WasPointerDown, Is.True);
-            Assert.That(dragHandler.WasInitializePotentialDrag, Is.True);
-            Assert.That(dragHandler.WasBeginDrag, Is.True);
-            Assert.That(dragHandler.LastDragPosition, Is.Not.EqualTo(default(Vector2)));
-            Assert.That(dragHandler.WasPointerUp, Is.True);
-            Assert.That(dragHandler.WasEndDrag, Is.True);
         }
     }
 }

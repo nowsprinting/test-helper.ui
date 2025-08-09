@@ -89,7 +89,7 @@ namespace TestHelper.UI.Operators
             CancellationToken cancellationToken = default)
         {
             var dropAnnotations = FindDropAnnotations();
-            var dropAnnotation = LotteryDropAnnotation(dropAnnotations);
+            var dropAnnotation = LotteryComponent(dropAnnotations);
             if (dropAnnotation != null)
             {
                 return OperateAsync(gameObject, dropAnnotation.gameObject, raycastResult, cancellationToken);
@@ -109,9 +109,9 @@ namespace TestHelper.UI.Operators
 #endif
         }
 
-        internal DropAnnotation LotteryDropAnnotation(DropAnnotation[] annotations)
+        internal Component LotteryComponent(Component[] annotations)
         {
-            var list = new List<DropAnnotation>(annotations);
+            var list = new List<Component>(annotations);
             while (list.Count > 0)
             {
                 var index = _random.Next(list.Count);
