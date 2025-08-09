@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace TestHelper.UI
 {
@@ -174,6 +177,39 @@ namespace TestHelper.UI
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjects()));
                 }
+            }
+        }
+
+        [TestFixture]
+        public class FindEventHandlersTest
+        {
+            [Test]
+            [CreateScene]
+            public void FindEventHandlers_HitEventHandler()
+            {
+                var button = new GameObject().AddComponent<Button>();
+                var expected = new[] { button };
+
+                var actual = new InteractableComponentsFinder().FindEventHandlers<IPointerClickHandler>();
+
+                Assert.That(actual, Is.EquivalentTo(expected));
+            }
+
+            [Test]
+            [CreateScene]
+            public void FindEventHandlers_HitEventTrigger()
+            {
+                var eventTrigger = new GameObject().AddComponent<EventTrigger>();
+                eventTrigger.triggers.Add(new EventTrigger.Entry
+                {
+                    eventID = EventTriggerType.PointerClick,
+                    callback = new EventTrigger.TriggerEvent()
+                });
+                var expected = new[] { eventTrigger };
+
+                var actual = new InteractableComponentsFinder().FindEventHandlers<IPointerClickHandler>();
+
+                Assert.That(actual, Is.EquivalentTo(expected));
             }
         }
     }
