@@ -101,6 +101,14 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        public void IsMatch_NotMatchTexture_ImageWithoutSprite_ReturnsFalse()
+        {
+            var sut = new ButtonMatcher(texture: "dummy");
+            var actual = sut.IsMatch(CreateButton(imageWithoutSprite: true));
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
         public void IsMatch_MatchAllProperties_ReturnsTrue()
         {
             var sut = new ButtonMatcher(
@@ -135,7 +143,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         private static GameObject CreateButton(string name = null, string path = null, string text = null,
-            string tmpText = null, string texture = null)
+            string tmpText = null, string texture = null, bool imageWithoutSprite = false)
         {
             var gameObject = new GameObject();
             gameObject.AddComponent<Button>();
@@ -185,6 +193,12 @@ namespace TestHelper.UI.GameObjectMatchers
             {
                 var imageComponent = gameObject.AddComponent<Image>();
                 imageComponent.sprite = CreateSprite(texture);
+            }
+
+            if (imageWithoutSprite)
+            {
+                gameObject.AddComponent<Image>();
+                // without sprite
             }
 
             return gameObject;
