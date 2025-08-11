@@ -1,7 +1,7 @@
 {
   "name": "com.nowsprinting.test-helper.ui",
   "description": "A library for object-based monkey and UI testing.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Koji Hasegawa <hasegawa@hubsys.co.jp> (https://github.com/nowsprinting)",
   "category": "Unity Test Framework",
   "changelogUrl": "https://github.com/nowsprinting/test-helper.ui/releases",
