@@ -1,7 +1,6 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using TMPro;
@@ -102,6 +101,14 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        public void IsMatch_NotMatchTexture_ImageWithoutSprite_ReturnsFalse()
+        {
+            var sut = new ButtonMatcher(texture: "dummy");
+            var actual = sut.IsMatch(CreateButton(imageWithoutSprite: true));
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
         public void IsMatch_MatchAllProperties_ReturnsTrue()
         {
             var sut = new ButtonMatcher(
@@ -111,7 +118,6 @@ namespace TestHelper.UI.GameObjectMatchers
                 text: "Click Me",
                 texture: "test_sprite");
             var actual = sut.IsMatch(CreateButton(
-                componentType: typeof(Button),
                 name: "Button",
                 path: "/Path/To/Button",
                 text: "Click Me",
@@ -129,7 +135,6 @@ namespace TestHelper.UI.GameObjectMatchers
                 text: "Click Me",
                 texture: "test_sprite");
             var actual = sut.IsMatch(CreateButton(
-                componentType: typeof(Button),
                 name: "Button",
                 path: "/Path/To/Button",
                 tmpText: "Click Me",
@@ -137,10 +142,11 @@ namespace TestHelper.UI.GameObjectMatchers
             Assert.That(actual, Is.True);
         }
 
-        private static GameObject CreateButton(Type componentType = null, string name = null, string path = null,
-            string text = null, string tmpText = null, string texture = null)
+        private static GameObject CreateButton(string name = null, string path = null, string text = null,
+            string tmpText = null, string texture = null, bool imageWithoutSprite = false)
         {
             var gameObject = new GameObject();
+            gameObject.AddComponent<Button>();
 
             if (path != null)
             {
@@ -169,11 +175,6 @@ namespace TestHelper.UI.GameObjectMatchers
                 gameObject.name = name; // Note: Allow it to be overwritten
             }
 
-            if (componentType != null)
-            {
-                gameObject.AddComponent(componentType);
-            }
-
             if (text != null)
             {
                 var textComponent = new GameObject().AddComponent<Text>();
@@ -192,6 +193,12 @@ namespace TestHelper.UI.GameObjectMatchers
             {
                 var imageComponent = gameObject.AddComponent<Image>();
                 imageComponent.sprite = CreateSprite(texture);
+            }
+
+            if (imageWithoutSprite)
+            {
+                gameObject.AddComponent<Image>();
+                // without sprite
             }
 
             return gameObject;

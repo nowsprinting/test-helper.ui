@@ -125,12 +125,12 @@ namespace TestHelper.UI.GameObjectMatchers
         private static bool IsMatchTexture(GameObject gameObject, string texture)
         {
             var imageComponent = gameObject.GetComponent<Image>();
-            if (imageComponent)
+            if (imageComponent == null || imageComponent.sprite == null)
             {
-                return imageComponent.sprite.name == texture;
+                return false;
             }
 
-            return false;
+            return imageComponent.sprite.name == texture;
         }
     }
 }
