@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using TestHelper.Random;
 using TestHelper.UI.Exceptions;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
-using TestHelper.Random;
 using UnityEngine;
 
 namespace TestHelper.UI
@@ -94,10 +94,7 @@ namespace TestHelper.UI
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {
             new UguiClickOperator(),
-            new UguiClickAndHoldOperator(),
-            new UguiDoubleClickOperator(),
-            new UguiScrollWheelOperator(), // Specify PRNG instance, if necessary
-            new UguiTextInputOperator(),   // Specify random text input strategy, if necessary
+            new UguiTextInputOperator(), // Specify random text input strategy, if necessary
         };
     }
 }
