@@ -101,6 +101,14 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        public void IsMatch_NotMatchTexture_ImageWithDestroyedSprite_ReturnsFalse()
+        {
+            var sut = new ButtonMatcher(texture: "dummy");
+            var actual = sut.IsMatch(CreateButton(imageWithDestroyedSprite: true));
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
         public void IsMatch_NotMatchTexture_ImageWithoutSprite_ReturnsFalse()
         {
             var sut = new ButtonMatcher(texture: "dummy");
@@ -143,7 +151,8 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         private static GameObject CreateButton(string name = null, string path = null, string text = null,
-            string tmpText = null, string texture = null, bool imageWithoutSprite = false)
+            string tmpText = null, string texture = null, bool imageWithDestroyedSprite = false,
+            bool imageWithoutSprite = false)
         {
             var gameObject = new GameObject();
             gameObject.AddComponent<Button>();
@@ -193,6 +202,13 @@ namespace TestHelper.UI.GameObjectMatchers
             {
                 var imageComponent = gameObject.AddComponent<Image>();
                 imageComponent.sprite = CreateSprite(texture);
+            }
+
+            if (imageWithDestroyedSprite)
+            {
+                var imageComponent = gameObject.AddComponent<Image>();
+                imageComponent.sprite = CreateSprite("texture");
+                GameObject.DestroyImmediate(imageComponent.sprite);
             }
 
             if (imageWithoutSprite)
