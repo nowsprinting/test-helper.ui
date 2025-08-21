@@ -78,7 +78,7 @@ namespace TestHelper.UI.Operators
             await operationLogger.Log();
 
             // Do double click using the new multiple click method
-            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, Logger))
+            using (var pointerClickSimulator = new PointerClickEventSimulator(gameObject, raycastResult, Logger))
             {
                 await pointerClickSimulator.PointerClickAsync(0, 2, _intervalMillis, cancellationToken);
             }

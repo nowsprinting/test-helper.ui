@@ -169,9 +169,16 @@ namespace TestHelper.UI.Operators
             await operationLogger.Log();
 
             // Do operation
-            using (var eventSimulator = new PointerEventSimulator(gameObject, raycastResult, Logger))
+            using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
             {
-                await eventSimulator.DragAndDropAsync(destination, _dragSpeed, _delayBeforeDrop, cancellationToken);
+                simulator.BeginDrag();
+                await simulator.DragAsync(destination, _dragSpeed, cancellationToken);
+
+                // Wait for delay before drop
+                await UniTask.Delay(TimeSpan.FromSeconds(_delayBeforeDrop), ignoreTimeScale: true,
+                    cancellationToken: cancellationToken);
+
+                simulator.EndDrag();
             }
         }
     }
