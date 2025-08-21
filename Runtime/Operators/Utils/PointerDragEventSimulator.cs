@@ -24,7 +24,7 @@ namespace TestHelper.UI.Operators.Utils
         private readonly ILogger _logger;
 
         private bool _isDragging;
-        private readonly List<RaycastResult> _raycastResults = new();
+        private readonly List<RaycastResult> _raycastResults = new List<RaycastResult>();
 
         /// <summary>
         /// Constructor.
