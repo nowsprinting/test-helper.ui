@@ -124,7 +124,7 @@ namespace TestHelper.UI.Operators.Utils
 
                 _eventData.position = currentPosition + direction * speed;
 
-#if UNITY_2020_1_OR_NEWER
+#if ENABLE_UGUI2
                 if (TryGetGameObjectAtCurrentPosition(out var pointerGameObject))
                 {
                     ExecuteEvents.ExecuteHierarchy(pointerGameObject, _eventData, ExecuteEvents.pointerMoveHandler);
