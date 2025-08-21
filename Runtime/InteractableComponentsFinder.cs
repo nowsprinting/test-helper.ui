@@ -74,7 +74,7 @@ namespace TestHelper.UI
         /// </summary>
         /// <typeparam name="T">Event handler type</typeparam>
         /// <returns>Components can handle the specified event handler</returns>
-        public IEnumerable<MonoBehaviour> FindEventHandlers<T>() where T : IEventSystemHandler
+        public static IEnumerable<MonoBehaviour> FindEventHandlers<T>() where T : IEventSystemHandler
         {
             foreach (var component in FindMonoBehaviours().Where(x => x.isActiveAndEnabled))
             {

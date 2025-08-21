@@ -190,7 +190,7 @@ namespace TestHelper.UI
                 var button = new GameObject().AddComponent<Button>();
                 var expected = new[] { button };
 
-                var actual = new InteractableComponentsFinder().FindEventHandlers<IPointerClickHandler>();
+                var actual = InteractableComponentsFinder.FindEventHandlers<IPointerClickHandler>();
 
                 Assert.That(actual, Is.EquivalentTo(expected));
             }
@@ -207,7 +207,7 @@ namespace TestHelper.UI
                 });
                 var expected = new[] { eventTrigger };
 
-                var actual = new InteractableComponentsFinder().FindEventHandlers<IPointerClickHandler>();
+                var actual = InteractableComponentsFinder.FindEventHandlers<IPointerClickHandler>();
 
                 Assert.That(actual, Is.EquivalentTo(expected));
             }

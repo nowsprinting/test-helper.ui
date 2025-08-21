@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Random;
@@ -37,7 +38,7 @@ namespace TestHelper.UI.Operators
         /// Constructor.
         /// </summary>
         /// <param name="dragSpeed">Drag amount per frame (must be positive)</param>
-        /// <param name="delayBeforeDrop">Delay in seconds after dragging is complete and before dropping. You can also use it to keep an On-Screen Stick in place.</param>
+        /// <param name="delayBeforeDrop">Delay in seconds after dragging is complete and before dropping. You can also use it to keep an On-screen stick in place.</param>
         /// <param name="random">PRNG instance</param>
         /// <param name="getScreenPoint"></param>
         /// <param name="reachableStrategy"></param>
@@ -67,6 +68,9 @@ namespace TestHelper.UI.Operators
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// <see cref="IDropHandler"/> is not required.
+        /// </remarks>
         public bool CanOperate(GameObject gameObject)
         {
             if (gameObject == null)
@@ -76,19 +80,13 @@ namespace TestHelper.UI.Operators
 
             if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
             {
-                if (eventTrigger.CanHandle<IInitializePotentialDragHandler>() &&
-                    eventTrigger.CanHandle<IBeginDragHandler>() &&
-                    eventTrigger.CanHandle<IEndDragHandler>() &&
-                    eventTrigger.CanHandle<IDragHandler>())
+                if (eventTrigger.CanHandle<IDragHandler>())
                 {
                     return true;
                 }
             }
 
-            return gameObject.TryGetEnabledComponent<IInitializePotentialDragHandler>(out _) &&
-                   gameObject.TryGetEnabledComponent<IBeginDragHandler>(out _) &&
-                   gameObject.TryGetEnabledComponent<IEndDragHandler>(out _) &&
-                   gameObject.TryGetEnabledComponent<IDragHandler>(out _);
+            return gameObject.TryGetEnabledComponent<IDragHandler>(out _);
         }
 
         /// <inheritdoc />
@@ -108,7 +106,7 @@ namespace TestHelper.UI.Operators
                 return OperateAsync(gameObject, dropAnnotation.gameObject, raycastResult, cancellationToken);
             }
 
-            var dropHandlers = new InteractableComponentsFinder().FindEventHandlers<IDropHandler>() as Component[];
+            var dropHandlers = InteractableComponentsFinder.FindEventHandlers<IDropHandler>().ToArray<Component>();
             var dropHandler = LotteryComponent(dropHandlers);
             if (dropHandler != null)
             {
