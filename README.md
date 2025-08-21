@@ -184,6 +184,10 @@ Built-in operators:
 - `UguiClickOperator`: Performs the click.
 - `UguiClickAndHoldOperator`: Performs the click and hold; hold time can be specified.
 - `UguiDoubleClickOperator`: Performs the double click; interval between clicks can be specified.
+- `UguiDragAndDropOperator`: Performs the drag and drop; drag speed and destination can be specified. If omitted, drop positions are determined in the following order:
+  1. Drop to the position that `GameObject` with `DropAnnotation` component if it exists. It will be random if there are multiple.
+  2. Drop to the position that `GameObject` with implement `IDropHandler` component if it exists. It will be random if there are multiple.
+  3. Drop to the random screen position.
 - `UguiScrollWheelOperator`: Performs the scroll; scroll speed and destination can be specified. If omitted, it will be random.
 - `UguiTextInputOperator`: Inputs text into `InputField` or `TMP_InputField`; text can be specified. If omitted, it will be randomized text.
 
@@ -353,6 +357,10 @@ Please note that this will be included in the release build due to the way it wo
 > Even if the annotations assembly is removed from the release build, the link to the annotation component will remain Scenes and Prefabs in the asset bundle built.
 > Therefore, a warning log will be output during instantiate.
 > To avoid this, annotations assembly are included in release builds.
+
+##### DropAnnotation
+
+`UguiDragAndDropOperator` will preferentially drop onto `GameObject` with `DropAnnotation` attached.
 
 ##### IgnoreAnnotation
 

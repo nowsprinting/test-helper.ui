@@ -57,7 +57,7 @@ namespace TestHelper.UI.Operators
             await operationLogger.Log();
 
             // Do operation
-            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, Logger))
+            using (var pointerClickSimulator = new PointerClickEventSimulator(gameObject, raycastResult, Logger))
             {
                 await pointerClickSimulator.PointerClickAsync(cancellationToken: cancellationToken);
             }

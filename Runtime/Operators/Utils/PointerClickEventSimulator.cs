@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,14 +12,15 @@ using UnityEngine.UI;
 namespace TestHelper.UI.Operators.Utils
 {
     /// <summary>
-    /// Simulator class to reproduce pointer events.
+    /// A class that simulates pointer events.
     /// </summary>
-    public sealed class PointerEventSimulator : IDisposable
+    public sealed class PointerClickEventSimulator : IDisposable
     {
         private readonly GameObject _gameObject;
-        private readonly ILogger _logger;
+        private readonly string _gameObjectNameCache;
         private readonly bool _hasSelectable;
         private readonly SimulatedPointerEventData _eventData;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Constructor.
@@ -26,12 +28,13 @@ namespace TestHelper.UI.Operators.Utils
         /// <param name="gameObject">Click target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the game-title implementation.</param>
         /// <param name="logger">Logger set if you need</param>
-        public PointerEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger = null)
+        public PointerClickEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger = null)
         {
             _gameObject = gameObject;
-            _logger = logger;
-            _hasSelectable = gameObject.GetComponent<Selectable>() != null;
+            _gameObjectNameCache = gameObject.name;
+            _hasSelectable = gameObject.TryGetEnabledComponent<Selectable>(out _);
             _eventData = new SimulatedPointerEventData(gameObject, raycastResult);
+            _logger = logger;
         }
 
         /// <inheritdoc/>
@@ -45,13 +48,14 @@ namespace TestHelper.UI.Operators.Utils
         /// <list type="number">
         ///     <item><c>OnPointerEnter</c> (once at the beginning)</item>
         ///     <item><c>OnSelect</c> (once at the beginning, if <c>Selectable</c> is attached)</item>
-        ///     <item>For each click:</item>
-        ///     <item>-- <c>OnPointerDown</c></item>
-        ///     <item>-- <c>OnInitializePotentialDrag</c></item>
-        ///     <item>-- Wait for the hold time</item>
-        ///     <item>-- <c>OnPointerUp</c></item>
-        ///     <item>-- <c>OnPointerClick</c></item>
-        ///     <item>-- Wait for interval</item>
+        ///     <item><description>For each click count:<list type="number">
+        ///         <item><c>OnPointerDown</c></item>
+        ///         <item><c>OnInitializePotentialDrag</c></item>
+        ///         <item>Wait for the hold time</item>
+        ///         <item><c>OnPointerUp</c></item>
+        ///         <item><c>OnPointerClick</c></item>
+        ///         <item>Wait for interval</item>
+        ///     </list></description></item>
         ///     <item><c>OnPointerExit</c> (once at the end)</item>
         /// </list>
         /// </summary>
@@ -65,8 +69,6 @@ namespace TestHelper.UI.Operators.Utils
         public async UniTask PointerClickAsync(int holdMillis = 0, int clickCount = 1, int intervalMillis = 0,
             CancellationToken cancellationToken = default)
         {
-            var gameObjectNameCache = _gameObject.name;
-
             // Enter (once at the beginning)
             ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerEnterHandler);
             if (_hasSelectable)
@@ -103,13 +105,12 @@ namespace TestHelper.UI.Operators.Utils
                 }
 
                 await UniTask.Delay(intervalMillis, ignoreTimeScale: true, cancellationToken: cancellationToken);
-                if (_gameObject != null)
-                {
-                    continue;
-                }
 
-                _logger?.Log($"{gameObjectNameCache} is destroyed before pointer-up event.");
-                return;
+                if (_gameObject == null)
+                {
+                    _logger?.Log($"{_gameObjectNameCache} is destroyed before pointer-up event.");
+                    return;
+                }
             }
 
             // Exit (once at the end)

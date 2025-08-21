@@ -10,7 +10,7 @@ namespace TestHelper.UI.Operators.Utils
     /// <summary>
     /// Class that simulates the pointer-down state of <see cref="PointerEventData"/>.
     /// </summary>
-    internal sealed class SimulatedPointerEventData : PointerEventData, IDisposable
+    public sealed class SimulatedPointerEventData : PointerEventData, IDisposable
     {
         public enum PointingDeviceType
         {
