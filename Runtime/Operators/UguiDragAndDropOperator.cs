@@ -92,9 +92,11 @@ namespace TestHelper.UI.Operators
         /// <inheritdoc />
         /// <remarks>
         /// The drop positions are determined in the following order:
-        /// 1. Drop to the position that <c>GameObject</c> with <see cref="DropAnnotation"/> component if it exists. It will be random if there are multiple.
-        /// 2. Drop to the position that <c>GameObject</c> with implement <see cref="IDropHandler"/> component if it exists. It will be random if there are multiple.
-        /// 3. Drop to the random screen position.
+        /// <list type="number">
+        ///     <item>Drop to the position that <c>GameObject</c> with <see cref="DropAnnotation"/> component if it exists. It will be random if there are multiple</item>
+        ///     <item>Drop to the position that <c>GameObject</c> with implement <see cref="IDropHandler"/> component if it exists. It will be random if there are multiple</item>
+        ///     <item>Drop to the random screen position</item>
+        /// </list>
         /// </remarks>
         public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)

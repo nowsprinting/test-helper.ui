@@ -184,7 +184,10 @@ Built-in operators:
 - `UguiClickOperator`: Performs the click.
 - `UguiClickAndHoldOperator`: Performs the click and hold; hold time can be specified.
 - `UguiDoubleClickOperator`: Performs the double click; interval between clicks can be specified.
-- `UguiDragAndDropOperator`: Performs the drag and drop; drag speed and destination can be specified. If omitted, it will be random.
+- `UguiDragAndDropOperator`: Performs the drag and drop; drag speed and destination can be specified. If omitted, drop positions are determined in the following order:
+  1. Drop to the position that `GameObject` with `DropAnnotation` component if it exists. It will be random if there are multiple.
+  2. Drop to the position that `GameObject` with implement `IDropHandler` component if it exists. It will be random if there are multiple.
+  3. Drop to the random screen position.
 - `UguiScrollWheelOperator`: Performs the scroll; scroll speed and destination can be specified. If omitted, it will be random.
 - `UguiTextInputOperator`: Inputs text into `InputField` or `TMP_InputField`; text can be specified. If omitted, it will be randomized text.
 
