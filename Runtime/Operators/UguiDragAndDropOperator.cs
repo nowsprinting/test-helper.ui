@@ -37,13 +37,13 @@ namespace TestHelper.UI.Operators
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="dragSpeed">Drag amount per frame (must be positive)</param>
+        /// <param name="dragSpeed">Drag amount per frame (must be positive).</param>
         /// <param name="delayBeforeDrop">Delay in seconds after dragging is complete and before dropping. You can also use it to keep an On-screen stick in place.</param>
-        /// <param name="random">PRNG instance</param>
-        /// <param name="getScreenPoint"></param>
-        /// <param name="reachableStrategy"></param>
-        /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
-        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        /// <param name="random">PRNG instance.</param>
+        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c>. Used to determine drop position.</param>
+        /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user.</param>
+        /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console).</param>
+        /// <param name="screenshotOptions">Take screenshot options set if you need.</param>
         public UguiDragAndDropOperator(float dragSpeed = 10.0f, double delayBeforeDrop = 0.0d, IRandom random = null,
             Func<GameObject, Vector2> getScreenPoint = null, IReachableStrategy reachableStrategy = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
