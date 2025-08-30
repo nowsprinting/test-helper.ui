@@ -629,33 +629,31 @@ Lottery entries are empty or all of not reachable.
 
 ## Installation
 
-You can choose from two typical installation methods.
+### 1. Install via Package Manager window
 
-### Install via Package Manager window
-
-1. Open the **Package Manager** tab in Project Settings window (**Editor > Project Settings**)
-2. Click **+** button under the **Scoped Registries** and enter the following settings (figure 1.):
-   1. **Name:** `package.openupm.com`
-   2. **URL:** `https://package.openupm.com`
-   3. **Scope(s):** `com.nowsprinting` and `com.cysharp`
-3. Open the Package Manager window (**Window > Package Manager**) and select **My Registries** in registries drop-down list (figure 2.)
-4. Click **Install** button on the `com.nowsprinting.test-helper.ui` package
+1. Open the Project Settings window (**Editor > Project Settings**) and select **Package Manager** tab (figure 1)
+2. Click **+** button under the **Scoped Registries** and enter the following settings:
+    1. **Name:** `package.openupm.com`
+    2. **URL:** `https://package.openupm.com`
+    3. **Scope(s):** `com.nowsprinting` and `com.cysharp`
+3. Open the Package Manager window (**Window > Package Manager**) and select **My Registries** tab (figure 2)
+4. Select **UI Test Helper** and click the **Install** button
 
 > [!NOTE]  
 > Do not forget to add `com.cysharp` into scopes. These are used within this package.
 
-**Figure 1.** Package Manager tab in Project Settings window.
+**Figure 1.** Scoped Registries setting in Project Settings window
 
-![](Documentation~/ProjectSettings_Dark.png#gh-dark-mode-only)
-![](Documentation~/ProjectSettings_Light.png#gh-light-mode-only)
+![](Documentation~/ScopedRegistries_Dark.png#gh-dark-mode-only)
+![](Documentation~/ScopedRegistries_Light.png#gh-light-mode-only)
 
-**Figure 2.** Select registries drop-down list in Package Manager window.
+**Figure 2.** My Registries in Package Manager window
 
 ![](Documentation~/PackageManager_Dark.png#gh-dark-mode-only)
 ![](Documentation~/PackageManager_Light.png#gh-light-mode-only)
 
 
-### Add assembly reference
+### 2. Add assembly reference
 
 1. Open your test assembly definition file (.asmdef) in **Inspector** window
 2. Add **TestHelper.UI** into **Assembly Definition References**
