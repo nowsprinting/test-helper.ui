@@ -14,7 +14,7 @@ namespace TestHelper.UI.Operators.Utils
     /// <summary>
     /// A class that simulates pointer events.
     /// </summary>
-    public sealed class PointerClickEventSimulator : IDisposable
+    public readonly struct PointerClickEventSimulator : IDisposable
     {
         private readonly GameObject _gameObject;
         private readonly string _gameObjectNameCache;

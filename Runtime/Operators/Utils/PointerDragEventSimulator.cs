@@ -15,7 +15,7 @@ namespace TestHelper.UI.Operators.Utils
     /// <summary>
     /// A class that simulates drag and drop events.
     /// </summary>
-    public sealed class PointerDragEventSimulator : IDisposable
+    public struct PointerDragEventSimulator : IDisposable
     {
         private readonly GameObject _gameObject;
         private readonly string _gameObjectNameCache;
@@ -24,7 +24,7 @@ namespace TestHelper.UI.Operators.Utils
         private readonly ILogger _logger;
 
         private bool _isDragging;
-        private readonly List<RaycastResult> _raycastResults = new List<RaycastResult>();
+        private readonly List<RaycastResult> _raycastResults;
 
         /// <summary>
         /// Constructor.
@@ -39,6 +39,8 @@ namespace TestHelper.UI.Operators.Utils
             _hasSelectable = gameObject.TryGetEnabledComponent<Selectable>(out _);
             _eventData = new SimulatedPointerEventData(gameObject, raycastResult);
             _logger = logger;
+            _isDragging = false;
+            _raycastResults = new List<RaycastResult>();
         }
 
         /// <inheritdoc/>

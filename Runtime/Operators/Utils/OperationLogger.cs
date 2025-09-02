@@ -12,27 +12,26 @@ namespace TestHelper.UI.Operators.Utils
     /// <summary>
     /// Build and output log message with a screenshot for operation.
     /// </summary>
-    public class OperationLogger
+    public struct OperationLogger
     {
         private readonly GameObject _gameObject;
         private readonly IOperator _operator;
         private readonly ILogger _logger;
         private readonly ScreenshotOptions _screenshotOptions;
+        private string _lastScreenshotPath;
 
         /// <summary>
         /// Comments for the <c>Component</c>.
         /// e.g., button text, texture name.
         /// If omitted, output instance ID.
         /// </summary>
-        public readonly List<string> Comments = new List<string>();
+        public readonly List<string> Comments;
 
         /// <summary>
         /// Properties for the operation.
         /// e.g., click position, input text.
         /// </summary>
-        public readonly Dictionary<string, object> Properties = new Dictionary<string, object>();
-
-        private string _lastScreenshotPath;
+        public readonly Dictionary<string, object> Properties;
 
         /// <summary>
         /// Constructor.
@@ -48,6 +47,9 @@ namespace TestHelper.UI.Operators.Utils
             _operator = @operator;
             _logger = logger;
             _screenshotOptions = screenshotOptions;
+            _lastScreenshotPath = null;
+            Comments = new List<string>();
+            Properties = new Dictionary<string, object>();
         }
 
         /// <summary>
