@@ -31,7 +31,7 @@ namespace TestHelper.UI.Operators.Utils
         /// </summary>
         /// <param name="gameObject">Drag target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the game-title implementation.</param>
-        /// <param name="logger">Logger set if you need</param>
+        /// <param name="logger">Verbose logger set if you need</param>
         public PointerDragEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger = null)
         {
             _gameObject = gameObject;
