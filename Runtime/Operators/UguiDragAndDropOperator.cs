@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Random;
@@ -168,10 +169,11 @@ namespace TestHelper.UI.Operators
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
+            operationLogger.Properties.Add("destination", destination);
             await operationLogger.Log();
 
             // Do operation
-            using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
+            using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult))
             {
                 simulator.BeginDrag();
                 await simulator.DragAsync(destination, _dragSpeed, cancellationToken);
@@ -180,8 +182,21 @@ namespace TestHelper.UI.Operators
                 await UniTask.Delay(TimeSpan.FromSeconds(_delayBeforeDrop), ignoreTimeScale: true,
                     cancellationToken: cancellationToken);
 
-                simulator.EndDrag();
+                simulator.EndDrag(out var dropGameObject, out var dropPosition);
+                if (dropGameObject != null)
+                {
+                    var builder = new StringBuilder();
+                    builder.Append($"{this.GetType().Name} drop to {dropGameObject.name}");
+                    builder.Append($"({dropGameObject.GetInstanceID()})");
+                    builder.Append($", position={Format(dropPosition)}");
+                    Logger.Log(builder.ToString());
+                }
             }
+        }
+
+        private static string Format(Vector2 vector2)
+        {
+            return $"({vector2.x:F0},{vector2.y:F0})"; // format as an integer because the screen position
         }
     }
 }

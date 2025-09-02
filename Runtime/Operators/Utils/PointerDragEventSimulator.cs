@@ -31,7 +31,7 @@ namespace TestHelper.UI.Operators.Utils
         /// </summary>
         /// <param name="gameObject">Drag target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the game-title implementation.</param>
-        /// <param name="logger">Logger set if you need</param>
+        /// <param name="logger">Verbose logger set if you need</param>
         public PointerDragEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger = null)
         {
             _gameObject = gameObject;
@@ -47,7 +47,7 @@ namespace TestHelper.UI.Operators.Utils
             if (_isDragging)
             {
                 _logger?.Log(LogType.Warning, $"{_gameObjectNameCache}.Dispose method was called while dragging.");
-                EndDrag();
+                EndDrag(out _, out _);
             }
 
             _eventData.Dispose();
@@ -155,7 +155,7 @@ namespace TestHelper.UI.Operators.Utils
         /// <remarks>
         /// <c>OnDeselect</c> event is called by the system when the focus moves to another element, so it is not called in this method.
         /// </remarks>
-        public void EndDrag()
+        public void EndDrag(out GameObject dropGameObject, out Vector2 dropPosition)
         {
             if (!_isDragging)
             {
@@ -165,6 +165,8 @@ namespace TestHelper.UI.Operators.Utils
             if (_gameObject == null)
             {
                 _logger?.Log($"{_gameObjectNameCache} is destroyed before ending drag.");
+                dropGameObject = null;
+                dropPosition = default;
                 return;
             }
 
@@ -172,9 +174,16 @@ namespace TestHelper.UI.Operators.Utils
             ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerUpHandler);
 
             // Drop
-            if (TryGetGameObjectAtCurrentPosition(out var dropGameObject))
+            if (TryGetGameObjectAtCurrentPosition(out var gameObject))
             {
+                dropGameObject = gameObject;
+                dropPosition = _eventData.position;
                 ExecuteEvents.ExecuteHierarchy(dropGameObject, _eventData, ExecuteEvents.dropHandler);
+            }
+            else
+            {
+                dropGameObject = null;
+                dropPosition = default;
             }
 
             // End drag
