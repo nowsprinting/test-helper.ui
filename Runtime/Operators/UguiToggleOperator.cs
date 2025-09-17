@@ -13,9 +13,20 @@ namespace TestHelper.UI.Operators
     /// <summary>
     /// Toggle operator for <see cref="Toggle"/> component.
     /// You can click to turn it on/off, or you can specify the on/off state.
+    /// In monkey testing, it behaves the same as the <see cref="UguiClickOperator"/>.
     /// </summary>
     public class UguiToggleOperator : UguiClickOperator, IToggleOperator
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
+        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        public UguiToggleOperator(ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+            : base(logger, screenshotOptions)
+        {
+        }
+
         /// <inheritdoc />
         /// <remarks>The <c>new</c> keyword is specified because we want it to work with the casted type.</remarks>
         public new bool CanOperate(GameObject gameObject)
