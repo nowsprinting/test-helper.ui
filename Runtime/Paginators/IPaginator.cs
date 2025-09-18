@@ -1,17 +1,23 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
 namespace TestHelper.UI.Paginators
 {
     /// <summary>
-    /// Interface for pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).
+    /// Interface for pagination controller for finding <c>GameObject</c> on pageable or scrollable UI components (e.g., <c>ScrollRect</c>, Carousel, Paged dialog).
     /// Provides intuitive pagination operations as page navigation functionality, enabling auxiliary operations in the <see cref="GameObjectFinder"/>.
     /// </summary>
     public interface IPaginator
     {
+        /// <summary>
+        /// Pageable or scrollable UI component type.
+        /// </summary>
+        Type ComponentType { get; }
+
         /// <summary>
         /// Move the page position to the beginning.
         /// For scroll components, the display position (top, bottom, left, or right) depends on the implementation.

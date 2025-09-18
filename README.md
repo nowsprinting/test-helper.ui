@@ -128,7 +128,7 @@ public class MyIntegrationTest
 
 #### Find GameObject in pageable component
 
-Find a `GameObject` in pageable (or scrollable) UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
+Find a `GameObject` on pageable or scrollable UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
 A paginator provides step-by-step navigation through pageable content, allowing users to find objects that are not currently visible in the viewport.
 
 Arguments:
@@ -140,8 +140,8 @@ Arguments:
 
 Built-in paginators:
 
-- `UguiScrollRectPaginator`: Used to find `GameObjects` that are on `ScrollRect`
 - `UguiScrollbarPaginator`: Used to find `GameObjects` that are on a scrollable component with a `ScrollBar`
+- `UguiScrollRectPaginator`: Used to find `GameObjects` that are on `ScrollRect`
 
 Usage:
 
