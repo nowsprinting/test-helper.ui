@@ -128,7 +128,7 @@ public class MyIntegrationTest
 
 #### Find GameObject in pageable component
 
-Find a `GameObject` in pageable (or scrollable) UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
+Find a `GameObject` on pageable or scrollable UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
 A paginator provides step-by-step navigation through pageable content, allowing users to find objects that are not currently visible in the viewport.
 
 Arguments:
@@ -140,8 +140,8 @@ Arguments:
 
 Built-in paginators:
 
-- `UguiScrollRectPaginator`: Used to find `GameObjects` that are on `ScrollRect`
 - `UguiScrollbarPaginator`: Used to find `GameObjects` that are on a scrollable component with a `ScrollBar`
+- `UguiScrollRectPaginator`: Used to find `GameObjects` that are on `ScrollRect`
 
 Usage:
 
@@ -440,6 +440,20 @@ If your game title uses a custom UI framework that is not uGUI compatible and/or
 The custom matcher can be specified as an argument to the `GameObjectFinder.FindByMatcherAsync` method.
 
 For example, the built-in `ButtonMatcher` class's `IsMatch` method returns `true` for `GameObjects` that match the specified button element `name`, `path`, `text`, and `texture`.
+
+
+
+### IPaginator interface
+
+If your game title uses a custom pageable or scrollable UI components (e.g., Scroller, Carousel, Paged dialog), you can implement the `IPaginator` interface.
+The custom paginator can be specified as an argument to the `GameObjectFinder.FindByMatcherAsync` method.
+
+A paginator must implement the following methods and properties:
+
+- `ComponentType` property to return the type of UI component that the paginator controls
+- `ResetAsync` method to navigate to the top page
+- `NextPageAsync` method to navigate to the next page
+- `HasNextPage` property to return whether there is a next page
 
 
 

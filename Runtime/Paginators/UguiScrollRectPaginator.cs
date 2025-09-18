@@ -14,6 +14,9 @@ namespace TestHelper.UI.Paginators
     /// </summary>
     public class UguiScrollRectPaginator : IPaginator
     {
+        /// <inheritdoc />
+        public Type ComponentType => typeof(ScrollRect);
+
         private readonly ScrollRect _scrollRect;
         private bool _isHorizontalAtEnd;
 

@@ -14,6 +14,9 @@ namespace TestHelper.UI.Paginators
     /// </summary>
     public class UguiScrollbarPaginator : IPaginator
     {
+        /// <inheritdoc />
+        public Type ComponentType => typeof(Scrollbar);
+
         private readonly Scrollbar _scrollbar;
 
         /// <summary>
