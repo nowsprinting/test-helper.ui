@@ -4,6 +4,7 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,7 +37,22 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [CreateScene]
-        public async Task OperateAsync_WithoutIsOn_ToggleComponent_FlipState([Values] bool state)
+        public async Task OperateAsync_WithIsOn_AlwaysSpecifiedState(
+            [Values] bool beforeState,
+            [Values] bool specifyState)
+        {
+            var gameObject = new GameObject();
+            var toggle = gameObject.AddComponent<Toggle>();
+            toggle.isOn = beforeState;
+
+            await _sut.OperateAsync(gameObject, specifyState);
+
+            Assert.That(toggle.isOn, Is.EqualTo(specifyState));
+        }
+
+        [Test]
+        [CreateScene]
+        public async Task OperateAsync_WithoutIsOn_FlipState([Values] bool state)
         {
             var gameObject = new GameObject();
             var toggle = gameObject.AddComponent<Toggle>();
@@ -49,17 +65,16 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [CreateScene]
-        public async Task OperateAsync_WithIsOn_AlwaysSpecifiedState(
-            [Values] bool beforeState,
-            [Values] bool specifiedState)
+        public async Task Constructor_WithLogger_UseLogger()
         {
+            var spyLogger = new SpyLogger();
+            var sut = new UguiToggleOperator(spyLogger);
             var gameObject = new GameObject();
-            var toggle = gameObject.AddComponent<Toggle>();
-            toggle.isOn = beforeState;
+            gameObject.AddComponent<Toggle>();
 
-            await _sut.OperateAsync(gameObject, specifiedState);
+            await sut.OperateAsync(gameObject);
 
-            Assert.That(toggle.isOn, Is.EqualTo(specifiedState));
+            Assert.That(spyLogger.Messages[0], Does.StartWith("UguiToggleOperator operates to"));
         }
     }
 }
