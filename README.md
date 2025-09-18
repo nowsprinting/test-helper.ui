@@ -443,6 +443,20 @@ For example, the built-in `ButtonMatcher` class's `IsMatch` method returns `true
 
 
 
+### IPaginator interface
+
+If your game title uses a custom pageable or scrollable UI components (e.g., Scroller, Carousel, Paged dialog), you can implement the `IPaginator` interface.
+The custom paginator can be specified as an argument to the `GameObjectFinder.FindByMatcherAsync` method.
+
+A paginator must implement the following methods and properties:
+
+- `ComponentType` property to return the type of UI component that the paginator controls
+- `ResetAsync` method to navigate to the top page
+- `NextPageAsync` method to navigate to the next page
+- `HasNextPage` property to return whether there is a next page
+
+
+
 ### IOperator interface
 
 If your game title uses a custom UI framework that is not uGUI compatible, you can implement the `IOperator` interface.
