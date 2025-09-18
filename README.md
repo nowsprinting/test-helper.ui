@@ -101,8 +101,8 @@ Arguments:
 
 Built-in matchers:
 
-- `ButtonMatcher`: Matches `UnityEngine.UI.Button` components by `name`, `path`, `text`, or `texture`
-- `ToggleMatcher`: Matches `UnityEngine.UI.Toggle` components by `name`, `path`, or `text`
+- `ButtonMatcher`: Matches `UnityEngine.UI.Button` components by `name`, `path`, `text`, and `texture`
+- `ToggleMatcher`: Matches `UnityEngine.UI.Toggle` components by `name`, `path`, and `text`
 
 Usage:
 
@@ -185,11 +185,12 @@ Built-in operators:
 - `UguiClickAndHoldOperator`: Performs the click and hold; hold time can be specified.
 - `UguiDoubleClickOperator`: Performs the double click; interval between clicks can be specified.
 - `UguiDragAndDropOperator`: Performs the drag and drop; drag speed and destination can be specified. If omitted, drop positions are determined in the following order:
-  1. Drop to the position that `GameObject` with `DropAnnotation` component if it exists. It will be random if there are multiple.
-  2. Drop to the position that `GameObject` with implement `IDropHandler` component if it exists. It will be random if there are multiple.
-  3. Drop to the random screen position.
+    1. Drop to the position that `GameObject` with `DropAnnotation` component if it exists. It will be random if there are multiple.
+    2. Drop to the position that `GameObject` with implement `IDropHandler` component if it exists. It will be random if there are multiple.
+    3. Drop to the random screen position.
 - `UguiScrollWheelOperator`: Performs the scroll; scroll speed and destination can be specified. If omitted, it will be random.
-- `UguiTextInputOperator`: Inputs text into `InputField` or `TMP_InputField`; text can be specified. If omitted, it will be randomized text.
+- `UguiTextInputOperator`: Inputs text into `InputField` and `TMP_InputField`; text can be specified. If omitted, it will be randomized text.
+- `UguiToggleOperator`: Toggles the `Toggle` component; target value can be specified. If omitted, it will always be flipped (same as click).
 
 Usage:
 
@@ -347,16 +348,44 @@ classDiagram
 ```
 
 
-#### Annotations for Monkey's behavior
 
-You can control the Monkey's behavior by attaching the annotation components to the `GameObject`.
+### Annotation Components
+
 Use the `TestHelper.UI.Annotations` assembly by adding it to the Assembly Definition References.
 Please note that this will be included in the release build due to the way it works.
 
-> [!NOTE]  
+> [!TIP]  
 > Even if the annotations assembly is removed from the release build, the link to the annotation component will remain Scenes and Prefabs in the asset bundle built.
 > Therefore, a warning log will be output during instantiate.
 > To avoid this, annotations assembly are included in release builds.
+
+
+#### Control ReachableStrategy
+
+You can control the `DefaultReachableStrategy` behavior by attaching the annotation components to the `GameObject`.
+
+##### ScreenOffsetAnnotation
+
+Specifies the screen position offset from the pivot position when raycast by `DefaultReachableStrategy`.
+Respects `CanvasScaler` but does not calculate the aspect ratio.
+
+##### ScreenPositionAnnotation
+
+Specifies the screen position when raycast by `DefaultReachableStrategy`.
+Respects `CanvasScaler` but does not calculate the aspect ratio.
+
+##### WorldOffsetAnnotation
+
+Specifies the world position offset from the pivot position when raycast by `DefaultReachableStrategy`.
+
+##### WorldPositionAnnotation
+
+Specifies the world position when raycast by `DefaultReachableStrategy`.
+
+
+#### Control Monkey
+
+You can control the random behavior of the operator during the monkey testing by attaching the annotation components to the `GameObject`.
 
 ##### DropAnnotation
 
@@ -368,25 +397,7 @@ Monkey will not operate objects with `IgnoreAnnotation` attached.
 
 ##### InputFieldAnnotation
 
-Specify the character kind and length input into `InputField` with `InputFieldAnnotation`.
-
-##### ScreenOffsetAnnotation
-
-Specify the screen position offset where Monkey operators operate.
-Respects `CanvasScaler` but does not calculate the aspect ratio.
-
-##### ScreenPositionAnnotation
-
-Specify the screen position where Monkey operators operate.
-Respects `CanvasScaler` but does not calculate the aspect ratio.
-
-##### WorldOffsetAnnotation
-
-Specify the world position offset where Monkey operators operate.
-
-##### WorldPositionAnnotation
-
-Specify the world position where Monkey operators operate.
+The `InputFieldAnnotation` can specify the kind and the length of characters that the `UguiTextInputOperator` will enter into the `InputField`.
 
 
 
@@ -412,23 +423,23 @@ If your game title uses a custom UI framework that is not uGUI compatible and/or
 #### IsInteractable function
 
 Returns whether the `Component` is interactable or not.
-`DefaultComponentInteractableStrategy.IsInteractable()` returns true if the component is a uGUI compatible component and its `interactable` property is true.
+`DefaultComponentInteractableStrategy.IsInteractable` method returns true if the component is a uGUI-compatible component and its `interactable` property is true.
 
 You should replace this when you want to control special components that comprise your game title.
 
 
-#### IsIgnored method
+#### IIgnoreStrategy interface
 
-`IIgnoreStrategy.IsIgnored()` method returns whether the `GameObject` is ignored or not from `Monkey`.
-`DefaultIgnoreStrategy.IsIgnored()` returns true if the `GameObject` has `IgnoreAnnotation` attached.
+`IsIgnored` method returns whether the `GameObject` is ignored or not from `Monkey`.
+`DefaultIgnoreStrategy.IsIgnored` method returns true if the `GameObject` has the `IgnoreAnnotation` component attached.
 
 You should replace this when you want to ignore specific objects (e.g., by name and/or path) in your game title.
 
 
-#### IsReachable method
+#### IReachableStrategy interface
 
-`IReachableStrategy.IsReachable()` method returns whether the `GameObject` is reachable from the user or not.
-`DefaultReachableStrategy.IsReachable()` returns true if it can raycast from `Camera.main` to the pivot position of `GameObject`.
+`IsReachable` method returns whether the `GameObject` is reachable from the user or not.
+`DefaultReachableStrategy.IsReachable` method returns true if it can raycast from `Camera.main` to the pivot position of `GameObject`.
 
 You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).
 
