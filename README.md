@@ -101,6 +101,7 @@ Arguments:
 
 Built-in matchers:
 
+- `ComponentMatcher`: Matches by `name`, `path`, and component type
 - `ButtonMatcher`: Matches `UnityEngine.UI.Button` components by `name`, `path`, `text`, and `texture`
 - `ToggleMatcher`: Matches `UnityEngine.UI.Toggle` components by `name`, `path`, and `text`
 
