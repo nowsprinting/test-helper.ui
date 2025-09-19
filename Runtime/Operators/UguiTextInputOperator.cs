@@ -5,11 +5,11 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Random;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
 using TestHelper.UI.Random;
-using TestHelper.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,20 +17,30 @@ using UnityEngine.UI;
 using TMPro;
 #endif
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-
 namespace TestHelper.UI.Operators
 {
     /// <summary>
     /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.
     /// </summary>
-    public class UguiTextInputOperator : ITextInputOperator
+    /// <remarks>
+    /// If no text is specified (e.g., in the case of monkey tests), a random string will be entered.
+    /// </remarks>
+    public class UguiTextInputOperator : ITextInputOperator, IRandomizable
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
 
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
+
+        /// <inheritdoc/>
+        public IRandom Random
+        {
+            set
+            {
+                _randomString.Random = value;
+            }
+        }
 
         private readonly Func<GameObject, RandomStringParameters> _randomStringParams;
         private readonly IRandomString _randomString;

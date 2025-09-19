@@ -3,7 +3,7 @@
 
 namespace TestHelper.UI.Random
 {
-    public interface IRandomString
+    public interface IRandomString : IRandomizable
     {
         string Next(RandomStringParameters parameters);
     }

@@ -3,9 +3,8 @@
 
 using System;
 using System.Text;
-using TestHelper.UI.Annotations.Enums;
 using TestHelper.Random;
-using UnityEngine;
+using TestHelper.UI.Annotations.Enums;
 using UnityEngine.Assertions;
 
 namespace TestHelper.UI.Random
@@ -20,8 +19,21 @@ namespace TestHelper.UI.Random
         internal const string CharsASCIIPrintable = CharsASCIIAlphanumeric + CharsASCIISymbols;
 
         private static StringBuilder _sb = new StringBuilder();
-        private readonly IRandom _random;
+        private IRandom _random;
 
+        /// <inheritdoc/>
+        public IRandom Random
+        {
+            private get
+            {
+                _random ??= new RandomWrapper();
+                return _random;
+            }
+            set
+            {
+                _random = value;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <c>RandomStringImpl</c> class,
@@ -29,11 +41,10 @@ namespace TestHelper.UI.Random
         /// <remarks>This class is not thread-safe.</remarks>
         /// </summary>
         /// <param name="random">Random number generator</param>
-        public RandomStringImpl(IRandom random)
+        public RandomStringImpl(IRandom random = null)
         {
-            _random = random;
+            Random = random;
         }
-
 
         /// <summary>
         /// Returns a random string.
@@ -44,19 +55,18 @@ namespace TestHelper.UI.Random
         public string Next(RandomStringParameters parameters)
         {
             Assert.IsTrue(parameters.MinimumLength <= parameters.MaximumLength);
-            var len = parameters.MinimumLength + _random.Next(parameters.MaximumLength - parameters.MinimumLength + 1);
+            var len = parameters.MinimumLength + Random.Next(parameters.MaximumLength - parameters.MinimumLength + 1);
 
             var chars = GetCharsByKind(parameters.CharactersKind);
 
             _sb.Clear();
             for (var i = 0; i < len; i++)
             {
-                _sb.Append(chars[_random.Next(chars.Length)]);
+                _sb.Append(chars[Random.Next(chars.Length)]);
             }
 
             return _sb.ToString();
         }
-
 
         private static string GetCharsByKind(CharactersKind charactersKind)
         {

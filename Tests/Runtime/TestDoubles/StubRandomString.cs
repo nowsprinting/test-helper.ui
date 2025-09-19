@@ -3,6 +3,7 @@
 
 using System;
 using NUnit.Framework;
+using TestHelper.Random;
 using TestHelper.UI.Random;
 
 namespace TestHelper.UI.TestDoubles
@@ -12,6 +13,7 @@ namespace TestHelper.UI.TestDoubles
         private readonly string[] _returnValues;
         private int _returnValueIndex;
 
+        public IRandom Random { get; set; }
 
         public StubRandomString(params string[] returnValues)
         {
@@ -19,7 +21,6 @@ namespace TestHelper.UI.TestDoubles
             _returnValues = returnValues;
             _returnValueIndex = 0;
         }
-
 
         public string Next(RandomStringParameters _)
         {

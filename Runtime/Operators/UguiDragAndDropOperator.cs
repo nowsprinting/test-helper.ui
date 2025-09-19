@@ -11,6 +11,7 @@ using TestHelper.Random;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
+using TestHelper.UI.Random;
 using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -21,15 +22,37 @@ namespace TestHelper.UI.Operators
     /// <summary>
     /// Drag and drop operator for Unity UI (uGUI) components.
     /// </summary>
-    public class UguiDragAndDropOperator : IDragAndDropOperator
+    /// <remarks>
+    /// If no drop destination is specified (e.g., in monkey testing), drop destinations are determined in the following order:
+    /// <list type="number">
+    ///     <item>Drop to the position that <c>GameObject</c> with <see cref="DropAnnotation"/> component if it exists. It will be random if there are multiple.</item>
+    ///     <item>Drop to the position that <c>GameObject</c> with implement <see cref="IDropHandler"/> component if it exists. It will be random if there are multiple.</item>
+    ///     <item>Drop to the random screen position.</item>
+    /// </list>
+    /// </remarks>
+    public class UguiDragAndDropOperator : IDragAndDropOperator, IRandomizable
     {
         /// <inheritdoc/>
-        public ILogger Logger { get; set; }
+        public ILogger Logger { private get; set; }
 
         /// <inheritdoc/>
-        public ScreenshotOptions ScreenshotOptions { get; set; }
+        public ScreenshotOptions ScreenshotOptions { private get; set; }
 
-        private readonly IRandom _random;
+        /// <inheritdoc/>
+        public IRandom Random
+        {
+            private get
+            {
+                _random ??= new RandomWrapper();
+                return _random;
+            }
+            set
+            {
+                _random = value;
+            }
+        }
+
+        private IRandom _random;
         private readonly IReachableStrategy _reachableStrategy;
         private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly float _dragSpeed;
@@ -61,7 +84,7 @@ namespace TestHelper.UI.Operators
 
             _dragSpeed = dragSpeed;
             _delayBeforeDrop = delayBeforeDrop;
-            _random = random ?? new RandomWrapper();
+            _random = random;
             _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy(_getScreenPoint);
             Logger = logger ?? Debug.unityLogger;
@@ -116,7 +139,7 @@ namespace TestHelper.UI.Operators
                 return OperateAsync(gameObject, dropHandler.gameObject, raycastResult, cancellationToken);
             }
 
-            var destination = _random.NextScreenPosition();
+            var destination = Random.NextScreenPosition();
             return OperateAsync(gameObject, destination, raycastResult, cancellationToken);
         }
 
@@ -140,7 +163,7 @@ namespace TestHelper.UI.Operators
             var list = new List<Component>(components);
             while (list.Count > 0)
             {
-                var index = _random.Next(list.Count);
+                var index = Random.Next(list.Count);
                 var current = list[index];
 
                 if (_reachableStrategy.IsReachable(current.gameObject, out _))
