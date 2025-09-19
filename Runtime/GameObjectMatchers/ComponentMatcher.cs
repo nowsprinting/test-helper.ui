@@ -9,7 +9,7 @@ using UnityEngine;
 namespace TestHelper.UI.GameObjectMatchers
 {
     /// <summary>
-    /// <see cref="GameObject"/> matcher that matchers by name, path, and <c>Component</c> type.
+    /// <see cref="GameObject"/> matcher that matches by name, path, and <c>Component</c> type.
     /// </summary>
     public class ComponentMatcher : IGameObjectMatcher
     {
