@@ -6,9 +6,10 @@ using UnityEngine;
 namespace TestHelper.UI.Annotations
 {
     /// <summary>
-    /// An annotation class that indicate the screen position offset on world space that where monkey operators operate
-    /// on
+    /// An annotation class that indicate the screen position offset on world space that where monkey operators operate on.
     /// </summary>
+    [AddComponentMenu("UI Test Helper/World Offset Annotation")]
+    [HelpURL("https://nowsprinting.github.io/test-helper.ui/api/TestHelper.UI.Annotations.WorldOffsetAnnotation.html")]
     public sealed class WorldOffsetAnnotation : MonoBehaviour
     {
         /// <summary>
