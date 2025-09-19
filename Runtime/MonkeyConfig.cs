@@ -94,7 +94,7 @@ namespace TestHelper.UI
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {
             new UguiClickOperator(),
-            new UguiTextInputOperator(), // Specify random text input strategy, if necessary
+            new UguiTextInputOperator(),
         };
     }
 }
