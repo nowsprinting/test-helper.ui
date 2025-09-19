@@ -500,34 +500,71 @@ To use the feature in player builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` t
 
 ##### Not found
 
-If no `GameObject` is found with the specified name, path, or matcher, throw `TimeoutException` with the following message:
+If no `GameObject` is found that matches the specified name, path, or matcher, throws a `TimeoutException` with the following message:
+
+By name:
 
 ```
-GameObject (NameMatcher: Target) is not found.
+GameObject (name=Button) is not found.
 ```
 
-Or for path:
+By path:
 
 ```
-GameObject (PathMatcher: Path/To/Target) is not found.
+GameObject (path=Path/To/Button) is not found.
+```
+
+By matcher:
+
+```
+GameObject (type=UnityEngine.UI.Button, text=START) is not found.
 ```
 
 ##### Not reachable
 
-If `GameObject` is found with the specified name, path, or matcher but not reachable, throw `TimeoutException` with the following message:
+If `GameObject` is found that matches the specified name, path, or matcher but not reachable, throws a `TimeoutException` with the following message:
 
 ```
-GameObject (NameMatcher: Target) is found, but not reachable.
+GameObject (name=CloseButton) is found, but not reachable.
 ```
 
-If you need detailed logs, pass an `ILogger` instance to the constructor of `GameObjectFinder`.
+If you need more details, pass an `ILogger` instance to the constructor of `DefaultReachableStrategy`, like this:
+
+```
+var reachableStrategy = new DefaultReachableStrategy(verboseLogger: Debug.unityLogger);
+var finder = new GameObjectFinder(reachableStrategy: reachableStrategy);
+var result = await finder.FindByNameAsync("StartButton", reachable: true);
+```
+
+If the following message is printed, the specified object is off-screen:
+
+```
+Not reachable to CloseButton(-2278), position=(515,-32). Raycast is not hit.
+```
+
+If the following message is printed, other object is hiding the pivot position of the specified object:
+
+```
+Not reachable to BehindButton(-2324), position=(320,240). Raycast hit other objects: [BlockScreen, FrontButton]
+```
+
+Solutions will be considered in the following order of priority:
+
+1. Adjust the pivot position of the target GameObject to be in-screen and not hidden by other objects.
+2. Adjust the location where the raycast is sent using annotation components such as `ScreenOffsetAnnotation`.
+3. Customize `IReachableStrategy` to make special decisions for specific GameObjects
+
+If the cause is hidden by other objects, you can choose the following solutions:
+
+1. If the raycast hit object is not the interactable, turn off the `raycastTarget` property.
+2. Makes the raycast hit object a child of the target object, so bubbles up.
 
 ##### Not interactable
 
-If `GameObject` is found with the specified name, path, or matcher but not interactable, throw `TimeoutException` with the following message:
+If `GameObject` is found that matches the specified name, path, or matcher but not interactable, throws a `TimeoutException` with the following message:
 
 ```
-GameObject (NameMatcher: Target) is found, but not interactable.
+GameObject (name=Button) is found, but not interactable.
 ```
 
 #### Thrown MultipleGameObjectsMatchingException
@@ -535,7 +572,7 @@ GameObject (NameMatcher: Target) is found, but not interactable.
 If multiple `GameObjects` matching the condition are found, throw `MultipleGameObjectsMatchingException` with the following message:
 
 ```
-Multiple GameObjects matching the condition (NameMatcher: Target) were found.
+Multiple GameObjects matching the condition (name=Button) were found.
 ```
 
 
