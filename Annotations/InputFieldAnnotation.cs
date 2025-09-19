@@ -3,11 +3,17 @@
 
 using TestHelper.UI.Annotations.Enums;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TestHelper.UI.Annotations
 {
+    /// <summary>
+    /// Annotation indicating the recommended text to enter in the <seealso cref="InputField"/> operation.
+    /// </summary>
+    [AddComponentMenu("UI Test Helper/InputField Annotation")]
+    [HelpURL("https://nowsprinting.github.io/test-helper.ui/api/TestHelper.UI.Annotations.InputFieldAnnotation.html")]
     [DisallowMultipleComponent]
-    public class InputFieldAnnotation : MonoBehaviour
+    public sealed class InputFieldAnnotation : MonoBehaviour
     {
         /// <summary>
         /// Character kind.

@@ -6,9 +6,11 @@ using UnityEngine;
 namespace TestHelper.UI.Annotations
 {
     /// <summary>
-    /// Ignore any operations from the Monkey Testing
+    /// Ignore any operations from the Monkey Testing.
     /// </summary>
-    public class IgnoreAnnotation : MonoBehaviour
+    [AddComponentMenu("UI Test Helper/Ignore Annotation")]
+    [HelpURL("https://nowsprinting.github.io/test-helper.ui/api/TestHelper.UI.Annotations.IgnoreAnnotation.html")]
+    public sealed class IgnoreAnnotation : MonoBehaviour
     {
     }
 }

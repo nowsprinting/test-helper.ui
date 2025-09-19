@@ -8,6 +8,9 @@ namespace TestHelper.UI.Annotations
     /// <summary>
     /// An annotation class that indicates the screen position where monkey operators operate.
     /// </summary>
+    [AddComponentMenu("UI Test Helper/Screen Position Annotation")]
+    [HelpURL(
+        "https://nowsprinting.github.io/test-helper.ui/api/TestHelper.UI.Annotations.ScreenPositionAnnotation.html")]
     public sealed class ScreenPositionAnnotation : MonoBehaviour
     {
         /// <summary>
