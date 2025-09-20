@@ -86,33 +86,6 @@ namespace TestHelper.UI.Extensions
         }
 
         /// <summary>
-        /// Get components that can handle the specified event handler.
-        /// If <see cref="EventTrigger"/>, only those with a matching <see cref="EventTrigger.Entry"/> type is returned.
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <typeparam name="T">The type of component to search for</typeparam>
-        /// <returns>Event handlers, active, and enabled</returns>
-        /// <seealso cref="EventTriggerExtensions.CanHandle{T}"/>
-        public static IEnumerable<MonoBehaviour> GetEventHandlers<T>(this GameObject gameObject)
-            where T : IEventSystemHandler
-        {
-            foreach (var component in gameObject.GetComponents<MonoBehaviour>().Where(x => x.isActiveAndEnabled))
-            {
-                if (component is EventTrigger eventTrigger)
-                {
-                    if (eventTrigger.CanHandle<T>())
-                    {
-                        yield return component;
-                    }
-                }
-                else if (component is T)
-                {
-                    yield return component;
-                }
-            }
-        }
-
-        /// <summary>
         /// Check whether a GameObject can handle the specified event handler.
         /// If <see cref="EventTrigger"/>, only those with a matching <see cref="EventTrigger.Entry"/> type are valid.
         /// </summary>
