@@ -78,7 +78,7 @@ namespace TestHelper.UI.Extensions
         /// <param name="gameObject"></param>
         /// <param name="component">A component of the matching type, if found.</param>
         /// <typeparam name="T">The type of component to search for</typeparam>
-        /// <returns>True if found event handler, active, and enabled</returns>
+        /// <returns>True if found component, active, and enabled</returns>
         public static bool TryGetEnabledComponent<T>(this GameObject gameObject, out T component)
         {
             component = gameObject.GetComponent<T>();
