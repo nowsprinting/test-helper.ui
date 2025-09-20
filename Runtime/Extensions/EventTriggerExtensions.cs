@@ -58,7 +58,7 @@ namespace TestHelper.UI.Extensions
         /// <summary>
         /// Returns true if the specified <see cref="EventTriggerType"/> can be executed.
         /// </summary>
-        public static bool CanExecuteEventTriggerType(this EventTrigger eventTrigger, EventTriggerType type)
+        private static bool CanExecuteEventTriggerType(this EventTrigger eventTrigger, EventTriggerType type)
         {
             return eventTrigger.triggers.Any(x => x.eventID == type && x.callback != null);
         }

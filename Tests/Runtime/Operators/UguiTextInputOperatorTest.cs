@@ -22,21 +22,80 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        public void CanOperate_NotInputText_ReturnFalse()
+        public void CanOperate_NullGameObject_ReturnsFalse()
         {
-            var gameObject = new GameObject();
-            gameObject.AddComponent<Button>();
+            var actual = _sut.CanOperate(null);
+            Assert.That(actual, Is.False);
+        }
 
+        [Test]
+        [CreateScene]
+        public void CanOperate_DestroyedGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(InputField));
+            Object.DestroyImmediate(gameObject);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(InputField));
+            gameObject.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveParentGameObject_ReturnsFalse()
+        {
+            var parent = new GameObject();
+            var gameObject = new GameObject(null, typeof(InputField));
+            gameObject.transform.SetParent(parent.transform);
+            parent.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithButtonComponent_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(Button));
             Assert.That(_sut.CanOperate(gameObject), Is.False);
         }
 
         [Test]
-        [LoadScene("../../Scenes/MissingComponent.unity")]
-        public void CanOperate_InputFieldWithMissingComponent_ReturnTrue()
+        [CreateScene]
+        public void CanOperate_WithInputFieldComponent_ReturnsTrue()
         {
-            var inputFieldWithMissing = GameObject.Find("InputField with Missing");
+            var gameObject = new GameObject(null, typeof(InputField));
+            Assert.That(_sut.CanOperate(gameObject), Is.True);
+        }
 
-            Assert.That(_sut.CanOperate(inputFieldWithMissing), Is.True);
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithTmpInputFieldComponent_ReturnsTrue()
+        {
+            var gameObject = new GameObject(null, typeof(TMP_InputField));
+            Assert.That(_sut.CanOperate(gameObject), Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithDisableInputFieldComponent_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(InputField));
+            var toggle = gameObject.GetComponent<InputField>();
+            toggle.enabled = false;
+
+            Assert.That(_sut.CanOperate(gameObject), Is.False);
         }
 
         [Test]

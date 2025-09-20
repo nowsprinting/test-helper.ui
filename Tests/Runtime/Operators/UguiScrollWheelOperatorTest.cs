@@ -9,6 +9,7 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.UI.TestDoubles;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.TestTools.Utils;
 using UnityEngine.UI;
 
@@ -19,6 +20,7 @@ namespace TestHelper.UI.Operators
     {
         private const string TestScene = "../../Scenes/ScrollViews.unity";
 
+        private readonly IOperator _sut = new UguiScrollWheelOperator();
         private GameObject _scrollView;
 
         [SetUp]
@@ -54,72 +56,118 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_GameObjectWithScrollRect_ReturnsTrue()
+        public void CanOperate_NullGameObject_ReturnsFalse()
         {
-            var sut = new UguiScrollWheelOperator();
-            var actual = sut.CanOperate(_scrollView);
+            var actual = _sut.CanOperate(null);
+            Assert.That(actual, Is.False);
+        }
 
+        [Test]
+        [CreateScene]
+        public void CanOperate_DestroyedGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(SpyOnScrollHandler));
+            Object.DestroyImmediate(gameObject);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(SpyOnScrollHandler));
+            gameObject.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveParentGameObject_ReturnsFalse()
+        {
+            var parent = new GameObject();
+            var gameObject = new GameObject(null, typeof(SpyOnScrollHandler));
+            gameObject.transform.SetParent(parent.transform);
+            parent.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_NoHandler_ReturnsFalse()
+        {
+            var gameObject = new GameObject();
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithEventTriggerNotIncludeScroll_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(EventTrigger));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithEventTriggerIncludeScroll_ReturnsTrue()
+        {
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreateScrollEntry());
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.True);
         }
 
         [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_GameObjectWithoutIScrollHandler_ReturnsFalse()
+        [CreateScene]
+        public void CanOperate_WithDisabledEventTriggerIncludeScroll_ReturnsFalse()
         {
-            var scrollRect = _scrollView.GetComponent<ScrollRect>();
-            Object.DestroyImmediate(scrollRect);
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreateScrollEntry());
+            eventTrigger.enabled = false;
 
-            var sut = new UguiScrollWheelOperator();
-            var actual = sut.CanOperate(_scrollView);
-
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
 
+        private static EventTrigger.Entry CreateScrollEntry() =>
+            new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.Scroll,
+                callback = new EventTrigger.TriggerEvent()
+            };
+
         [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_GameObjectWithDisabledScrollRect_ReturnsFalse()
+        [CreateScene]
+        public void CanOperate_WithScrollHandler_ReturnsTrue()
         {
-            var scrollRect = _scrollView.GetComponent<ScrollRect>();
-            scrollRect.enabled = false;
+            var gameObject = new GameObject(null, typeof(SpyOnScrollHandler));
 
-            var sut = new UguiScrollWheelOperator();
-            var actual = sut.CanOperate(_scrollView);
-
-            Assert.That(actual, Is.False);
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.True);
         }
 
         [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_InactiveGameObjectWithScrollRect_ReturnsFalse()
+        [CreateScene]
+        public void CanOperate_WithDisabledScrollHandler_ReturnsFalse()
         {
-            var canvas = GameObject.Find("Canvas");
-            canvas.SetActive(false);
+            var gameObject = new GameObject(null, typeof(SpyOnScrollHandler));
+            var handler = gameObject.GetComponent<SpyOnScrollHandler>();
+            handler.enabled = false;
 
-            var sut = new UguiScrollWheelOperator();
-            var actual = sut.CanOperate(_scrollView);
-
-            Assert.That(actual, Is.False);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_DestroyedGameObject_ReturnsFalse()
-        {
-            Object.DestroyImmediate(_scrollView);
-
-            var sut = new UguiScrollWheelOperator();
-            var actual = sut.CanOperate(_scrollView);
-
-            Assert.That(actual, Is.False);
-        }
-
-        [Test]
-        public void CanOperate_NullGameObject_ReturnsFalse()
-        {
-            var sut = new UguiScrollWheelOperator();
-            var actual = sut.CanOperate(null);
-
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
 

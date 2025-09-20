@@ -18,7 +18,7 @@ namespace TestHelper.UI.Operators
     [TestFixture]
     public class UguiDoubleClickOperatorTest
     {
-        private const string TestScene = "../../Scenes/Canvas.unity";
+        private readonly IOperator _sut = new UguiDoubleClickOperator();
 
         #region Constructor Tests
 
@@ -66,117 +66,118 @@ namespace TestHelper.UI.Operators
         #region CanOperate Tests
 
         [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_GameObjectWithEventTriggerPointerClick_ReturnsTrue()
-        {
-            var gameObject = new GameObject("TestObject");
-            var eventTrigger = gameObject.AddComponent<EventTrigger>();
-            var entry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerClick
-            };
-            eventTrigger.triggers.Add(entry);
-
-            var sut = new UguiDoubleClickOperator();
-            var actual = sut.CanOperate(gameObject);
-
-            Assert.That(actual, Is.True);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_GameObjectWithEventTriggerNonPointerClick_ReturnsFalse()
-        {
-            var gameObject = new GameObject("TestObject");
-            var eventTrigger = gameObject.AddComponent<EventTrigger>();
-            var entry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerEnter
-            };
-            eventTrigger.triggers.Add(entry);
-
-            var sut = new UguiDoubleClickOperator();
-            var actual = sut.CanOperate(gameObject);
-
-            Assert.That(actual, Is.False);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_GameObjectWithButton_ReturnsTrue()
-        {
-            var gameObject = new GameObject("TestObject");
-            gameObject.AddComponent<Button>();
-
-            var sut = new UguiDoubleClickOperator();
-            var actual = sut.CanOperate(gameObject);
-
-            Assert.That(actual, Is.True);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_GameObjectWithImageOnly_ReturnsFalse()
-        {
-            var gameObject = new GameObject("TestObject");
-            gameObject.AddComponent<Image>();
-
-            var sut = new UguiDoubleClickOperator();
-            var actual = sut.CanOperate(gameObject);
-
-            Assert.That(actual, Is.False);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_InactiveGameObject_ReturnsFalse()
-        {
-            var gameObject = new GameObject("TestObject");
-            gameObject.AddComponent<Button>();
-            gameObject.SetActive(false);
-
-            var sut = new UguiDoubleClickOperator();
-            var actual = sut.CanOperate(gameObject);
-
-            Assert.That(actual, Is.False);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void CanOperate_GameObjectWithInactiveParent_ReturnsFalse()
-        {
-            var parent = new GameObject("Parent");
-            var child = new GameObject("Child");
-            child.AddComponent<Button>();
-            child.transform.SetParent(parent.transform);
-            parent.SetActive(false);
-
-            var sut = new UguiDoubleClickOperator();
-            var actual = sut.CanOperate(child);
-
-            Assert.That(actual, Is.False);
-        }
-
-        [Test]
         public void CanOperate_NullGameObject_ReturnsFalse()
         {
-            var sut = new UguiDoubleClickOperator();
-            var actual = sut.CanOperate(null);
-
+            var actual = _sut.CanOperate(null);
             Assert.That(actual, Is.False);
         }
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         public void CanOperate_DestroyedGameObject_ReturnsFalse()
         {
-            var gameObject = new GameObject("TestObject");
-            gameObject.AddComponent<Button>();
+            var gameObject = new GameObject(null, typeof(SpyOnPointerClickHandler));
             Object.DestroyImmediate(gameObject);
 
-            var sut = new UguiDoubleClickOperator();
-            var actual = sut.CanOperate(gameObject);
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
 
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(SpyOnPointerClickHandler));
+            gameObject.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveParentGameObject_ReturnsFalse()
+        {
+            var parent = new GameObject();
+            var gameObject = new GameObject(null, typeof(SpyOnPointerClickHandler));
+            gameObject.transform.SetParent(parent.transform);
+            parent.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_NoHandler_ReturnsFalse()
+        {
+            var gameObject = new GameObject();
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithEventTriggerNotIncludePointerClick_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(EventTrigger));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithEventTriggerIncludePointerClick_ReturnsTrue()
+        {
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreatePointerClickEntry());
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithDisabledEventTriggerIncludePointerClick_ReturnsFalse()
+        {
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreatePointerClickEntry());
+            eventTrigger.enabled = false;
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        private static EventTrigger.Entry CreatePointerClickEntry() =>
+            new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerClick,
+                callback = new EventTrigger.TriggerEvent()
+            };
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithPointerClickHandler_ReturnsTrue()
+        {
+            var gameObject = new GameObject(null, typeof(SpyOnPointerClickHandler));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithDisabledPointerClickHandler_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(SpyOnPointerClickHandler));
+            var handler = gameObject.GetComponent<SpyOnPointerClickHandler>();
+            handler.enabled = false;
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
 
@@ -185,10 +186,10 @@ namespace TestHelper.UI.Operators
         #region OperateAsync Tests
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         public async Task OperateAsync_ValidGameObject_DoubleClickOccurs()
         {
-            var gameObject = new GameObject("DoubleClickTarget");
+            var gameObject = new GameObject();
             var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             var sut = new UguiDoubleClickOperator();
@@ -202,10 +203,10 @@ namespace TestHelper.UI.Operators
         [TestCase(100)]
         [TestCase(200)]
         [TestCase(500)]
-        [LoadScene(TestScene)]
+        [CreateScene]
         public async Task OperateAsync_VariousIntervals_ClicksWithCorrectTiming(int intervalMillis)
         {
-            var gameObject = new GameObject("DoubleClickTarget");
+            var gameObject = new GameObject();
             var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             var stopwatch = Stopwatch.StartNew();
@@ -218,10 +219,10 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         public async Task OperateAsync_PointerClickHandler_OnPointerClickCalled()
         {
-            var gameObject = new GameObject("DoubleClickTarget");
+            var gameObject = new GameObject();
             var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             var sut = new UguiDoubleClickOperator();
@@ -231,10 +232,10 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         public async Task OperateAsync_DoubleClickSequenceAndTiming_CorrectInterval()
         {
-            var gameObject = new GameObject("DoubleClickTarget");
+            var gameObject = new GameObject();
             var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             var sut = new UguiDoubleClickOperator(50);
@@ -246,11 +247,10 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         public async Task OperateAsync_WithLogger_LoggingWorks()
         {
-            var gameObject = new GameObject("DoubleClickTarget");
-            gameObject.AddComponent<Button>();
+            var gameObject = new GameObject(null, typeof(Button));
             var spyLogger = new SpyLogger();
 
             var sut = new UguiDoubleClickOperator(100, spyLogger);
@@ -260,11 +260,10 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         public async Task OperateAsync_WithScreenshotOptions_TakeScreenshotOnce()
         {
-            var gameObject = new GameObject("DoubleClickTarget");
-            gameObject.AddComponent<Button>();
+            var gameObject = new GameObject(null, typeof(Button));
             var directory = Application.temporaryCachePath;
             var filename = $"{TestContext.CurrentContext.Test.FullName}.png";
             var path = Path.Combine(directory, filename);
@@ -302,11 +301,10 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         public async Task OperateAsync_DestroyedGameObject_ThrowsException()
         {
-            var gameObject = new GameObject("DoubleClickTarget");
-            gameObject.AddComponent<Button>();
+            var gameObject = new GameObject(null, typeof(Button));
             Object.DestroyImmediate(gameObject);
 
             var sut = new UguiDoubleClickOperator();

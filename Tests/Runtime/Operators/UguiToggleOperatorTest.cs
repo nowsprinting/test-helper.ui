@@ -16,21 +16,70 @@ namespace TestHelper.UI.Operators
         private readonly IToggleOperator _sut = new UguiToggleOperator();
 
         [Test]
-        [CreateScene]
-        public void CanOperate_WithToggleComponent_ReturnTrue()
+        public void CanOperate_NullGameObject_ReturnsFalse()
         {
-            var gameObject = new GameObject();
-            gameObject.AddComponent<Toggle>();
+            var actual = _sut.CanOperate(null);
+            Assert.That(actual, Is.False);
+        }
 
+        [Test]
+        [CreateScene]
+        public void CanOperate_DestroyedGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(Toggle));
+            Object.DestroyImmediate(gameObject);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(Toggle));
+            gameObject.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveParentGameObject_ReturnsFalse()
+        {
+            var parent = new GameObject();
+            var gameObject = new GameObject(null, typeof(Toggle));
+            gameObject.transform.SetParent(parent.transform);
+            parent.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithButtonComponent_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(Button));
+            Assert.That(_sut.CanOperate(gameObject), Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithToggleComponent_ReturnsTrue()
+        {
+            var gameObject = new GameObject(null, typeof(Toggle));
             Assert.That(_sut.CanOperate(gameObject), Is.True);
         }
 
         [Test]
         [CreateScene]
-        public void CanOperate_WithButtonComponent_ReturnFalse()
+        public void CanOperate_WithDisableToggleComponent_ReturnsFalse()
         {
-            var gameObject = new GameObject();
-            gameObject.AddComponent<Button>();
+            var gameObject = new GameObject(null, typeof(Toggle));
+            var toggle = gameObject.GetComponent<Toggle>();
+            toggle.enabled = false;
 
             Assert.That(_sut.CanOperate(gameObject), Is.False);
         }

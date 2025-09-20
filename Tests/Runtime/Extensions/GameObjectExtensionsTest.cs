@@ -20,11 +20,13 @@ namespace TestHelper.UI.Extensions
         {
             var gameObject = new GameObject();
             var onPointerClickHandler = gameObject.AddComponent<SpyOnPointerClickHandler>();
-            var onPointerDownUpHandler = gameObject.AddComponent<SpyOnPointerDownUpHandler>();
+            var onPointerDownHandler = gameObject.AddComponent<SpyOnPointerDownHandler>();
+            var onPointerUpHandler = gameObject.AddComponent<SpyOnPointerUpHandler>();
             gameObject.AddComponent<Image>(); // Not interactable
 
             var actual = gameObject.GetInteractableComponents();
-            Assert.That(actual, Is.EquivalentTo(new Component[] { onPointerClickHandler, onPointerDownUpHandler }));
+            Assert.That(actual, Is.EquivalentTo(
+                new Component[] { onPointerClickHandler, onPointerDownHandler, onPointerUpHandler }));
         }
 
         [Test]
