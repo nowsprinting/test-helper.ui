@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Extensions;
@@ -52,12 +51,7 @@ namespace TestHelper.UI.Operators
                 return false;
             }
 
-            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
-            {
-                return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
-            }
-
-            return gameObject.TryGetEnabledComponent<IPointerClickHandler>(out _);
+            return gameObject.HasEventHandlers<IPointerClickHandler>();
         }
 
         /// <inheritdoc />

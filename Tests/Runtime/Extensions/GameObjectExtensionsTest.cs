@@ -20,11 +20,13 @@ namespace TestHelper.UI.Extensions
         {
             var gameObject = new GameObject();
             var onPointerClickHandler = gameObject.AddComponent<SpyOnPointerClickHandler>();
-            var onPointerDownUpHandler = gameObject.AddComponent<SpyOnPointerDownUpHandler>();
+            var onPointerDownHandler = gameObject.AddComponent<SpyOnPointerDownHandler>();
+            var onPointerUpHandler = gameObject.AddComponent<SpyOnPointerUpHandler>();
             gameObject.AddComponent<Image>(); // Not interactable
 
             var actual = gameObject.GetInteractableComponents();
-            Assert.That(actual, Is.EquivalentTo(new Component[] { onPointerClickHandler, onPointerDownUpHandler }));
+            Assert.That(actual, Is.EquivalentTo(
+                new Component[] { onPointerClickHandler, onPointerDownHandler, onPointerUpHandler }));
         }
 
         [Test]
@@ -35,6 +37,63 @@ namespace TestHelper.UI.Extensions
 
             var actual = button.gameObject.GetInteractableComponents();
             Assert.That(actual, Is.Empty);
+        }
+
+        [Test]
+        public void TryGetEnabledComponent_Null_ReturnsFalse()
+        {
+            var gameObject = new GameObject();
+            var actual = gameObject.TryGetEnabledComponent<Button>(out var _);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void TryGetEnabledComponent_NotBehaviour_ReturnsTrue()
+        {
+            var gameObject = new GameObject();
+            var actual = gameObject.TryGetEnabledComponent<Transform>(out var _);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        public void TryGetEnabledComponent_ActiveAndEnabled_ReturnsTrue()
+        {
+            var gameObject = new GameObject("Button", typeof(Button));
+            var actual = gameObject.TryGetEnabledComponent<Button>(out var _);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        public void TryGetEnabledComponent_NotActive_ReturnsFalse()
+        {
+            var gameObject = new GameObject("Button", typeof(Button));
+            gameObject.SetActive(false);
+
+            var actual = gameObject.TryGetEnabledComponent<Button>(out var _);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void TryGetEnabledComponent_NotActiveParent_ReturnsFalse()
+        {
+            var parent = new GameObject();
+            var gameObject = new GameObject("Button", typeof(Button));
+            gameObject.transform.SetParent(parent.transform);
+            parent.SetActive(false);
+
+            var actual = gameObject.TryGetEnabledComponent<Button>(out var _);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void TryGetEnabledComponent_NotEnabled_ReturnsFalse()
+        {
+            var gameObject = new GameObject();
+            var button = gameObject.AddComponent<Button>();
+            button.enabled = false;
+
+            var actual = gameObject.TryGetEnabledComponent<Button>(out var _);
+            Assert.That(actual, Is.False);
         }
     }
 }

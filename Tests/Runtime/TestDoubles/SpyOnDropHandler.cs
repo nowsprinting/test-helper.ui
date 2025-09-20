@@ -9,7 +9,7 @@ namespace TestHelper.UI.TestDoubles
 {
     [RequireComponent(typeof(Image))]
     [AddComponentMenu("/")] // Hide from "Add Component" picker
-    public class SpyDropHandler : MonoBehaviour, IDropHandler
+    public class SpyOnDropHandler : MonoBehaviour, IDropHandler
     {
         public bool WasDrop { get; private set; }
 

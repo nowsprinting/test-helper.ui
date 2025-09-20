@@ -224,6 +224,7 @@ namespace TestHelper.UI
                 "UsingOnPointerClickHandler|UguiClickOperator",
                 "UsingPointerClickEventTrigger|UguiClickOperator",
                 "UsingOnPointerDownUpHandler|UguiClickAndHoldOperator",
+                "UsingOnPointerDownUpHandler|UguiClickAndHoldOperator", // down and up handler are owned by the same GameObject
                 "UsingPointerDownUpEventTrigger|UguiClickAndHoldOperator",
                 "UsingMultipleEventTriggers|UguiClickOperator",
                 "UsingMultipleEventTriggers|UguiClickAndHoldOperator",
@@ -553,7 +554,8 @@ namespace TestHelper.UI
                 // @formatter:off
                 Assert.That(spyLogger.Messages[0], Does.StartWith("Lottery entries: "));
                 Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\(\d+\):EventTrigger:UguiClickOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\):SpyOnPointerDownUpHandler:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\):SpyOnPointerDownHandler:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\):SpyOnPointerUpHandler:UguiClickAndHoldOperator"));
                 Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\(\d+\):EventTrigger:UguiClickAndHoldOperator"));
                 Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerClickHandler\(\d+\):SpyOnPointerClickHandler:UguiClickOperator")); // includes ignored objects
                 Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UguiClickOperator"));

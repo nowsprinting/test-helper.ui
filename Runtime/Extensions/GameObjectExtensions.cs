@@ -7,6 +7,7 @@ using System.Linq;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace TestHelper.UI.Extensions
 {
@@ -76,12 +77,40 @@ namespace TestHelper.UI.Extensions
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="component">A component of the matching type, if found.</param>
-        /// <typeparam name="T">The type of Component to search for</typeparam>
-        /// <returns>True if found and active and enabled component</returns>
+        /// <typeparam name="T">The type of component to search for</typeparam>
+        /// <returns>True if found component, active, and enabled</returns>
         public static bool TryGetEnabledComponent<T>(this GameObject gameObject, out T component)
         {
             component = gameObject.GetComponent<T>();
             return component != null && (!(component is Behaviour) || (component as Behaviour).isActiveAndEnabled);
+        }
+
+        /// <summary>
+        /// Check whether a GameObject can handle the specified event handler.
+        /// If <see cref="EventTrigger"/>, only those with a matching <see cref="EventTrigger.Entry"/> type are valid.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <typeparam name="T">The type of component to search for</typeparam>
+        /// <returns>True if found event handler, active, and enabled</returns>
+        /// <seealso cref="EventTriggerExtensions.CanHandle{T}"/>
+        public static bool HasEventHandlers<T>(this GameObject gameObject) where T : IEventSystemHandler
+        {
+            foreach (var component in gameObject.GetComponents<MonoBehaviour>().Where(x => x.isActiveAndEnabled))
+            {
+                if (component is EventTrigger eventTrigger)
+                {
+                    if (eventTrigger.CanHandle<T>())
+                    {
+                        return true;
+                    }
+                }
+                else if (component is T)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

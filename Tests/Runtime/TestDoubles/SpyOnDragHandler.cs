@@ -9,7 +9,7 @@ namespace TestHelper.UI.TestDoubles
 {
     [RequireComponent(typeof(Image))]
     [AddComponentMenu("/")] // Hide from "Add Component" picker
-    public class SpyDragHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
+    public class SpyOnDragHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
         IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
     {
         public bool WasPointerDown { get; private set; }

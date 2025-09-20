@@ -16,6 +16,7 @@ namespace TestHelper.UI.Operators
     [TestFixture]
     public class UguiDragAndDropOperatorTest
     {
+        private readonly IOperator _sut = new UguiDragAndDropOperator();
         private Vector3 _objectPosition;
 
         [SetUp]
@@ -37,45 +38,134 @@ namespace TestHelper.UI.Operators
             _objectPosition.y += ((RectTransform)handler.transform).sizeDelta.y;
         }
 
-        private SpyDragHandler CreateSpyDragHandler()
+        private SpyOnDragHandler CreateSpyDragHandler()
         {
-            var handler = new GameObject("SpyDragHandler").AddComponent<SpyDragHandler>();
+            var handler = new GameObject("SpyDragHandler").AddComponent<SpyOnDragHandler>();
             SetOnCanvas(handler);
             return handler;
         }
 
-        private SpyDropHandler CreateSpyDropHandler()
+        private SpyOnDropHandler CreateSpyDropHandler()
         {
-            var handler = new GameObject("SpyDropHandler").AddComponent<SpyDropHandler>();
+            var handler = new GameObject("SpyDropHandler").AddComponent<SpyOnDropHandler>();
             SetOnCanvas(handler);
             return handler;
         }
 
         [Test]
-        public void CanOperate_Null_ReturnsFalse()
+        public void CanOperate_NullGameObject_ReturnsFalse()
         {
-            var sut = new UguiDragAndDropOperator();
-            var actual = sut.CanOperate(null);
+            var actual = _sut.CanOperate(null);
             Assert.That(actual, Is.False);
         }
 
         [Test]
-        public void CanOperate_HasNotDragHandler_ReturnsFalse()
+        [CreateScene]
+        public void CanOperate_DestroyedGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+            GameObject.DestroyImmediate(gameObject);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveGameObject_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+            gameObject.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_InactiveParentGameObject_ReturnsFalse()
+        {
+            var parent = new GameObject();
+            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+            gameObject.transform.SetParent(parent.transform);
+            parent.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_NoHandler_ReturnsFalse()
         {
             var gameObject = new GameObject();
-            var sut = new UguiDragAndDropOperator();
-            var actual = sut.CanOperate(gameObject);
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
 
         [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
-        public void CanOperate_HasDragHandler_ReturnsTrue()
+        [CreateScene]
+        public void CanOperate_WithEventTriggerNotIncludeDrag_ReturnsFalse()
         {
-            var gameObject = CreateSpyDragHandler().gameObject;
-            var sut = new UguiDragAndDropOperator();
-            var actual = sut.CanOperate(gameObject);
+            var gameObject = new GameObject(null, typeof(EventTrigger));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithEventTriggerIncludeDrag_ReturnsTrue()
+        {
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreateDragEntry());
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithDisabledEventTriggerIncludeDrag_ReturnsFalse()
+        {
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreateDragEntry());
+            eventTrigger.enabled = false;
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        private static EventTrigger.Entry CreateDragEntry() =>
+            new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.Drag,
+                callback = new EventTrigger.TriggerEvent()
+            };
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithPointerDragHandler_ReturnsTrue()
+        {
+            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithDisabledPointerDragHandler_ReturnsFalse()
+        {
+            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+            var handler = gameObject.GetComponent<DummyDragHandler>();
+            handler.enabled = false;
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
         }
 
         [Test]

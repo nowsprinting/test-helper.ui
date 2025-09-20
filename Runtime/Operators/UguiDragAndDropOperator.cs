@@ -106,15 +106,7 @@ namespace TestHelper.UI.Operators
                 return false;
             }
 
-            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
-            {
-                if (eventTrigger.CanHandle<IDragHandler>())
-                {
-                    return true;
-                }
-            }
-
-            return gameObject.TryGetEnabledComponent<IDragHandler>(out _);
+            return gameObject.HasEventHandlers<IDragHandler>();
         }
 
         /// <inheritdoc />

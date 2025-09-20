@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Runtime.CompilerServices;
@@ -8,17 +8,16 @@ using UnityEngine.EventSystems;
 namespace TestHelper.UI.TestDoubles
 {
     /// <summary>
-    /// Pointer down/up event handler
+    /// OnPointerUp event handler
     /// </summary>
     [AddComponentMenu("/")] // Hide from "Add Component" picker
-    internal class SpyOnPointerDownUpHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+    public class SpyOnPointerUpHandler : MonoBehaviour, IPointerUpHandler
     {
-        private void Log([CallerMemberName] string member = "")
+        private void Log([CallerMemberName] string member = null)
         {
             Debug.Log($"{this.name}.{member}");
         }
 
-        public void OnPointerDown(PointerEventData eventData) => Log();
         public void OnPointerUp(PointerEventData eventData) => Log();
     }
 }
