@@ -34,6 +34,11 @@ namespace TestHelper.UI.Operators
         /// <remarks>The <c>new</c> keyword is specified because we want it to work with the casted type.</remarks>
         public new bool CanOperate(GameObject gameObject)
         {
+            if (gameObject == null)
+            {
+                return false;
+            }
+
             return gameObject.TryGetEnabledComponent<Toggle>(out _);
         }
 

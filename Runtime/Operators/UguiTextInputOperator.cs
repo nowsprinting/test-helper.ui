@@ -65,6 +65,11 @@ namespace TestHelper.UI.Operators
         /// <inheritdoc />
         public bool CanOperate(GameObject gameObject)
         {
+            if (gameObject == null)
+            {
+                return false;
+            }
+
 #if ENABLE_TMP
             return gameObject.TryGetEnabledComponent<InputField>(out _) ||
                    gameObject.TryGetEnabledComponent<TMP_InputField>(out _);

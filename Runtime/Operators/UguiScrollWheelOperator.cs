@@ -78,7 +78,7 @@ namespace TestHelper.UI.Operators
                 return false;
             }
 
-            return gameObject.TryGetEnabledComponent<IScrollHandler>(out _);
+            return gameObject.HasEventHandlers<IScrollHandler>();
         }
 
         /// <inheritdoc />

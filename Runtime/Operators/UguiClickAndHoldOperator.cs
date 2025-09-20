@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Extensions;
@@ -42,14 +41,13 @@ namespace TestHelper.UI.Operators
         /// <inheritdoc />
         public bool CanOperate(GameObject gameObject)
         {
-            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
+            if (gameObject == null)
             {
-                return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerDown) &&
-                       eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerUp);
+                return false;
             }
 
-            return gameObject.TryGetEnabledComponent<IPointerDownHandler>(out _) &&
-                   gameObject.TryGetEnabledComponent<IPointerUpHandler>(out _);
+            return gameObject.HasEventHandlers<IPointerDownHandler>() &&
+                   gameObject.HasEventHandlers<IPointerUpHandler>();
         }
 
         /// <inheritdoc />
