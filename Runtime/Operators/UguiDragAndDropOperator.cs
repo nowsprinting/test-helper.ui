@@ -43,7 +43,11 @@ namespace TestHelper.UI.Operators
         {
             private get
             {
-                _random ??= new RandomWrapper();
+                if (_random == null)
+                {
+                    _random = new RandomWrapper();
+                }
+
                 return _random;
             }
             set
