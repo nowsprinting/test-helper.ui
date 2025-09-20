@@ -126,6 +126,7 @@ create_project:
 	touch $(PROJECT_HOME)/Assets/.gitkeep
 	openupm add -c $(PROJECT_HOME) -f com.unity.test-framework@stable
 	openupm add -c $(PROJECT_HOME) -f com.unity.testtools.codecoverage
+	openupm add -c $(PROJECT_HOME) -f com.unity.inputsystem@1.12.0
 	openupm add -c $(PROJECT_HOME) -f com.cysharp.unitask
 	openupm add -c $(PROJECT_HOME) -f com.nowsprinting.test-helper
 	openupm add -c $(PROJECT_HOME) -f com.nowsprinting.test-helper.random
