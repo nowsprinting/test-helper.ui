@@ -13,8 +13,11 @@ namespace TestHelper.UI.Operators
     /// <summary>
     /// Toggle operator for <see cref="Toggle"/> component.
     /// You can click to turn it on/off, or you can specify the on/off state.
-    /// In monkey testing, it behaves the same as the <see cref="UguiClickOperator"/>.
     /// </summary>
+    /// <remarks>
+    /// If state is not specified (e.g., in monkey testing), it will always be flipped (same as click).
+    /// </remarks>
+    /// <seealso cref="UguiClickOperator"/>
     public class UguiToggleOperator : UguiClickOperator, IToggleOperator
     {
         /// <summary>

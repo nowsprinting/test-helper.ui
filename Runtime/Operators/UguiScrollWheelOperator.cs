@@ -4,9 +4,10 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Random;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
-using TestHelper.Random;
+using TestHelper.UI.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -15,7 +16,10 @@ namespace TestHelper.UI.Operators
     /// <summary>
     /// Scroll wheel operator for Unity UI (uGUI) components that implements IScrollHandler.
     /// </summary>
-    public class UguiScrollWheelOperator : IScrollWheelOperator
+    /// <remarks>
+    /// If no scroll destination is specified (e.g., in monkey testing), a random scroll destinations will be used.
+    /// </remarks>
+    public class UguiScrollWheelOperator : IScrollWheelOperator, IRandomizable
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
@@ -23,7 +27,25 @@ namespace TestHelper.UI.Operators
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
 
-        private readonly IRandom _random;
+        /// <inheritdoc/>
+        public IRandom Random
+        {
+            private get
+            {
+                if (_random == null)
+                {
+                    _random = new RandomWrapper();
+                }
+
+                return _random;
+            }
+            set
+            {
+                _random = value;
+            }
+        }
+
+        private IRandom _random;
         private readonly float _scrollSpeed;
 
         /// <summary>
@@ -43,7 +65,7 @@ namespace TestHelper.UI.Operators
             }
 
             _scrollSpeed = scrollSpeed;
-            _random = random ?? new RandomWrapper();
+            _random = random;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
         }
@@ -65,8 +87,8 @@ namespace TestHelper.UI.Operators
         {
             var distance = CalcMaxScrollDistance(gameObject);
             var destination = new Vector2(
-                _random.Next(-distance, distance),
-                _random.Next(-distance, distance)
+                Random.Next(-distance, distance),
+                Random.Next(-distance, distance)
             );
             await OperateAsync(gameObject, destination, raycastResult, cancellationToken);
         }

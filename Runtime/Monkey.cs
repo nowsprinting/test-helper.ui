@@ -8,11 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.UI.Exceptions;
-using TestHelper.UI.Operators;
-using TestHelper.UI.Strategies;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
+using TestHelper.UI.Exceptions;
+using TestHelper.UI.Operators;
+using TestHelper.UI.Random;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -52,11 +53,7 @@ namespace TestHelper.UI
                 GameViewControlHelper.SetGizmos(true);
             }
 
-            foreach (var iOperator in config.Operators)
-            {
-                iOperator.Logger = config.Logger;
-                iOperator.ScreenshotOptions = config.Screenshots;
-            }
+            SetupOperators(config);
 
             var interactableComponentsFinder =
                 new InteractableComponentsFinder(config.IsInteractable, config.Operators);
@@ -113,6 +110,20 @@ namespace TestHelper.UI
                 if (config.Gizmos)
                 {
                     GameViewControlHelper.SetGizmos(beforeGizmos);
+                }
+            }
+        }
+
+        private static void SetupOperators(MonkeyConfig config)
+        {
+            foreach (var iOperator in config.Operators)
+            {
+                iOperator.Logger = config.Logger;
+                iOperator.ScreenshotOptions = config.Screenshots;
+
+                if (iOperator is IRandomizable randomizable)
+                {
+                    randomizable.Random = config.Random.Fork();
                 }
             }
         }
