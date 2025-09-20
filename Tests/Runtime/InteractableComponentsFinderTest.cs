@@ -184,7 +184,7 @@ namespace TestHelper.UI
         public class FindEventHandlersTest
         {
             [Test]
-            [CreateScene]
+            [CreateScene(unloadOthers: true)]
             public void FindEventHandlers_HitEventHandler()
             {
                 var button = new GameObject().AddComponent<Button>();
@@ -196,7 +196,7 @@ namespace TestHelper.UI
             }
 
             [Test]
-            [CreateScene]
+            [CreateScene(unloadOthers: true)]
             public void FindEventHandlers_HitEventTrigger()
             {
                 var eventTrigger = new GameObject().AddComponent<EventTrigger>();
