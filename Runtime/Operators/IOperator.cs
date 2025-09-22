@@ -43,7 +43,7 @@ namespace TestHelper.UI.Operators
         /// If you want to add parameters for execution outside of monkey tests, define a method in the sub-interface (e.g., <c>ITextInputOperator</c>).
         /// </remarks>
         /// <param name="gameObject">Operation target <c>GameObject</c></param>
-        /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>
+        /// <param name="raycastResult">Includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>
         /// <param name="cancellationToken">Cancellation token for operation (e.g., click and hold)</param>
         UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default);
