@@ -57,10 +57,11 @@ namespace TestHelper.UI.Operators
         }
 
         private IRandom _random;
-        private readonly IReachableStrategy _reachableStrategy;
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
+
         private readonly float _dragSpeed;
         private readonly double _delayBeforeDrop;
+        private readonly Func<GameObject, Vector2> _getScreenPoint;
+        private readonly IReachableStrategy _reachableStrategy;
 
         /// <summary>
         /// Constructor.
@@ -68,8 +69,8 @@ namespace TestHelper.UI.Operators
         /// <param name="dragSpeed">Drag amount per frame (must be positive).</param>
         /// <param name="delayBeforeDrop">Delay in seconds after dragging is complete and before dropping. You can also use it to keep an On-screen stick in place.</param>
         /// <param name="random">PRNG instance.</param>
-        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c>. Used to determine drop position.</param>
-        /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user.</param>
+        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
+        /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. Used to determine drop position.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console).</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need.</param>
         public UguiDragAndDropOperator(float dragSpeed = 10.0f, double delayBeforeDrop = 0.0d, IRandom random = null,
@@ -111,6 +112,9 @@ namespace TestHelper.UI.Operators
 
         /// <inheritdoc />
         /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start dragging.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// <br/>
         /// The drop positions are determined in the following order:
         /// <list type="number">
         ///     <item>Drop to the position that <c>GameObject</c> with <see cref="DropAnnotation"/> component if it exists. It will be random if there are multiple</item>
@@ -174,6 +178,10 @@ namespace TestHelper.UI.Operators
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start dragging.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
         public UniTask OperateAsync(GameObject gameObject, GameObject destination,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
@@ -182,9 +190,18 @@ namespace TestHelper.UI.Operators
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start dragging.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
         public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
+            if (raycastResult.gameObject == null)
+            {
+                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, _getScreenPoint);
+            }
+
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);

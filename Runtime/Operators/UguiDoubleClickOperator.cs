@@ -6,6 +6,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -23,14 +24,16 @@ namespace TestHelper.UI.Operators
         public ScreenshotOptions ScreenshotOptions { private get; set; }
 
         private readonly int _intervalMillis;
+        private readonly Func<GameObject, Vector2> _getScreenPoint;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="intervalMillis">Double click interval in milliseconds. Must be positive.</param>
+        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        public UguiDoubleClickOperator(int intervalMillis = 100,
+        public UguiDoubleClickOperator(int intervalMillis = 100, Func<GameObject, Vector2> getScreenPoint = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             if (intervalMillis <= 0)
@@ -39,6 +42,7 @@ namespace TestHelper.UI.Operators
             }
 
             _intervalMillis = intervalMillis;
+            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
         }
@@ -56,14 +60,15 @@ namespace TestHelper.UI.Operators
 
         /// <inheritdoc />
         /// <remarks>
-        /// This method receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be clicked.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
-            if (gameObject == null)
+            if (raycastResult.gameObject == null)
             {
-                throw new ArgumentNullException(nameof(gameObject));
+                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, _getScreenPoint);
             }
 
             // Output log before the operation, after the shown effects

@@ -48,7 +48,7 @@ namespace TestHelper.UI.Operators
             var logger = new SpyLogger();
             var screenshotOptions = new ScreenshotOptions();
 
-            var sut = new UguiDoubleClickOperator(100, logger, screenshotOptions);
+            var sut = new UguiDoubleClickOperator(logger: logger, screenshotOptions: screenshotOptions);
 
             Assert.That(sut, Is.Not.Null);
         }
@@ -253,7 +253,7 @@ namespace TestHelper.UI.Operators
             var gameObject = new GameObject(null, typeof(Button));
             var spyLogger = new SpyLogger();
 
-            var sut = new UguiDoubleClickOperator(100, spyLogger);
+            var sut = new UguiDoubleClickOperator(logger: spyLogger);
             await sut.OperateAsync(gameObject);
 
             Assert.That(spyLogger.Messages, Is.Not.Empty);
@@ -278,26 +278,10 @@ namespace TestHelper.UI.Operators
                 FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
             };
 
-            var sut = new UguiDoubleClickOperator(100, null, screenshotOptions);
+            var sut = new UguiDoubleClickOperator(screenshotOptions: screenshotOptions);
             await sut.OperateAsync(gameObject);
 
             Assert.That(path, Does.Exist);
-        }
-
-        [Test]
-        public async Task OperateAsync_NullGameObject_ThrowsArgumentNullException()
-        {
-            var sut = new UguiDoubleClickOperator();
-
-            try
-            {
-                await sut.OperateAsync(null);
-                Assert.Fail("Expected ArgumentNullException");
-            }
-            catch (ArgumentNullException exception)
-            {
-                Assert.That(exception.ParamName, Is.EqualTo("gameObject"));
-            }
         }
 
         [Test]

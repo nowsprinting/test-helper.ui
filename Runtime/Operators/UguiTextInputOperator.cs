@@ -80,7 +80,7 @@ namespace TestHelper.UI.Operators
 
         /// <inheritdoc />
         /// <remarks>
-        /// This method does not require a <c>RaycastResult</c>.
+        /// This method does not use a <c>raycastResult</c>.
         /// </remarks>
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult _,
