@@ -103,9 +103,9 @@ namespace TestHelper.UI.Operators.Utils
         /// </list>
         /// </summary>
         /// <param name="destination">Drop destination point.</param>
-        /// <param name="speed">Drag amount per frame (must be positive)</param>
+        /// <param name="speed">Drag speed in units per second (must be positive)</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public async UniTask DragAsync(Vector2 destination, float speed, CancellationToken cancellationToken = default)
+        public async UniTask DragAsync(Vector2 destination, int speed, CancellationToken cancellationToken = default)
         {
             if (!_isDragging)
             {
@@ -118,13 +118,14 @@ namespace TestHelper.UI.Operators.Utils
                 var currentPosition = _eventData.position;
                 var direction = (destination - currentPosition).normalized;
                 var distance = Vector2.Distance(currentPosition, destination);
-                if (distance < speed)
+                var frameSpeed = speed * Time.deltaTime;
+                if (distance < frameSpeed)
                 {
                     _eventData.position = destination;
                     break;
                 }
 
-                _eventData.position = currentPosition + direction * speed;
+                _eventData.position = currentPosition + direction * frameSpeed;
 
 #if ENABLE_UGUI2
                 if (TryGetGameObjectAtCurrentPosition(out var pointerGameObject))

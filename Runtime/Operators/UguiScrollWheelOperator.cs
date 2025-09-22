@@ -51,18 +51,18 @@ namespace TestHelper.UI.Operators
 
         private IRandom _random;
 
-        private readonly float _scrollSpeed;
+        private readonly int _scrollSpeed;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="scrollSpeed">Scroll amount per frame (must be positive)</param>
+        /// <param name="scrollSpeed">Scroll speed in units per second (must be positive)</param>
         /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
         /// <param name="random">PRNG instance</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <exception cref="ArgumentException">Thrown when scrollPerFrame is zero or negative</exception>
-        public UguiScrollWheelOperator(float scrollSpeed = 10.0f, Func<GameObject, Vector2> getScreenPoint = null,
+        public UguiScrollWheelOperator(int scrollSpeed = 1200, Func<GameObject, Vector2> getScreenPoint = null,
             IRandom random = null, ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             if (scrollSpeed <= 0)
@@ -148,12 +148,13 @@ namespace TestHelper.UI.Operators
 
                 while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
                 {
-                    var scrollDelta = direction * Mathf.Min(_scrollSpeed, remainingDistance);
+                    var frameSpeed = _scrollSpeed * Time.deltaTime;
+                    var scrollDelta = direction * Mathf.Min(frameSpeed, remainingDistance);
                     pointerEventData.scrollDelta = scrollDelta;
 
                     ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.scrollHandler);
 
-                    remainingDistance -= _scrollSpeed;
+                    remainingDistance -= frameSpeed;
 
                     await UniTask.Yield(cancellationToken);
                 }

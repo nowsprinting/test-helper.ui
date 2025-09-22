@@ -39,20 +39,20 @@ namespace TestHelper.UI.Operators
         [Test]
         public void Constructor_ValidScrollSpeed_ObjectCreatedSuccessfully()
         {
-            var sut = new UguiScrollWheelOperator(1.0f);
+            var sut = new UguiScrollWheelOperator(100);
             Assert.That(sut, Is.Not.Null);
         }
 
         [Test]
         public void Constructor_ZeroScrollSpeed_ThrowsArgumentException()
         {
-            Assert.That(() => new UguiScrollWheelOperator(0f), Throws.ArgumentException);
+            Assert.That(() => new UguiScrollWheelOperator(0), Throws.ArgumentException);
         }
 
         [Test]
         public void Constructor_NegativeScrollSpeed_ThrowsArgumentException()
         {
-            Assert.That(() => new UguiScrollWheelOperator(-1.0f), Throws.ArgumentException);
+            Assert.That(() => new UguiScrollWheelOperator(-1), Throws.ArgumentException);
         }
 
         [Test]
@@ -175,13 +175,16 @@ namespace TestHelper.UI.Operators
         [LoadScene(TestScene)]
         public async Task OperateAsync_WithScrollSpeed_ScrollSpecifiedAmountInOneFrame()
         {
-            const float ScrollSpeed = 5.0f;
+            const int ScrollSpeed = 300;
             var destination = new Vector2(20, 20);
             var viewport = _scrollView.transform.Find("Viewport");
             var content = viewport.Find("Content");
             var contentRectTransform = content.GetComponent<RectTransform>();
             var beforePosition = contentRectTransform.position;
-            var expectedPosition = new Vector3(beforePosition.x + ScrollSpeed, beforePosition.y + ScrollSpeed,
+            var frameSpeed = ScrollSpeed * Time.deltaTime;
+            var normalizedDirection = destination.normalized;
+            var expectedDelta = normalizedDirection * frameSpeed;
+            var expectedPosition = new Vector3(beforePosition.x + expectedDelta.x, beforePosition.y + expectedDelta.y,
                 beforePosition.z);
 
             var sut = new UguiScrollWheelOperator(ScrollSpeed);
@@ -198,13 +201,16 @@ namespace TestHelper.UI.Operators
         [LoadScene(TestScene)]
         public async Task OperateAsync_Cancel_ScrollCancelled()
         {
-            const float ScrollSpeed = 5.0f;
+            const int ScrollSpeed = 300;
             var destination = new Vector2(20, 20);
             var viewport = _scrollView.transform.Find("Viewport");
             var content = viewport.Find("Content");
             var contentRectTransform = content.GetComponent<RectTransform>();
             var beforePosition = contentRectTransform.position;
-            var expectedPosition = new Vector3(beforePosition.x + ScrollSpeed, beforePosition.y + ScrollSpeed,
+            var frameSpeed = ScrollSpeed * Time.deltaTime;
+            var normalizedDirection = destination.normalized;
+            var expectedDelta = normalizedDirection * frameSpeed;
+            var expectedPosition = new Vector3(beforePosition.x + expectedDelta.x, beforePosition.y + expectedDelta.y,
                 beforePosition.z); // Cancelled position
 
             var sut = new UguiScrollWheelOperator(ScrollSpeed);
