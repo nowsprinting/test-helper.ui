@@ -106,14 +106,14 @@ namespace TestHelper.UI.Operators
         [Test]
         public void Constructor_NegativeSwipeSpeed_ThrowsArgumentException()
         {
-            Assert.That(() => new UguiSwipeOperator(swipeSpeed: -1f),
+            Assert.That(() => new UguiSwipeOperator(swipeSpeed: -1),
                 Throws.TypeOf<ArgumentException>().With.Message.Contains("Swipe speed must be positive"));
         }
         
         [Test]
         public void Constructor_ZeroSwipeSpeed_ThrowsArgumentException()
         {
-            Assert.That(() => new UguiSwipeOperator(swipeSpeed: 0f),
+            Assert.That(() => new UguiSwipeOperator(swipeSpeed: 0),
                 Throws.TypeOf<ArgumentException>().With.Message.Contains("Swipe speed must be positive"));
         }
         
