@@ -32,7 +32,7 @@ namespace TestHelper.UI.Operators.Utils
         /// <param name="gameObject">Drag target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the game-title implementation.</param>
         /// <param name="logger">Verbose logger set if you need</param>
-        public PointerDragEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger = null)
+        public PointerDragEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger)
         {
             _gameObject = gameObject;
             _gameObjectNameCache = gameObject.name;
@@ -48,7 +48,7 @@ namespace TestHelper.UI.Operators.Utils
         {
             if (_isDragging)
             {
-                _logger?.Log(LogType.Warning, $"{_gameObjectNameCache}.Dispose method was called while dragging.");
+                _logger.Log(LogType.Warning, $"{_gameObjectNameCache}.Dispose method was called while dragging.");
                 EndDrag(out _, out _);
             }
 
@@ -74,7 +74,7 @@ namespace TestHelper.UI.Operators.Utils
 
             if (_gameObject == null)
             {
-                _logger?.Log($"{_gameObjectNameCache} is destroyed before beginning drag.");
+                _logger.Log(LogType.Warning, $"{_gameObjectNameCache} is destroyed before beginning drag.");
                 return;
             }
 
@@ -103,9 +103,9 @@ namespace TestHelper.UI.Operators.Utils
         /// </list>
         /// </summary>
         /// <param name="destination">Drop destination point.</param>
-        /// <param name="speed">Drag amount per frame (must be positive)</param>
+        /// <param name="speed">Drag speed in units per second (must be positive)</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public async UniTask DragAsync(Vector2 destination, float speed, CancellationToken cancellationToken = default)
+        public async UniTask DragAsync(Vector2 destination, int speed, CancellationToken cancellationToken = default)
         {
             if (!_isDragging)
             {
@@ -118,13 +118,14 @@ namespace TestHelper.UI.Operators.Utils
                 var currentPosition = _eventData.position;
                 var direction = (destination - currentPosition).normalized;
                 var distance = Vector2.Distance(currentPosition, destination);
-                if (distance < speed)
+                var frameSpeed = speed * Time.deltaTime;
+                if (distance < frameSpeed)
                 {
                     _eventData.position = destination;
                     break;
                 }
 
-                _eventData.position = currentPosition + direction * speed;
+                _eventData.position = currentPosition + direction * frameSpeed;
 
 #if ENABLE_UGUI2
                 if (TryGetGameObjectAtCurrentPosition(out var pointerGameObject))
@@ -135,7 +136,7 @@ namespace TestHelper.UI.Operators.Utils
 
                 if (_gameObject == null)
                 {
-                    _logger?.Log($"{_gameObjectNameCache} is destroyed before dragging.");
+                    _logger.Log(LogType.Warning, $"{_gameObjectNameCache} is destroyed before dragging.");
                     return;
                 }
 
@@ -166,7 +167,7 @@ namespace TestHelper.UI.Operators.Utils
 
             if (_gameObject == null)
             {
-                _logger?.Log($"{_gameObjectNameCache} is destroyed before ending drag.");
+                _logger.Log(LogType.Warning, $"{_gameObjectNameCache} is destroyed before ending drag.");
                 dropGameObject = null;
                 dropPosition = default;
                 return;

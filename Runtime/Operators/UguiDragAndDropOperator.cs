@@ -65,20 +65,20 @@ namespace TestHelper.UI.Operators
 
         private IRandom _random;
 
-        private readonly float _dragSpeed;
+        private readonly int _dragSpeed;
         private readonly double _delayBeforeDrop;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="dragSpeed">Drag amount per frame (must be positive).</param>
+        /// <param name="dragSpeed">Drag speed in units per second (must be positive).</param>
         /// <param name="delayBeforeDrop">Delay in seconds after dragging is complete and before dropping. You can also use it to keep an On-screen stick in place.</param>
         /// <param name="random">PRNG instance.</param>
         /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
         /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. Used to determine drop position.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console).</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need.</param>
-        public UguiDragAndDropOperator(float dragSpeed = 10.0f, double delayBeforeDrop = 0.0d, IRandom random = null,
+        public UguiDragAndDropOperator(int dragSpeed = 1200, double delayBeforeDrop = 0D, IRandom random = null,
             Func<GameObject, Vector2> getScreenPoint = null, IReachableStrategy reachableStrategy = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
@@ -214,7 +214,7 @@ namespace TestHelper.UI.Operators
             await operationLogger.Log();
 
             // Do operation
-            using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult))
+            using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
             {
                 simulator.BeginDrag();
                 await simulator.DragAsync(destination, _dragSpeed, cancellationToken);
