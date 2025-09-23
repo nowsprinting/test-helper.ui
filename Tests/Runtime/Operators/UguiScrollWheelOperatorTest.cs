@@ -1,6 +1,8 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +14,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools.Utils;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace TestHelper.UI.Operators
 {
@@ -171,28 +174,55 @@ namespace TestHelper.UI.Operators
             Assert.That(actual, Is.False);
         }
 
+        [TestCase(2.3f, 5.7f)] // not normalized
+        [TestCase(0f, 0f)]     // on direction
+        public async Task OperateAsync_InvalidDirection_ThrowsArgumentException(float x, float y)
+        {
+            try
+            {
+                var sut = new UguiScrollWheelOperator();
+                await sut.OperateAsync(null, new Vector2(x, y), 300);
+                Assert.Fail("Expected exception was not thrown.");
+            }
+            catch (ArgumentException e)
+            {
+                Assert.That(e.Message, Does.StartWith("Direction vector must be normalized"));
+            }
+        }
+
+        [TestCase(-100)]
+        [TestCase(0)]
+        public async Task OperateAsync_InvalidDistance_ThrowsArgumentException(int distance)
+        {
+            try
+            {
+                var sut = new UguiScrollWheelOperator();
+                await sut.OperateAsync(null, Vector2.up, distance);
+                Assert.Fail("Expected exception was not thrown.");
+            }
+            catch (ArgumentException e)
+            {
+                Assert.That(e.Message, Does.StartWith("Distance must be positive"));
+            }
+        }
+
         [Test]
         [LoadScene(TestScene)]
         public async Task OperateAsync_WithScrollSpeed_ScrollSpecifiedAmountInOneFrame()
         {
             const int ScrollSpeed = 300;
-            var destination = new Vector2(20, 20);
             var viewport = _scrollView.transform.Find("Viewport");
             var content = viewport.Find("Content");
-            var contentRectTransform = content.GetComponent<RectTransform>();
-            var beforePosition = contentRectTransform.position;
-            var frameSpeed = ScrollSpeed * Time.deltaTime;
-            var normalizedDirection = destination.normalized;
-            var expectedDelta = normalizedDirection * frameSpeed;
-            var expectedPosition = new Vector3(beforePosition.x + expectedDelta.x, beforePosition.y + expectedDelta.y,
-                beforePosition.z);
+            var rectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
 
             var sut = new UguiScrollWheelOperator(ScrollSpeed);
-            var task = sut.OperateAsync(_scrollView, destination);
+            var task = sut.OperateAsync(_scrollView, Vector2.up, 300);
             await UniTask.NextFrame();
 
-            Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
-                .Using(new Vector3EqualityComparer(1.0f)));
+            var frameSpeed = ScrollSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
 
             await task; // Ensure the task completes
         }
@@ -202,29 +232,78 @@ namespace TestHelper.UI.Operators
         public async Task OperateAsync_Cancel_ScrollCancelled()
         {
             const int ScrollSpeed = 300;
-            var destination = new Vector2(20, 20);
             var viewport = _scrollView.transform.Find("Viewport");
             var content = viewport.Find("Content");
-            var contentRectTransform = content.GetComponent<RectTransform>();
-            var beforePosition = contentRectTransform.position;
-            var frameSpeed = ScrollSpeed * Time.deltaTime;
-            var normalizedDirection = destination.normalized;
-            var expectedDelta = normalizedDirection * frameSpeed;
-            var expectedPosition = new Vector3(beforePosition.x + expectedDelta.x, beforePosition.y + expectedDelta.y,
-                beforePosition.z); // Cancelled position
+            var rectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
 
-            var sut = new UguiScrollWheelOperator(ScrollSpeed);
             var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
-            var task = sut.OperateAsync(_scrollView, destination, cancellationToken: cancellationToken);
+
+            var sut = new UguiScrollWheelOperator(ScrollSpeed);
+            var task = sut.OperateAsync(_scrollView, Vector2.up, 300, cancellationToken: cancellationToken);
             await UniTask.NextFrame(cancellationToken);
+
+            var frameSpeed = ScrollSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
 
             cancellationTokenSource.Cancel();
             await task; // Cancelled
 
-            Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
-                .Using(new Vector3EqualityComparer(1.0f)));
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
         }
+
+        private static IEnumerable<TestCaseData> DirectionAndDistanceCases()
+        {
+            yield return new TestCaseData(Vector2.up, 100, new Vector2(0f, -100f));    // scroll down
+            yield return new TestCaseData(Vector2.down, 100, new Vector2(0f, 100f));   // scroll up
+            yield return new TestCaseData(Vector2.left, 100, new Vector2(100f, 0f));   // scroll right
+            yield return new TestCaseData(Vector2.right, 100, new Vector2(-100f, 0f)); // scroll left
+        }
+
+        [TestCaseSource(nameof(DirectionAndDistanceCases))]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithDirectionAndDistance_Scrolled(Vector2 direction, int distance,
+            Vector2 expectedDelta)
+        {
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var rectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+            var expectedPosition = beforePosition + new Vector3(expectedDelta.x, expectedDelta.y);
+
+            var sut = new UguiScrollWheelOperator();
+            await sut.OperateAsync(_scrollView, direction, distance);
+
+            Assert.That(rectTransform.position, Is.EqualTo(expectedPosition).Using(Vector3EqualityComparer.Instance));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_OnScrollCalled()
+        {
+            var spyEventHandler = _scrollView.AddComponent<SpyOnScrollHandler>();
+
+            var sut = new UguiScrollWheelOperator();
+            await sut.OperateAsync(_scrollView, Vector2.up, 100);
+
+            Assert.That(spyEventHandler.WasScrolled, Is.True);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_OnPointerEnterAndExitCalled()
+        {
+            var spyEventHandler = _scrollView.AddComponent<SpyOnPointerEnterExitHandler>();
+
+            var sut = new UguiScrollWheelOperator();
+            await sut.OperateAsync(_scrollView, Vector2.up, 100);
+
+            Assert.That(spyEventHandler.WasPointerEntered, Is.True);
+            Assert.That(spyEventHandler.WasPointerExited, Is.True);
+        }
+
+        #region Obsoleted
 
         [TestCase(0f, 0f)]
         [TestCase(30f, 20f)]
@@ -246,34 +325,11 @@ namespace TestHelper.UI.Operators
                 .Using(new Vector3EqualityComparer(1.0f)));
         }
 
-        [Test]
-        [LoadScene(TestScene)]
-        public async Task OperateAsync_OnScrollCalled()
-        {
-            var spyEventHandler = _scrollView.AddComponent<SpyOnScrollHandler>();
-
-            var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView, new Vector2(2f, 3f));
-
-            Assert.That(spyEventHandler.WasScrolled, Is.True);
-        }
+        #endregion
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task OperateAsync_OnPointerEnterAndExitCalled()
-        {
-            var spyEventHandler = _scrollView.AddComponent<SpyOnPointerEnterExitHandler>();
-
-            var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView, new Vector2(2f, 3f));
-
-            Assert.That(spyEventHandler.WasPointerEntered, Is.True);
-            Assert.That(spyEventHandler.WasPointerExited, Is.True);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public async Task OperateAsync_WithoutDestination_RandomScrolling()
+        public async Task OperateAsync_WithoutDirectionAndDistance_RandomScrolling()
         {
             var scrollRect = _scrollView.GetComponent<ScrollRect>();
             var beforePosition = scrollRect.normalizedPosition;

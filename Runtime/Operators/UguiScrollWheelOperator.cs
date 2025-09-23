@@ -120,18 +120,59 @@ namespace TestHelper.UI.Operators
         /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance,
+            RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
+        {
+            // Validate parameters
+            if (Math.Abs(direction.magnitude - 1f) > 0.01f)
+            {
+                throw new ArgumentException("Direction vector must be normalized", nameof(direction));
+            }
+
+            if (distance <= 0)
+            {
+                throw new ArgumentException("Distance must be positive", nameof(distance));
+            }
+
+            // Log direction and distance
+            var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
+            operationLogger.Properties.Add("direction", direction);
+            operationLogger.Properties.Add("distance", distance);
+            await operationLogger.Log();
+
+            // Calculate destination from direction and distance
+            var flipped = new Vector2(-direction.x, direction.y); // flip X axis to match scroll wheel direction
+            var destination = flipped * distance;
+
+            // Call the common implementation
+            await OperateAsyncCore(gameObject, destination, raycastResult, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
+        [Obsolete("Use OperateAsync with direction and distance parameters instead.")]
         public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
+        {
+            // Log destination
+            var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
+            operationLogger.Properties.Add("destination", destination);
+            await operationLogger.Log();
+
+            // Call the common implementation
+            await OperateAsyncCore(gameObject, destination, raycastResult, cancellationToken);
+        }
+
+        private async UniTask OperateAsyncCore(GameObject gameObject, Vector2 destination,
+            RaycastResult raycastResult, CancellationToken cancellationToken)
         {
             if (raycastResult.gameObject == null)
             {
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
-
-            // Output log before the operation
-            var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
-            operationLogger.Properties.Add("destination", destination);
-            await operationLogger.Log();
 
             // Send pointer enter event
             var pointerEventData = new PointerEventData(EventSystem.current)
@@ -141,23 +182,20 @@ namespace TestHelper.UI.Operators
             ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.pointerEnterHandler);
 
             // Perform scroll operation
-            if (destination.magnitude > 0)
+            var remainingDistance = destination.magnitude;
+            var direction = destination.normalized;
+
+            while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
             {
-                var remainingDistance = destination.magnitude;
-                var direction = destination.normalized;
+                var frameSpeed = _scrollSpeed * Time.deltaTime;
+                var scrollDelta = direction * Mathf.Min(frameSpeed, remainingDistance);
+                pointerEventData.scrollDelta = scrollDelta;
 
-                while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
-                {
-                    var frameSpeed = _scrollSpeed * Time.deltaTime;
-                    var scrollDelta = direction * Mathf.Min(frameSpeed, remainingDistance);
-                    pointerEventData.scrollDelta = scrollDelta;
+                ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.scrollHandler);
 
-                    ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.scrollHandler);
+                remainingDistance -= frameSpeed;
 
-                    remainingDistance -= frameSpeed;
-
-                    await UniTask.Yield(cancellationToken);
-                }
+                await UniTask.Yield(cancellationToken);
             }
 
             // Send pointer exit event
