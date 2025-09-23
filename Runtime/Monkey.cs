@@ -130,6 +130,11 @@ namespace TestHelper.UI
                 {
                     screenPointCustomizable.GetScreenPoint = config.GetScreenPoint;
                 }
+
+                if (iOperator is IReachableStrategyCustomizable reachableStrategyCustomizable)
+                {
+                    reachableStrategyCustomizable.ReachableStrategy = config.ReachableStrategy;
+                }
             }
         }
 

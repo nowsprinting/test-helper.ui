@@ -30,7 +30,8 @@ namespace TestHelper.UI.Operators
     ///     <item>Drop to the random screen position.</item>
     /// </list>
     /// </remarks>
-    public class UguiDragAndDropOperator : IDragAndDropOperator, IRandomizable, IScreenPointCustomizable
+    public class UguiDragAndDropOperator : IDragAndDropOperator, IRandomizable, IScreenPointCustomizable,
+        IReachableStrategyCustomizable
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
@@ -40,6 +41,9 @@ namespace TestHelper.UI.Operators
 
         /// <inheritdoc/>
         public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
+
+        /// <inheritdoc/>
+        public IReachableStrategy ReachableStrategy { private get; set; }
 
         /// <inheritdoc/>
         public IRandom Random
@@ -63,7 +67,6 @@ namespace TestHelper.UI.Operators
 
         private readonly float _dragSpeed;
         private readonly double _delayBeforeDrop;
-        private readonly IReachableStrategy _reachableStrategy;
 
         /// <summary>
         /// Constructor.
@@ -93,7 +96,7 @@ namespace TestHelper.UI.Operators
             _delayBeforeDrop = delayBeforeDrop;
             _random = random;
             GetScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
-            _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy(GetScreenPoint);
+            ReachableStrategy = reachableStrategy ?? new DefaultReachableStrategy(GetScreenPoint);
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
         }
@@ -168,7 +171,7 @@ namespace TestHelper.UI.Operators
                 var index = Random.Next(list.Count);
                 var current = list[index];
 
-                if (_reachableStrategy.IsReachable(current.gameObject, out _))
+                if (ReachableStrategy.IsReachable(current.gameObject, out _))
                 {
                     return current;
                 }
