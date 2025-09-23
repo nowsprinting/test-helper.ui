@@ -108,25 +108,8 @@ namespace TestHelper.UI.Operators
         /// <inheritdoc/>
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
-            // Generate random direction based on scrollable directions
-            Vector2 direction;
-            if (gameObject.TryGetEnabledComponent<ScrollRect>(out var scrollRect))
-            {
-                var x = GetRandomHorizontalDirection(scrollRect);
-                var y = GetRandomVerticalDirection(scrollRect);
-                direction = new Vector2(x, y);
-            }
-            else if (gameObject.TryGetEnabledComponent<Scrollbar>(out var scrollbar))
-            {
-                var x = GetRandomHorizontalDirection(scrollbar);
-                var y = GetRandomVerticalDirection(scrollbar);
-                direction = new Vector2(x, y);
-            }
-            else
-            {
-                // For other swipeable components, use a random direction
-                direction = Random.insideUnitCircle;
-            }
+            // Generate random direction based on component type
+            var direction = GenerateRandomSwipeDirection(gameObject);
 
             // Ensure direction is not zero (especially for ScrollRect/Scrollbar with only one axis)
             if (direction == Vector2.zero)
@@ -139,19 +122,34 @@ namespace TestHelper.UI.Operators
             await OperateAsync(gameObject, direction, raycastResult, cancellationToken);
         }
 
-        private float GetRandomHorizontalDirection(UIBehaviour scroller)
+        private Vector2 GenerateRandomSwipeDirection(GameObject gameObject)
         {
-            if (scroller.CanScrollHorizontally())
+            // Check for scrollable components
+            if (gameObject.TryGetEnabledComponent<ScrollRect>(out var scrollRect))
             {
-                return Random.value < 0.5f ? -1f : 1f;
+                return GenerateDirectionForScrollable(scrollRect);
             }
-
-            return 0f;
+            
+            if (gameObject.TryGetEnabledComponent<Scrollbar>(out var scrollbar))
+            {
+                return GenerateDirectionForScrollable(scrollbar);
+            }
+            
+            // For other swipeable components, use a random direction
+            return Random.insideUnitCircle;
         }
-
-        private float GetRandomVerticalDirection(UIBehaviour scroller)
+        
+        private Vector2 GenerateDirectionForScrollable(UIBehaviour scrollable)
         {
-            if (scroller.CanScrollVertically())
+            var x = GetRandomDirectionForAxis(scrollable, isHorizontal: true);
+            var y = GetRandomDirectionForAxis(scrollable, isHorizontal: false);
+            return new Vector2(x, y);
+        }
+        
+        private float GetRandomDirectionForAxis(UIBehaviour scroller, bool isHorizontal)
+        {
+            var canScroll = isHorizontal ? scroller.CanScrollHorizontally() : scroller.CanScrollVertically();
+            if (canScroll)
             {
                 return Random.value < 0.5f ? -1f : 1f;
             }
