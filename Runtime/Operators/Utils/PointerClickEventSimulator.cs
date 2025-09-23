@@ -28,7 +28,7 @@ namespace TestHelper.UI.Operators.Utils
         /// <param name="gameObject">Click target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the game-title implementation.</param>
         /// <param name="logger">Verbose logger set if you need</param>
-        public PointerClickEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger = null)
+        public PointerClickEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger)
         {
             _gameObject = gameObject;
             _gameObjectNameCache = gameObject.name;
@@ -108,7 +108,7 @@ namespace TestHelper.UI.Operators.Utils
 
                 if (_gameObject == null)
                 {
-                    _logger?.Log($"{_gameObjectNameCache} is destroyed before pointer-up event.");
+                    _logger.Log(LogType.Warning, $"{_gameObjectNameCache} is destroyed before pointer-up event.");
                     return;
                 }
             }

@@ -214,7 +214,7 @@ namespace TestHelper.UI.Operators
             await operationLogger.Log();
 
             // Do operation
-            using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult))
+            using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
             {
                 simulator.BeginDrag();
                 await simulator.DragAsync(destination, _dragSpeed, cancellationToken);

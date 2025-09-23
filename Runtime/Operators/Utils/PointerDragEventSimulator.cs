@@ -32,7 +32,7 @@ namespace TestHelper.UI.Operators.Utils
         /// <param name="gameObject">Drag target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the game-title implementation.</param>
         /// <param name="logger">Verbose logger set if you need</param>
-        public PointerDragEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger = null)
+        public PointerDragEventSimulator(GameObject gameObject, RaycastResult raycastResult, ILogger logger)
         {
             _gameObject = gameObject;
             _gameObjectNameCache = gameObject.name;
@@ -48,7 +48,7 @@ namespace TestHelper.UI.Operators.Utils
         {
             if (_isDragging)
             {
-                _logger?.Log(LogType.Warning, $"{_gameObjectNameCache}.Dispose method was called while dragging.");
+                _logger.Log(LogType.Warning, $"{_gameObjectNameCache}.Dispose method was called while dragging.");
                 EndDrag(out _, out _);
             }
 
@@ -74,7 +74,7 @@ namespace TestHelper.UI.Operators.Utils
 
             if (_gameObject == null)
             {
-                _logger?.Log($"{_gameObjectNameCache} is destroyed before beginning drag.");
+                _logger.Log(LogType.Warning,$"{_gameObjectNameCache} is destroyed before beginning drag.");
                 return;
             }
 
@@ -136,7 +136,7 @@ namespace TestHelper.UI.Operators.Utils
 
                 if (_gameObject == null)
                 {
-                    _logger?.Log($"{_gameObjectNameCache} is destroyed before dragging.");
+                    _logger.Log(LogType.Warning,$"{_gameObjectNameCache} is destroyed before dragging.");
                     return;
                 }
 
@@ -167,7 +167,7 @@ namespace TestHelper.UI.Operators.Utils
 
             if (_gameObject == null)
             {
-                _logger?.Log($"{_gameObjectNameCache} is destroyed before ending drag.");
+                _logger.Log(LogType.Warning,$"{_gameObjectNameCache} is destroyed before ending drag.");
                 dropGameObject = null;
                 dropPosition = default;
                 return;
