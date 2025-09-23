@@ -74,7 +74,7 @@ namespace TestHelper.UI.Operators.Utils
 
             if (_gameObject == null)
             {
-                _logger.Log(LogType.Warning,$"{_gameObjectNameCache} is destroyed before beginning drag.");
+                _logger.Log(LogType.Warning, $"{_gameObjectNameCache} is destroyed before beginning drag.");
                 return;
             }
 
@@ -136,7 +136,7 @@ namespace TestHelper.UI.Operators.Utils
 
                 if (_gameObject == null)
                 {
-                    _logger.Log(LogType.Warning,$"{_gameObjectNameCache} is destroyed before dragging.");
+                    _logger.Log(LogType.Warning, $"{_gameObjectNameCache} is destroyed before dragging.");
                     return;
                 }
 
@@ -167,7 +167,7 @@ namespace TestHelper.UI.Operators.Utils
 
             if (_gameObject == null)
             {
-                _logger.Log(LogType.Warning,$"{_gameObjectNameCache} is destroyed before ending drag.");
+                _logger.Log(LogType.Warning, $"{_gameObjectNameCache} is destroyed before ending drag.");
                 dropGameObject = null;
                 dropPosition = default;
                 return;
