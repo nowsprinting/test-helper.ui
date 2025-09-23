@@ -118,9 +118,9 @@ namespace TestHelper.UI.Operators
             await OperateAsync(gameObject, direction, distance, raycastResult, cancellationToken);
         }
 
-        private float GetRandomHorizontalDirection(ScrollRect scrollRect)
+        private float GetRandomHorizontalDirection(UIBehaviour scroller)
         {
-            if (scrollRect.horizontal)
+            if (scroller.CanScrollHorizontally())
             {
                 return Random.value < 0.5 ? -1f : 1f;
             }
@@ -128,9 +128,9 @@ namespace TestHelper.UI.Operators
             return 0f;
         }
 
-        private float GetRandomVerticalDirection(ScrollRect scrollRect)
+        private float GetRandomVerticalDirection(UIBehaviour scroller)
         {
-            if (scrollRect.vertical)
+            if (scroller.CanScrollVertically())
             {
                 return Random.value < 0.5 ? -1f : 1f;
             }
