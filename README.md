@@ -284,6 +284,7 @@ Configurations in `MonkeyConfig`:
     - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
 - **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 - **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
+- **GetScreenPoint**: Function to get the screen point from `GameObject` used in the operators. The default implementation returns the pivot position of the `GameObject` in screen space.
 - **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
 - **Operators**: A collection of `IOperator` that the monkey invokes. The default is `UguiClickOperator` and `UguiTextInputOperator`. There is support for standard uGUI components.
 

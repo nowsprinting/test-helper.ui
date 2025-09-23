@@ -8,6 +8,7 @@ using TestHelper.Random;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
 using TestHelper.UI.Random;
+using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -19,13 +20,16 @@ namespace TestHelper.UI.Operators
     /// <remarks>
     /// If no scroll destination is specified (e.g., in monkey testing), a random scroll destinations will be used.
     /// </remarks>
-    public class UguiScrollWheelOperator : IScrollWheelOperator, IRandomizable
+    public class UguiScrollWheelOperator : IScrollWheelOperator, IRandomizable, IScreenPointCustomizable
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
 
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
+
+        /// <inheritdoc/>
+        public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
 
         /// <inheritdoc/>
         public IRandom Random
@@ -46,18 +50,20 @@ namespace TestHelper.UI.Operators
         }
 
         private IRandom _random;
+
         private readonly float _scrollSpeed;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="scrollSpeed">Scroll amount per frame (must be positive)</param>
+        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
         /// <param name="random">PRNG instance</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <exception cref="ArgumentException">Thrown when scrollPerFrame is zero or negative</exception>
-        public UguiScrollWheelOperator(float scrollSpeed = 10.0f, IRandom random = null,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+        public UguiScrollWheelOperator(float scrollSpeed = 10.0f, Func<GameObject, Vector2> getScreenPoint = null,
+            IRandom random = null, ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             if (scrollSpeed <= 0)
             {
@@ -65,6 +71,7 @@ namespace TestHelper.UI.Operators
             }
 
             _scrollSpeed = scrollSpeed;
+            GetScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _random = random;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
@@ -82,6 +89,10 @@ namespace TestHelper.UI.Operators
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
@@ -105,9 +116,18 @@ namespace TestHelper.UI.Operators
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
         public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
+            if (raycastResult.gameObject == null)
+            {
+                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
+            }
+
             // Output log before the operation
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("destination", destination);

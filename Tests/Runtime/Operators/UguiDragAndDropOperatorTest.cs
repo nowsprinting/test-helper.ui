@@ -231,8 +231,7 @@ namespace TestHelper.UI.Operators
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
-            await sut.OperateAsync(dragHandler.gameObject,
-                new RaycastResult { screenPosition = dragHandler.transform.position });
+            await sut.OperateAsync(dragHandler.gameObject);
 
             Assert.That(dropHandler.WasDrop, Is.False);
             Assert.That(dropHandlerWithAnnotation.WasDrop, Is.True);
@@ -248,8 +247,7 @@ namespace TestHelper.UI.Operators
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
-            await sut.OperateAsync(dragHandler.gameObject,
-                new RaycastResult { screenPosition = dragHandler.transform.position });
+            await sut.OperateAsync(dragHandler.gameObject);
 
             Assert.That(dropHandler.WasDrop, Is.True);
         }
@@ -263,8 +261,7 @@ namespace TestHelper.UI.Operators
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
-            await sut.OperateAsync(dragHandler.gameObject,
-                new RaycastResult { screenPosition = dragHandler.transform.position });
+            await sut.OperateAsync(dragHandler.gameObject);
 
             Assert.That(dragHandler.WasPointerDown, Is.True);
             Assert.That(dragHandler.WasInitializePotentialDrag, Is.True);
@@ -284,8 +281,7 @@ namespace TestHelper.UI.Operators
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
-            await sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject,
-                new RaycastResult { screenPosition = dragHandler.transform.position });
+            await sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject);
 
             Assert.That(dropHandler.WasDrop, Is.True);
         }
@@ -300,8 +296,7 @@ namespace TestHelper.UI.Operators
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
-            await sut.OperateAsync(dragHandler.gameObject, dropHandler.transform.position,
-                new RaycastResult { screenPosition = dragHandler.transform.position });
+            await sut.OperateAsync(dragHandler.gameObject, dropHandler.transform.position);
 
             Assert.That(dropHandler.WasDrop, Is.True);
         }

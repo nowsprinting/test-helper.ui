@@ -117,7 +117,7 @@ namespace TestHelper.UI.Operators
         public async Task Constructor_WithLogger_UseLogger()
         {
             var spyLogger = new SpyLogger();
-            var sut = new UguiToggleOperator(spyLogger);
+            var sut = new UguiToggleOperator(logger: spyLogger);
             var gameObject = new GameObject();
             gameObject.AddComponent<Toggle>();
 

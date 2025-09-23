@@ -22,7 +22,7 @@ namespace TestHelper.UI.Operators
         /// </summary>
         /// <param name="gameObject">Operation target <c>GameObject</c></param>
         /// <param name="isOn">Set the specify on/off to the toggle state</param>
-        /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>
+        /// <param name="raycastResult">Includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>
         /// <param name="cancellationToken">Cancellation token for operation (e.g., click and hold)</param>
         UniTask OperateAsync(GameObject gameObject, bool isOn, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default);
