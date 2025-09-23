@@ -797,7 +797,7 @@ MonoBehaviour:
   reachableColor: {r: 0, g: 0, b: 1, a: 1}
   unreachableColor: {r: 0.9372549, g: 0.5058824, b: 0.05882353, a: 1}
   originalPointColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  framesPerRefresh: 100
+  framesPerRefresh: 1
 --- !u!4 &1315248325
 Transform:
   m_ObjectHideFlags: 0
