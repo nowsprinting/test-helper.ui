@@ -16,6 +16,7 @@ namespace TestHelper.UI.Extensions
         /// <param name="gameObject">Event target <c>GameObject</c></param>
         /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
         /// <returns></returns>
+        /// <returns>A <c>RaycastResult</c> with the specified <c>gameObject</c> and its screen position as determined by <paramref name="getScreenPoint"/></returns>
         public static RaycastResult CreateFrom(GameObject gameObject, Func<GameObject, Vector2> getScreenPoint)
         {
             return new RaycastResult

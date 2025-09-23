@@ -30,13 +30,16 @@ namespace TestHelper.UI.Operators
     ///     <item>Drop to the random screen position.</item>
     /// </list>
     /// </remarks>
-    public class UguiDragAndDropOperator : IDragAndDropOperator, IRandomizable
+    public class UguiDragAndDropOperator : IDragAndDropOperator, IRandomizable, IScreenPointCustomizable
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
 
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
+
+        /// <inheritdoc/>
+        public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
 
         /// <inheritdoc/>
         public IRandom Random
@@ -60,7 +63,6 @@ namespace TestHelper.UI.Operators
 
         private readonly float _dragSpeed;
         private readonly double _delayBeforeDrop;
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly IReachableStrategy _reachableStrategy;
 
         /// <summary>
@@ -90,8 +92,8 @@ namespace TestHelper.UI.Operators
             _dragSpeed = dragSpeed;
             _delayBeforeDrop = delayBeforeDrop;
             _random = random;
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
-            _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy(_getScreenPoint);
+            GetScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy(GetScreenPoint);
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
         }
@@ -185,7 +187,7 @@ namespace TestHelper.UI.Operators
         public UniTask OperateAsync(GameObject gameObject, GameObject destination,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
-            var destinationPoint = _getScreenPoint.Invoke(destination);
+            var destinationPoint = GetScreenPoint.Invoke(destination);
             return OperateAsync(gameObject, destinationPoint, raycastResult, cancellationToken);
         }
 
@@ -199,7 +201,7 @@ namespace TestHelper.UI.Operators
         {
             if (raycastResult.gameObject == null)
             {
-                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, _getScreenPoint);
+                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
             // Output log before the operation, after the shown effects

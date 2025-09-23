@@ -20,13 +20,16 @@ namespace TestHelper.UI.Operators
     /// <remarks>
     /// If no scroll destination is specified (e.g., in monkey testing), a random scroll destinations will be used.
     /// </remarks>
-    public class UguiScrollWheelOperator : IScrollWheelOperator, IRandomizable
+    public class UguiScrollWheelOperator : IScrollWheelOperator, IRandomizable, IScreenPointCustomizable
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
 
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
+
+        /// <inheritdoc/>
+        public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
 
         /// <inheritdoc/>
         public IRandom Random
@@ -49,7 +52,6 @@ namespace TestHelper.UI.Operators
         private IRandom _random;
 
         private readonly float _scrollSpeed;
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
 
         /// <summary>
         /// Constructor.
@@ -69,7 +71,7 @@ namespace TestHelper.UI.Operators
             }
 
             _scrollSpeed = scrollSpeed;
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            GetScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _random = random;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
@@ -123,7 +125,7 @@ namespace TestHelper.UI.Operators
         {
             if (raycastResult.gameObject == null)
             {
-                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, _getScreenPoint);
+                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
             // Output log before the operation

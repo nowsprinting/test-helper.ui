@@ -79,6 +79,11 @@ namespace TestHelper.UI
         public IIgnoreStrategy IgnoreStrategy { get; set; } = new DefaultIgnoreStrategy();
 
         /// <summary>
+        /// Strategy to get the screen position of the <c>GameObject</c>.
+        /// </summary>
+        public Func<GameObject, Vector2> GetScreenPoint { get; set; } = DefaultScreenPointStrategy.GetScreenPoint;
+
+        /// <summary>
         /// Strategy to examine whether <c>GameObject</c> is reachable from the user.
         /// <c>verboseLogger</c> will be overridden at runtime by the <c>Logger</c> if <c>Verbose</c> is true.
         /// </summary>

@@ -15,7 +15,7 @@ namespace TestHelper.UI.Operators
     /// <summary>
     /// Double click (tap) operator for Unity UI (uGUI) components.
     /// </summary>
-    public class UguiDoubleClickOperator : IDoubleClickOperator
+    public class UguiDoubleClickOperator : IDoubleClickOperator, IScreenPointCustomizable
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
@@ -23,8 +23,10 @@ namespace TestHelper.UI.Operators
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
 
+        /// <inheritdoc/>
+        public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
+
         private readonly int _intervalMillis;
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
 
         /// <summary>
         /// Constructor.
@@ -42,7 +44,7 @@ namespace TestHelper.UI.Operators
             }
 
             _intervalMillis = intervalMillis;
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            GetScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
         }
@@ -68,7 +70,7 @@ namespace TestHelper.UI.Operators
         {
             if (raycastResult.gameObject == null)
             {
-                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, _getScreenPoint);
+                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
             // Output log before the operation, after the shown effects

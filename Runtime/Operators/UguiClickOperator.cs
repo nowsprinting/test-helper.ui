@@ -15,15 +15,16 @@ namespace TestHelper.UI.Operators
     /// <summary>
     /// Click (tap) operator for Unity UI (uGUI) components.
     /// </summary>
-    public class UguiClickOperator : IClickOperator
+    public class UguiClickOperator : IClickOperator, IScreenPointCustomizable
     {
         /// <inheritdoc/>
-        public ILogger Logger { protected get; set; }
+        public ILogger Logger { private get; set; }
 
         /// <inheritdoc/>
-        public ScreenshotOptions ScreenshotOptions { protected get; set; }
+        public ScreenshotOptions ScreenshotOptions { private get; set; }
 
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
+        /// <inheritdoc/>
+        public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
 
         /// <summary>
         /// Constructor.
@@ -34,7 +35,7 @@ namespace TestHelper.UI.Operators
         public UguiClickOperator(Func<GameObject, Vector2> getScreenPoint = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            GetScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
         }
@@ -60,7 +61,7 @@ namespace TestHelper.UI.Operators
         {
             if (raycastResult.gameObject == null)
             {
-                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, _getScreenPoint);
+                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
             // Output log before the operation, after the shown effects

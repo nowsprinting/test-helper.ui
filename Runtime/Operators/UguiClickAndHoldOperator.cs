@@ -16,7 +16,7 @@ namespace TestHelper.UI.Operators
     /// Click and hold operator for Unity UI (uGUI) components.
     /// a.k.a. touch and hold, long press.
     /// </summary>
-    public class UguiClickAndHoldOperator : IClickAndHoldOperator
+    public class UguiClickAndHoldOperator : IClickAndHoldOperator, IScreenPointCustomizable
     {
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
@@ -24,8 +24,10 @@ namespace TestHelper.UI.Operators
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
 
+        /// <inheritdoc/>
+        public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
+
         private readonly int _holdMillis;
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
 
         /// <summary>
         /// Constructor.
@@ -38,7 +40,7 @@ namespace TestHelper.UI.Operators
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             _holdMillis = holdMillis;
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            GetScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
         }
@@ -65,7 +67,7 @@ namespace TestHelper.UI.Operators
         {
             if (raycastResult.gameObject == null)
             {
-                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, _getScreenPoint);
+                raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
             // Output log before the operation, after the shown effects

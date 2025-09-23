@@ -125,6 +125,11 @@ namespace TestHelper.UI
                 {
                     randomizable.Random = config.Random.Fork();
                 }
+
+                if (iOperator is IScreenPointCustomizable screenPointCustomizable)
+                {
+                    screenPointCustomizable.GetScreenPoint = config.GetScreenPoint;
+                }
             }
         }
 
