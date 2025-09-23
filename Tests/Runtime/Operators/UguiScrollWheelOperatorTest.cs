@@ -25,17 +25,30 @@ namespace TestHelper.UI.Operators
 
         private readonly IOperator _sut = new UguiScrollWheelOperator();
         private GameObject _scrollView;
+        private GameObject _scrollViewHorizontal;
+        private GameObject _scrollViewVertical;
 
         [SetUp]
         public void SetUp()
         {
             _scrollView = GameObject.Find("Both Scroll View");
-            if (_scrollView == null)
+            Centering(_scrollView);
+
+            _scrollViewHorizontal = GameObject.Find("Horizontal Scroll View");
+            Centering(_scrollViewHorizontal);
+
+            _scrollViewVertical = GameObject.Find("Vertical Scroll View");
+            Centering(_scrollViewVertical);
+        }
+
+        private static void Centering(GameObject scrollView)
+        {
+            if (scrollView == null)
             {
                 return; // Some tests do not use LoadScene attribute, so _scrollView might be null.
             }
 
-            var scrollRect = _scrollView.GetComponent<ScrollRect>();
+            var scrollRect = scrollView.GetComponent<ScrollRect>();
             scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f); // center the scroll view
         }
 
@@ -174,19 +187,18 @@ namespace TestHelper.UI.Operators
             Assert.That(actual, Is.False);
         }
 
-        [TestCase(2.3f, 5.7f)] // not normalized
-        [TestCase(0f, 0f)]     // on direction
-        public async Task OperateAsync_InvalidDirection_ThrowsArgumentException(float x, float y)
+        [Test]
+        public async Task OperateAsync_InvalidDirection_ThrowsArgumentException()
         {
             try
             {
                 var sut = new UguiScrollWheelOperator();
-                await sut.OperateAsync(null, new Vector2(x, y), 300);
+                await sut.OperateAsync(null, Vector2.zero, 300);
                 Assert.Fail("Expected exception was not thrown.");
             }
             catch (ArgumentException e)
             {
-                Assert.That(e.Message, Does.StartWith("Direction vector must be normalized"));
+                Assert.That(e.Message, Does.StartWith("Direction must not be zero"));
             }
         }
 
@@ -329,6 +341,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
+        [Repeat(10)]
         public async Task OperateAsync_WithoutDirectionAndDistance_RandomScrolling()
         {
             var scrollRect = _scrollView.GetComponent<ScrollRect>();
@@ -339,6 +352,45 @@ namespace TestHelper.UI.Operators
 
             var actual = scrollRect.normalizedPosition;
             Assert.That(actual, Is.Not.EqualTo(beforePosition));
+        }
+
+        [Test]
+        [CreateScene]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirectionAndDistance_NotScrollRect_RandomScrolling()
+        {
+            var gameObject = new GameObject(null, typeof(Image));
+            var spyOnScrollHandler = gameObject.AddComponent<SpyOnScrollHandler>();
+
+            var sut = new UguiScrollWheelOperator();
+            await sut.OperateAsync(gameObject);
+
+            Assert.That(spyOnScrollHandler.WasScrolled, Is.True);
+            Assert.That(spyOnScrollHandler.LastScrollDelta, Is.Not.EqualTo(Vector2.zero));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollOnlyHorizontal_RandomScrollingHorizontal()
+        {
+            var spyLogger = new SpyLogger();
+            var sut = new UguiScrollWheelOperator(logger: spyLogger);
+            await sut.OperateAsync(_scrollViewHorizontal);
+
+            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(-1,0)").Or.Contain("direction=(1,0)"));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollOnlyVertical_RandomScrollingVertical()
+        {
+            var spyLogger = new SpyLogger();
+            var sut = new UguiScrollWheelOperator(logger: spyLogger);
+            await sut.OperateAsync(_scrollViewVertical);
+
+            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(0,-1)").Or.Contain("direction=(0,1)"));
         }
 
         [Test]

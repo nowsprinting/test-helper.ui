@@ -11,6 +11,7 @@ using TestHelper.UI.Random;
 using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace TestHelper.UI.Operators
 {
@@ -96,23 +97,55 @@ namespace TestHelper.UI.Operators
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
-            var distance = CalcMaxScrollDistance(gameObject);
-            var destination = new Vector2(
-                Random.Next(-distance, distance),
-                Random.Next(-distance, distance)
-            );
-            await OperateAsync(gameObject, destination, raycastResult, cancellationToken);
+            // Generate random direction based on scrollable directions
+            Vector2 direction;
+            if (gameObject.TryGetEnabledComponent<ScrollRect>(out var scrollRect))
+            {
+                var x = GetRandomHorizontalDirection(scrollRect);
+                var y = GetRandomVerticalDirection(scrollRect);
+                direction = new Vector2(x, y);
+            }
+            else
+            {
+                direction = Random.insideUnitCircle;
+            }
+
+            // Generate random distance (1 to max distance)
+            var maxDistance = CalcMaxScrollDistance(gameObject);
+            var distance = Random.Next(10, maxDistance);
+
+            // Call the direction/distance overload
+            await OperateAsync(gameObject, direction, distance, raycastResult, cancellationToken);
+        }
+
+        private float GetRandomHorizontalDirection(ScrollRect scrollRect)
+        {
+            if (scrollRect.horizontal)
+            {
+                return Random.value < 0.5 ? -1f : 1f;
+            }
+
+            return 0f;
+        }
+
+        private float GetRandomVerticalDirection(ScrollRect scrollRect)
+        {
+            if (scrollRect.vertical)
+            {
+                return Random.value < 0.5 ? -1f : 1f;
+            }
+
+            return 0f;
         }
 
         private static int CalcMaxScrollDistance(GameObject gameObject)
         {
-            var rectTransform = gameObject.GetComponent<RectTransform>();
-            if (rectTransform == null)
+            if (gameObject.TryGetEnabledComponent<RectTransform>(out var rectTransform))
             {
-                return 200;
+                return (int)Math.Max(rectTransform.rect.width, rectTransform.rect.height);
             }
 
-            return (int)Math.Max(rectTransform.rect.width, rectTransform.rect.height);
+            return Math.Max(Screen.width, Screen.height);
         }
 
         /// <inheritdoc />
@@ -124,9 +157,9 @@ namespace TestHelper.UI.Operators
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
             // Validate parameters
-            if (Math.Abs(direction.magnitude - 1f) > 0.01f)
+            if (direction.magnitude == 0f)
             {
-                throw new ArgumentException("Direction vector must be normalized", nameof(direction));
+                throw new ArgumentException("Direction must not be zero", nameof(direction));
             }
 
             if (distance <= 0)
@@ -141,8 +174,8 @@ namespace TestHelper.UI.Operators
             await operationLogger.Log();
 
             // Calculate destination from direction and distance
-            var flipped = new Vector2(-direction.x, direction.y); // flip X axis to match scroll wheel direction
-            var destination = flipped * distance;
+            var flipped = direction * new Vector2(-1, 1); // flip X axis to match scroll wheel direction
+            var destination = flipped.normalized * distance;
 
             // Call the common implementation
             await OperateAsyncCore(gameObject, destination, raycastResult, cancellationToken);
