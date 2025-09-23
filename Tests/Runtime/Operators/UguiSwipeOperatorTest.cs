@@ -2,588 +2,530 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Random;
 using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.TestTools.Utils;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace TestHelper.UI.Operators
 {
     [TestFixture]
     public class UguiSwipeOperatorTest
     {
-        private UguiSwipeOperator _sut;
-        private Vector3 _objectPosition;
+        private const string TestScene = "../../Scenes/ScrollViews.unity";
+
+        private readonly ISwipeOperator _sut = new UguiSwipeOperator();
+        private GameObject _scrollView;
+        private GameObject _scrollViewHorizontal;
+        private GameObject _scrollViewVertical;
 
         [SetUp]
         public void SetUp()
         {
-            _sut = new UguiSwipeOperator();
-            _objectPosition = new Vector3(50, 50, 0);
+            _scrollView = GameObject.Find("Both Scroll View");
+            Centering(_scrollView);
+
+            _scrollViewHorizontal = GameObject.Find("Horizontal Scroll View");
+            Centering(_scrollViewHorizontal);
+
+            _scrollViewVertical = GameObject.Find("Vertical Scroll View");
+            Centering(_scrollViewVertical);
         }
 
-        private void SetOnCanvas(MonoBehaviour handler)
+        private static void Centering(GameObject scrollView)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var canvas = GameObject.FindObjectOfType<Canvas>();
-#pragma warning restore CS0618 // Type or member is obsolete
-            Assume.That(canvas, Is.Not.Null, "Canvas not found in the scene.");
-
-            handler.transform.SetParent(canvas.transform);
-            handler.transform.position = _objectPosition;
-            _objectPosition.x += ((RectTransform)handler.transform).sizeDelta.x;
-            _objectPosition.y += ((RectTransform)handler.transform).sizeDelta.y;
-        }
-        
-        private SpyOnPointerDownUpHandler CreateSpyPointerDownUpHandler()
-        {
-            var handler = new GameObject("SpyPointerDownUpHandler").AddComponent<SpyOnPointerDownUpHandler>();
-            SetOnCanvas(handler);
-            return handler;
-        }
-        
-        private SpyOnDragHandler CreateSpyDragHandler()
-        {
-            var handler = new GameObject("SpyDragHandler").AddComponent<SpyOnDragHandler>();
-            SetOnCanvas(handler);
-            return handler;
-        }
-        
-        private SpyOnPointerDownHandler CreateSpyPointerDownHandler()
-        {
-            var handler = new GameObject("SpyPointerDownHandler").AddComponent<SpyOnPointerDownHandler>();
-            SetOnCanvas(handler);
-            return handler;
-        }
-        
-        private SpyOnPointerUpHandler CreateSpyPointerUpHandler()
-        {
-            var handler = new GameObject("SpyPointerUpHandler").AddComponent<SpyOnPointerUpHandler>();
-            SetOnCanvas(handler);
-            return handler;
-        }
-        
-        private ScrollRect CreateScrollRect(bool horizontal = true, bool vertical = true)
-        {
-            var scrollRectObject = new GameObject("ScrollRect");
-            var scrollRect = scrollRectObject.AddComponent<ScrollRect>();
-            scrollRect.horizontal = horizontal;
-            scrollRect.vertical = vertical;
-            SetOnCanvas(scrollRect);
-            return scrollRect;
-        }
-        
-        private Scrollbar CreateScrollbar(Scrollbar.Direction direction)
-        {
-            var scrollbarObject = new GameObject("Scrollbar");
-            var scrollbar = scrollbarObject.AddComponent<Scrollbar>();
-            scrollbar.direction = direction;
-            SetOnCanvas(scrollbar);
-            return scrollbar;
-        }
-        
-        private EventTrigger CreateEventTriggerWithHandlers(params EventTriggerType[] types)
-        {
-            var eventTrigger = new GameObject("EventTrigger").AddComponent<EventTrigger>();
-            foreach (var type in types)
+            if (scrollView == null)
             {
-                var entry = new EventTrigger.Entry { eventID = type };
-                entry.callback.AddListener(_ => { });
-                eventTrigger.triggers.Add(entry);
+                return; // Some tests do not use LoadScene attribute, so _scrollView might be null.
             }
-            SetOnCanvas(eventTrigger);
-            return eventTrigger;
+
+            var scrollRect = scrollView.GetComponent<ScrollRect>();
+            scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f); // center the scroll view
         }
 
-        // Constructor tests
-        
+        [Test]
+        public void Constructor_ValidSwipeSpeedAndDistance_ObjectCreatedSuccessfully()
+        {
+            var sut = new UguiSwipeOperator(swipeSpeed: 1, swipeDistance: 2);
+            Assert.That(sut, Is.Not.Null);
+        }
+
         [Test]
         public void Constructor_NegativeSwipeSpeed_ThrowsArgumentException()
         {
             Assert.That(() => new UguiSwipeOperator(swipeSpeed: -1),
                 Throws.TypeOf<ArgumentException>().With.Message.Contains("Swipe speed must be positive"));
         }
-        
+
         [Test]
         public void Constructor_ZeroSwipeSpeed_ThrowsArgumentException()
         {
             Assert.That(() => new UguiSwipeOperator(swipeSpeed: 0),
                 Throws.TypeOf<ArgumentException>().With.Message.Contains("Swipe speed must be positive"));
         }
-        
+
         [Test]
         public void Constructor_NegativeSwipeDistance_ThrowsArgumentException()
         {
             Assert.That(() => new UguiSwipeOperator(swipeDistance: -1f),
                 Throws.TypeOf<ArgumentException>().With.Message.Contains("Swipe distance must be positive"));
         }
-        
+
         [Test]
         public void Constructor_ZeroSwipeDistance_ThrowsArgumentException()
         {
             Assert.That(() => new UguiSwipeOperator(swipeDistance: 0f),
                 Throws.TypeOf<ArgumentException>().With.Message.Contains("Swipe distance must be positive"));
         }
-        
-        // CanOperate tests
 
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
+        [CreateScene]
         public void CanOperate_PointerDownAndUpHandlers_ReturnsTrue()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            
-            var actual = _sut.CanOperate(handler.gameObject);
+            var gameObject = new GameObject(null, typeof(SpyOnPointerDownHandler), typeof(SpyOnPointerUpHandler));
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.True);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
+        [CreateScene]
         public void CanOperate_DragHandlerOnly_ReturnsTrue()
         {
-            var handler = CreateSpyDragHandler();
-            
-            var actual = _sut.CanOperate(handler.gameObject);
+            var gameObject = new GameObject(null, typeof(SpyOnDragHandler));
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.True);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
+        [CreateScene]
         public void CanOperate_PointerDownHandlerOnly_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownHandler();
-            
-            var actual = _sut.CanOperate(handler.gameObject);
+            var gameObject = new GameObject(null, typeof(SpyOnPointerDownHandler));
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
+        [CreateScene]
         public void CanOperate_PointerUpHandlerOnly_ReturnsFalse()
         {
-            var handler = CreateSpyPointerUpHandler();
-            
-            var actual = _sut.CanOperate(handler.gameObject);
+            var gameObject = new GameObject(null, typeof(SpyOnPointerUpHandler));
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
-        
+
         [Test]
         [CreateScene]
         public void CanOperate_NoUIInterface_ReturnsFalse()
         {
             var gameObject = new GameObject();
-            
+
             var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
-        
+
         [Test]
         public void CanOperate_NullGameObject_ReturnsFalse()
         {
             var actual = _sut.CanOperate(null);
             Assert.That(actual, Is.False);
         }
-        
+
         [Test]
         [CreateScene]
         public void CanOperate_DestroyedGameObject_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            GameObject.DestroyImmediate(handler.gameObject);
-            
-            var actual = _sut.CanOperate(handler.gameObject);
+            var gameObject = new GameObject(null, typeof(SpyOnDragHandler));
+            Object.DestroyImmediate(gameObject);
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
-        
+
         [Test]
         [CreateScene]
         public void CanOperate_InactiveGameObject_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            handler.gameObject.SetActive(false);
-            
-            var actual = _sut.CanOperate(handler.gameObject);
+            var gameObject = new GameObject(null, typeof(SpyOnDragHandler));
+            gameObject.SetActive(false);
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
-        
+
         [Test]
         [CreateScene]
         public void CanOperate_ParentInactive_ReturnsFalse()
         {
             var parent = new GameObject();
-            var handler = CreateSpyPointerDownUpHandler();
-            handler.transform.SetParent(parent.transform);
+            var gameObject = new GameObject(null, typeof(SpyOnDragHandler));
+            gameObject.transform.SetParent(parent.transform);
             parent.SetActive(false);
-            
-            var actual = _sut.CanOperate(handler.gameObject);
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public void CanOperate_DisabledPointerDownHandler_ReturnsFalse()
+        [CreateScene]
+        public void CanOperate_WithEventTriggerNotIncludeDrag_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            handler.enabled = false;
-            
-            var actual = _sut.CanOperate(handler.gameObject);
+            var gameObject = new GameObject(null, typeof(EventTrigger));
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
-        
-        // EventTrigger support tests
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public void CanOperate_EventTriggerWithoutHandlers_ReturnsFalse()
+        [CreateScene]
+        public void CanOperate_WithEventTriggerIncludeDrag_ReturnsTrue()
         {
-            var eventTrigger = new GameObject().AddComponent<EventTrigger>();
-            SetOnCanvas(eventTrigger);
-            
-            var actual = _sut.CanOperate(eventTrigger.gameObject);
-            Assert.That(actual, Is.False);
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public void CanOperate_EventTriggerWithDragHandlers_ReturnsTrue()
-        {
-            var eventTrigger = CreateEventTriggerWithHandlers(EventTriggerType.Drag);
-            
-            var actual = _sut.CanOperate(eventTrigger.gameObject);
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreateDragEntry());
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.True);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public void CanOperate_EventTriggerWithoutDragHandlers_ReturnsFalse()
+        [CreateScene]
+        public void CanOperate_WithDisabledEventTriggerIncludeDrag_ReturnsFalse()
         {
-            var eventTrigger = CreateEventTriggerWithHandlers(EventTriggerType.PointerClick);
-            
-            var actual = _sut.CanOperate(eventTrigger.gameObject);
-            Assert.That(actual, Is.False);
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public void CanOperate_EventTriggerWithPointerDownAndUp_ReturnsTrue()
-        {
-            var eventTrigger = CreateEventTriggerWithHandlers(EventTriggerType.PointerDown, EventTriggerType.PointerUp);
-            
-            var actual = _sut.CanOperate(eventTrigger.gameObject);
-            Assert.That(actual, Is.True);
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public void CanOperate_EventTriggerWithoutPointerDownUp_ReturnsFalse()
-        {
-            var eventTrigger = CreateEventTriggerWithHandlers(EventTriggerType.PointerClick);
-            
-            var actual = _sut.CanOperate(eventTrigger.gameObject);
-            Assert.That(actual, Is.False);
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public void CanOperate_DisabledEventTrigger_ReturnsFalse()
-        {
-            var eventTrigger = CreateEventTriggerWithHandlers(EventTriggerType.Drag);
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreateDragEntry());
             eventTrigger.enabled = false;
-            
-            var actual = _sut.CanOperate(eventTrigger.gameObject);
+
+            var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.False);
         }
-        
-        // OperateAsync(direction) tests
-        
+
+        private static EventTrigger.Entry CreateDragEntry() =>
+            new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.Drag,
+                callback = new EventTrigger.TriggerEvent()
+            };
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_RightSwipe_MovesRight()
+        [CreateScene]
+        public void CanOperate_WithEventTriggerIncludeOnlyPointerDown_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            var direction = new Vector2(1, 0);
-            
-            await _sut.OperateAsync(handler.gameObject, direction);
-            
-            Assert.That(handler.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler.PointerUpEvents.Count, Is.GreaterThan(0));
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreatePointerDownEntry());
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_LeftSwipe_MovesLeft()
+        [CreateScene]
+        public void CanOperate_WithEventTriggerIncludeOnlyPointerUp_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            var direction = new Vector2(-1, 0);
-            
-            await _sut.OperateAsync(handler.gameObject, direction);
-            
-            Assert.That(handler.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler.PointerUpEvents.Count, Is.GreaterThan(0));
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreatePointerUpEntry());
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_UpSwipe_MovesUp()
+        [CreateScene]
+        public void CanOperate_WithEventTriggerIncludeOnlyPointerDownAndUp_ReturnsTrue()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            var direction = new Vector2(0, 1);
-            
-            await _sut.OperateAsync(handler.gameObject, direction);
-            
-            Assert.That(handler.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler.PointerUpEvents.Count, Is.GreaterThan(0));
+            var gameObject = new GameObject();
+            var eventTrigger = gameObject.AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(CreatePointerDownEntry());
+            eventTrigger.triggers.Add(CreatePointerUpEntry());
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.True);
         }
-        
+
+        private static EventTrigger.Entry CreatePointerDownEntry() =>
+            new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerDown,
+                callback = new EventTrigger.TriggerEvent()
+            };
+
+        private static EventTrigger.Entry CreatePointerUpEntry() =>
+            new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerUp,
+                callback = new EventTrigger.TriggerEvent()
+            };
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_DownSwipe_MovesDown()
+        [CreateScene]
+        public void CanOperate_WithDragHandler_ReturnsTrue()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            var direction = new Vector2(0, -1);
-            
-            await _sut.OperateAsync(handler.gameObject, direction);
-            
-            Assert.That(handler.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler.PointerUpEvents.Count, Is.GreaterThan(0));
+            var gameObject = new GameObject(null, typeof(SpyOnDragHandler));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.True);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_DiagonalSwipe_MovesDiagonally()
+        [CreateScene]
+        public void CanOperate_WithDisabledDragHandler_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            var direction = new Vector2(1, 1);
-            
-            await _sut.OperateAsync(handler.gameObject, direction);
-            
-            Assert.That(handler.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler.PointerUpEvents.Count, Is.GreaterThan(0));
+            var gameObject = new GameObject(null, typeof(SpyOnDragHandler));
+            var handler = gameObject.GetComponent<SpyOnDragHandler>();
+            handler.enabled = false;
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_UnnormalizedVector_NormalizesCorrectly()
+        [CreateScene]
+        public void CanOperate_WithOnlyPointerDownHandler_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            var direction = new Vector2(3, 4); // magnitude = 5
-            
-            await _sut.OperateAsync(handler.gameObject, direction);
-            
-            Assert.That(handler.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler.PointerUpEvents.Count, Is.GreaterThan(0));
+            var gameObject = new GameObject(null, typeof(SpyOnPointerDownHandler));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_ZeroVector_ThrowsArgumentException()
+        [CreateScene]
+        public void CanOperate_WithOnlyPointerUpHandler_ReturnsFalse()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            var direction = Vector2.zero;
-            
+            var gameObject = new GameObject(null, typeof(SpyOnPointerUpHandler));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanOperate_WithPointerDownAndUpHandler_ReturnsTrue()
+        {
+            var gameObject = new GameObject(null, typeof(SpyOnPointerDownHandler), typeof(SpyOnPointerUpHandler));
+
+            var actual = _sut.CanOperate(gameObject);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        public async Task OperateAsync_InvalidDirection_ThrowsArgumentException()
+        {
             try
             {
-                await _sut.OperateAsync(handler.gameObject, direction);
-                Assert.Fail("Expected ArgumentException");
+                await _sut.OperateAsync(null, Vector2.zero);
+                Assert.Fail("Expected exception was not thrown.");
             }
             catch (ArgumentException e)
             {
-                Assert.That(e.Message, Does.Contain("direction"));
+                Assert.That(e.Message, Does.StartWith("Direction must not be zero"));
             }
         }
-        
+
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_Cancelled_OperationCancelled()
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithSwipeSpeed_SwipSpecifiedAmountInOneFrame()
         {
-            var handler = CreateSpyPointerDownUpHandler();
-            var cts = new CancellationTokenSource();
-            cts.Cancel();
-            
-            try
+            const int SwipeSpeed = 300;
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var rectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+
+            var sut = new UguiSwipeOperator(swipeSpeed: SwipeSpeed);
+            var task = sut.OperateAsync(_scrollView, Vector2.up);
+            await UniTask.NextFrame();
+
+            var frameSpeed = SwipeSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+
+            await task; // Ensure the task completes
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_Cancel_SwipeCancelled()
+        {
+            const int SwipeSpeed = 300;
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var rectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+
+            var sut = new UguiSwipeOperator(SwipeSpeed);
+            var task = sut.OperateAsync(_scrollView, Vector2.up, cancellationToken: cancellationToken);
+            await UniTask.NextFrame(cancellationToken);
+
+            var frameSpeed = SwipeSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+
+            cancellationTokenSource.Cancel();
+            await task; // Cancelled
+
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+        }
+
+        private static IEnumerable<TestCaseData> DirectionAndDistanceCases()
+        {
+            yield return new TestCaseData(Vector2.up, 100, new Vector2(0f, 100f));    // move up
+            yield return new TestCaseData(Vector2.down, 100, new Vector2(0f, -100f)); // move down
+            yield return new TestCaseData(Vector2.left, 100, new Vector2(-100f, 0f)); // move left
+            yield return new TestCaseData(Vector2.right, 100, new Vector2(100f, 0f)); // move right
+        }
+
+        [TestCaseSource(nameof(DirectionAndDistanceCases))]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithDirection_Swiped(Vector2 direction, int distance,
+            Vector2 expectedDelta)
+        {
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var rectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+            var expectedPosition = beforePosition + new Vector3(expectedDelta.x, expectedDelta.y);
+
+            var sut = new UguiSwipeOperator(swipeDistance: distance);
+            await sut.OperateAsync(_scrollView, direction);
+
+            Assert.That(rectTransform.position, Is.EqualTo(expectedPosition).Using(Vector3EqualityComparer.Instance));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_OnDragCalled()
+        {
+            var spyEventHandler = _scrollView.AddComponent<SpyOnDragHandler>();
+
+            var sut = new UguiSwipeOperator();
+            await sut.OperateAsync(_scrollView, Vector2.up);
+
+            Assert.That(spyEventHandler.WasInitializePotentialDrag, Is.True);
+            Assert.That(spyEventHandler.WasBeginDrag, Is.True);
+            Assert.That(spyEventHandler.LastDragPosition, Is.Not.EqualTo(Vector2.zero));
+            Assert.That(spyEventHandler.WasEndDrag, Is.True);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_OnPointerDownAndUpCalled()
+        {
+            var spyOnPointerDownHandler = _scrollView.AddComponent<SpyOnPointerDownHandler>();
+            var spyOnPointerUpHandler = _scrollView.AddComponent<SpyOnPointerUpHandler>();
+
+            var sut = new UguiSwipeOperator();
+            await sut.OperateAsync(_scrollView, Vector2.up);
+
+            Assert.That(spyOnPointerDownHandler.WasOnPointerDown, Is.True);
+            Assert.That(spyOnPointerUpHandler.WasOnPointerUp, Is.True);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirection_RandomSwipe()
+        {
+            var scrollRect = _scrollView.GetComponent<ScrollRect>();
+            var beforePosition = scrollRect.normalizedPosition;
+
+            var sut = new UguiSwipeOperator();
+            await sut.OperateAsync(_scrollView);
+
+            var actual = scrollRect.normalizedPosition;
+            Assert.That(actual, Is.Not.EqualTo(beforePosition));
+        }
+
+        [Test]
+        [CreateScene]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirection_NotScrollRect_RandomSwipe()
+        {
+            var gameObject = new GameObject(null, typeof(Image));
+            var spyOnDragHandler = gameObject.AddComponent<SpyOnDragHandler>();
+
+            var sut = new UguiSwipeOperator();
+            await sut.OperateAsync(gameObject);
+
+            Assert.That(spyOnDragHandler.LastDragPosition, Is.Not.EqualTo(Vector2.zero));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirection_ScrollOnlyHorizontal_RandomSwipeHorizontal()
+        {
+            var spyLogger = new SpyLogger();
+            var sut = new UguiSwipeOperator(logger: spyLogger);
+            await sut.OperateAsync(_scrollViewHorizontal);
+
+            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(-1,0)").Or.Contain("direction=(1,0)"));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirection_ScrollOnlyVertical_RandomSwipeVertical()
+        {
+            var spyLogger = new SpyLogger();
+            var sut = new UguiSwipeOperator(logger: spyLogger);
+            await sut.OperateAsync(_scrollViewVertical);
+
+            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(0,-1)").Or.Contain("direction=(0,1)"));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithLogger_LoggingWorks()
+        {
+            var spyLogger = new SpyLogger();
+
+            var sut = new UguiSwipeOperator(logger: spyLogger);
+            await sut.OperateAsync(_scrollView);
+
+            Assert.That(spyLogger.Messages, Is.Not.Empty);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithScreenshotOptions_TakeScreenshot()
+        {
+            var directory = Application.temporaryCachePath;
+            var filename = $"{TestContext.CurrentContext.Test.FullName}.png";
+            var path = Path.Combine(directory, filename);
+            if (File.Exists(path))
             {
-                await _sut.OperateAsync(handler.gameObject, Vector2.right, default, cts.Token);
-                Assert.Fail("Expected OperationCanceledException");
+                File.Delete(path);
             }
-            catch (OperationCanceledException)
+
+            var screenshotOptions = new ScreenshotOptions
             {
-                // Expected
-            }
+                Directory = directory,
+                FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
+            };
+
+            var sut = new UguiSwipeOperator(screenshotOptions: screenshotOptions);
+            await sut.OperateAsync(_scrollView);
+
+            Assert.That(path, Does.Exist);
         }
-        
-        // Pointer event tests
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_WithPointerHandlers_SendsPointerDownAndUp()
-        {
-            var handler = CreateSpyPointerDownUpHandler();
-            
-            await _sut.OperateAsync(handler.gameObject, Vector2.right);
-            
-            Assert.That(handler.PointerDownEvents.Count, Is.EqualTo(1));
-            Assert.That(handler.PointerUpEvents.Count, Is.EqualTo(1));
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_WithDragHandler_SendsDragEvents()
-        {
-            var handler = CreateSpyDragHandler();
-            
-            await _sut.OperateAsync(handler.gameObject, Vector2.right);
-            
-            Assert.That(handler.WasBeginDrag, Is.True);
-            Assert.That(handler.LastDragPosition, Is.Not.EqualTo(Vector2.zero));
-            Assert.That(handler.WasEndDrag, Is.True);
-        }
-        
-        // Monkey test version tests
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        [Repeat(10)]
-        public async Task OperateAsync_HorizontalScrollRect_SwipesHorizontally()
-        {
-            var scrollRect = CreateScrollRect(horizontal: true, vertical: false);
-            
-            await _sut.OperateAsync(scrollRect.gameObject);
-            
-            // Should have swiped horizontally
-            Assert.Pass("Swipe operation completed");
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        [Repeat(10)]
-        public async Task OperateAsync_VerticalScrollRect_SwipesVertically()
-        {
-            var scrollRect = CreateScrollRect(horizontal: false, vertical: true);
-            
-            await _sut.OperateAsync(scrollRect.gameObject);
-            
-            // Should have swiped vertically
-            Assert.Pass("Swipe operation completed");
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        [Repeat(10)]
-        public async Task OperateAsync_BothDirectionsScrollRect_SwipesBothDirections()
-        {
-            var scrollRect = CreateScrollRect(horizontal: true, vertical: true);
-            
-            await _sut.OperateAsync(scrollRect.gameObject);
-            
-            // Should have swiped in both directions
-            Assert.Pass("Swipe operation completed");
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        [Repeat(10)]
-        public async Task OperateAsync_DisabledScrollRect_SwipesRandomly()
-        {
-            var scrollRect = CreateScrollRect(horizontal: false, vertical: false);
-            
-            await _sut.OperateAsync(scrollRect.gameObject);
-            
-            // Should have swiped in random direction
-            Assert.Pass("Swipe operation completed");
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        [Repeat(10)]
-        public async Task OperateAsync_HorizontalScrollbar_SwipesHorizontally()
-        {
-            var scrollbar = CreateScrollbar(Scrollbar.Direction.LeftToRight);
-            
-            await _sut.OperateAsync(scrollbar.gameObject);
-            
-            // Should have swiped horizontally
-            Assert.Pass("Swipe operation completed");
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        [Repeat(10)]
-        public async Task OperateAsync_VerticalScrollbar_SwipesVertically()
-        {
-            var scrollbar = CreateScrollbar(Scrollbar.Direction.BottomToTop);
-            
-            await _sut.OperateAsync(scrollbar.gameObject);
-            
-            // Should have swiped vertically
-            Assert.Pass("Swipe operation completed");
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        [Repeat(10)]
-        public async Task OperateAsync_NonScrollObject_SwipesRandomly()
-        {
-            var handler = CreateSpyPointerDownUpHandler();
-            
-            await _sut.OperateAsync(handler.gameObject);
-            
-            Assert.That(handler.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler.PointerUpEvents.Count, Is.GreaterThan(0));
-        }
-        
-        // Random seed tests
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_SameSeed_ProducesSameDirection()
-        {
-            var handler1 = CreateSpyPointerDownUpHandler();
-            var handler2 = CreateSpyPointerDownUpHandler();
-            
-            // Using StubRandom with predefined values for deterministic behavior
-            var stubRandom1 = new StubRandom(1, 1); // For random values
-            var stubRandom2 = new StubRandom(1, 1); // Same values
-            
-            var sut1 = new UguiSwipeOperator(random: stubRandom1);
-            var sut2 = new UguiSwipeOperator(random: stubRandom2);
-            
-            await sut1.OperateAsync(handler1.gameObject);
-            await sut2.OperateAsync(handler2.gameObject);
-            
-            // Both should have been operated
-            Assert.That(handler1.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler2.PointerDownEvents.Count, Is.GreaterThan(0));
-        }
-        
-        [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.ui/Tests/Scenes/OperatorsTestScene.unity")]
-        public async Task OperateAsync_DifferentSeed_ProducesDifferentDirection()
-        {
-            var handler1 = CreateSpyPointerDownUpHandler();
-            var handler2 = CreateSpyPointerDownUpHandler();
-            
-            // Using StubRandom with different values for different behavior
-            var stubRandom1 = new StubRandom(1, 1);
-            var stubRandom2 = new StubRandom(0, 0);
-            
-            var sut1 = new UguiSwipeOperator(random: stubRandom1);
-            var sut2 = new UguiSwipeOperator(random: stubRandom2);
-            
-            await sut1.OperateAsync(handler1.gameObject);
-            await sut2.OperateAsync(handler2.gameObject);
-            
-            // Both should have been operated
-            Assert.That(handler1.PointerDownEvents.Count, Is.GreaterThan(0));
-            Assert.That(handler2.PointerDownEvents.Count, Is.GreaterThan(0));
-        }
-        
-        // Logger and screenshot tests would go here but are omitted for brevity
-        // They would follow the same pattern as the DragAndDropOperatorTest
     }
 }

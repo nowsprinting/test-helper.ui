@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Threading;
@@ -21,6 +21,7 @@ namespace TestHelper.UI.Operators
         /// <param name="raycastResult">RaycastResult from the cursor.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Task to await.</returns>
-        UniTask OperateAsync(GameObject gameObject, Vector2 direction, RaycastResult raycastResult = default, CancellationToken cancellationToken = default);
+        UniTask OperateAsync(GameObject gameObject, Vector2 direction, RaycastResult raycastResult = default,
+            CancellationToken cancellationToken = default);
     }
 }
