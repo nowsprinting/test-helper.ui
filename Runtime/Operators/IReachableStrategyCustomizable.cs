@@ -6,7 +6,7 @@ using TestHelper.UI.Strategies;
 namespace TestHelper.UI.Operators
 {
     /// <summary>
-    /// can customize the strategy to determine whether <c>GameObject</c> is reachable from the user.
+    /// Can customize the strategy to determine whether <c>GameObject</c> is reachable from the user.
     /// </summary>
     public interface IReachableStrategyCustomizable
     {
