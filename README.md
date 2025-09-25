@@ -5,8 +5,8 @@
 [![openupm](https://img.shields.io/npm/v/com.nowsprinting.test-helper.ui?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.nowsprinting.test-helper.ui/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nowsprinting/test-helper.ui)
 
-A library for object-based monkey and UI testing.
-(Formerly known as Monkey Test Helper)
+A Unity library for UI testing including object-based monkey testing.
+(Formerly known as "Monkey Test Helper")
 
 This library can be used in runtime code because it does **NOT** depend on the [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest).  
 Required Unity 2019 LTS or later.
