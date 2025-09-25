@@ -9,11 +9,9 @@ namespace TestHelper.UI.TestDoubles
 {
     [RequireComponent(typeof(Image))]
     [AddComponentMenu("/")] // Hide from "Add Component" picker
-    public class SpyOnDragHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
-        IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
+    public class SpyOnDragHandler : MonoBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler,
+        IDragHandler
     {
-        public bool WasPointerDown { get; private set; }
-        public bool WasPointerUp { get; private set; }
         public bool WasInitializePotentialDrag { get; private set; }
         public bool WasBeginDrag { get; private set; }
         public bool WasEndDrag { get; private set; }
@@ -27,18 +25,6 @@ namespace TestHelper.UI.TestDoubles
             _image = GetComponent<Image>();
             _image.color = UnityEngine.Random.ColorHSV();
             _image.raycastTarget = true;
-        }
-
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            Debug.Log($"OnPointerDown: {eventData.position}");
-            WasPointerDown = true;
-        }
-
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            Debug.Log($"OnPointerUp: {eventData.position}");
-            WasPointerUp = true;
         }
 
         public void OnInitializePotentialDrag(PointerEventData eventData)
