@@ -286,7 +286,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task OperateAsync_SpecifySwipeSpeed_SwipSpecifiedAmountInOneFrame()
+        public async Task OperateAsync_SpecifySwipeSpeed_SwipeSpecifiedAmountInOneFrame()
         {
             const int SwipeSpeed = 200;
             var viewport = _scrollView.transform.Find("Viewport");

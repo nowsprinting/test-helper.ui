@@ -124,7 +124,7 @@ namespace TestHelper.UI.Operators
                 return GenerateDirectionForScrollable(scrollbar);
             }
 
-            // For other swipeable components, use a random direction
+            // Default to random direction for non-scrollable components
             return Random.insideUnitCircle;
         }
 
