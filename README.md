@@ -189,7 +189,8 @@ Built-in operators:
     1. Drop to the position that `GameObject` with `DropAnnotation` component if it exists. It will be random if there are multiple.
     2. Drop to the position that `GameObject` with implement `IDropHandler` component if it exists. It will be random if there are multiple.
     3. Drop to the random screen position.
-- `UguiScrollWheelOperator`: Performs the scroll; scroll speed, direction, and distance can be specified. If omitted, it will be random.
+- `UguiScrollWheelOperator`: Performs the scroll; scroll speed, direction, and distance can be specified. If direction and/or distance is omitted, it will be random.
+- `UguiSwipeOperator`: Performs the swipe; swipe speed, distance, and direction can be specified. If direction is omitted, it will be random.
 - `UguiTextInputOperator`: Inputs text into `InputField` and `TMP_InputField`; text can be specified. If omitted, it will be randomized text.
 - `UguiToggleOperator`: Toggles the `Toggle` component; target value can be specified. If omitted, it will always be flipped (same as click).
 
@@ -220,6 +221,9 @@ public class MyIntegrationTest
 
 > [!TIP]  
 > You can set the `Logger` and `ScreenshotOptions` instance via the constructor arguments or properties if needed.
+
+> [!TIP]  
+> All operators implement an overload method that takes only a `GameObject` for monkey testing.
 
 
 
@@ -479,6 +483,9 @@ An operator must implement the `CanOperate` method to determine whether an opera
 
 > [!IMPORTANT]  
 > Until test-helper.monkey v0.14.0, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
+
+> [!TIP]  
+> All operators implement an overload method that takes only a `GameObject` for monkey testing.
 
 
 

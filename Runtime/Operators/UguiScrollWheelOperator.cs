@@ -97,25 +97,39 @@ namespace TestHelper.UI.Operators
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
-            // Generate random direction based on scrollable directions
-            Vector2 direction;
-            if (gameObject.TryGetEnabledComponent<ScrollRect>(out var scrollRect))
-            {
-                var x = GetRandomHorizontalDirection(scrollRect);
-                var y = GetRandomVerticalDirection(scrollRect);
-                direction = new Vector2(x, y);
-            }
-            else
-            {
-                direction = Random.insideUnitCircle;
-            }
+            // Generate a random direction with respect to scrollable directions
+            var direction = GenerateRandomScrollDirection(gameObject);
 
-            // Generate random distance (1 to max distance)
+            // Generate random distance (10 to max distance)
             var maxDistance = CalcMaxScrollDistance(gameObject);
             var distance = Random.Next(10, maxDistance);
 
             // Call the direction/distance overload
             await OperateAsync(gameObject, direction, distance, raycastResult, cancellationToken);
+        }
+
+        private Vector2 GenerateRandomScrollDirection(GameObject gameObject)
+        {
+            // Check for scrollable components
+            if (gameObject.TryGetEnabledComponent<ScrollRect>(out var scrollRect))
+            {
+                return GenerateDirectionForScrollable(scrollRect);
+            }
+
+            if (gameObject.TryGetEnabledComponent<Scrollbar>(out var scrollbar))
+            {
+                return GenerateDirectionForScrollable(scrollbar);
+            }
+
+            // For other scrollable components, use a random direction
+            return Random.insideUnitCircle;
+        }
+
+        private Vector2 GenerateDirectionForScrollable(UIBehaviour scrollable)
+        {
+            var x = GetRandomHorizontalDirection(scrollable);
+            var y = GetRandomVerticalDirection(scrollable);
+            return new Vector2(x, y);
         }
 
         private float GetRandomHorizontalDirection(UIBehaviour scroller)

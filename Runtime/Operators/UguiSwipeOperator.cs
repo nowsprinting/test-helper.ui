@@ -104,7 +104,7 @@ namespace TestHelper.UI.Operators
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
-            // Generate random direction based on component type
+            // Generate a random direction with respect to scrollable directions
             var direction = GenerateRandomSwipeDirection(gameObject);
 
             // Call the direction overload

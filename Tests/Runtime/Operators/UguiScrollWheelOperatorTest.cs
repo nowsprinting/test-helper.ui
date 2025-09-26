@@ -342,7 +342,7 @@ namespace TestHelper.UI.Operators
         [Test]
         [LoadScene(TestScene)]
         [Repeat(10)]
-        public async Task OperateAsync_WithoutDirectionAndDistance_RandomScrolling()
+        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollRectBoth_RandomScrolling()
         {
             var scrollRect = _scrollView.GetComponent<ScrollRect>();
             var beforePosition = scrollRect.normalizedPosition;
@@ -355,24 +355,9 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [CreateScene]
-        [Repeat(10)]
-        public async Task OperateAsync_WithoutDirectionAndDistance_NotScrollRect_RandomScrolling()
-        {
-            var gameObject = new GameObject(null, typeof(Image));
-            var spyOnScrollHandler = gameObject.AddComponent<SpyOnScrollHandler>();
-
-            var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(gameObject);
-
-            Assert.That(spyOnScrollHandler.WasScrolled, Is.True);
-            Assert.That(spyOnScrollHandler.LastScrollDelta, Is.Not.EqualTo(Vector2.zero));
-        }
-
-        [Test]
         [LoadScene(TestScene)]
         [Repeat(10)]
-        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollOnlyHorizontal_RandomScrollingHorizontal()
+        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollRectHorizontal_RandomScrollingHorizontal()
         {
             var spyLogger = new SpyLogger();
             var sut = new UguiScrollWheelOperator(logger: spyLogger);
@@ -384,13 +369,51 @@ namespace TestHelper.UI.Operators
         [Test]
         [LoadScene(TestScene)]
         [Repeat(10)]
-        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollOnlyVertical_RandomScrollingVertical()
+        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollRectVertical_RandomScrollingVertical()
         {
             var spyLogger = new SpyLogger();
             var sut = new UguiScrollWheelOperator(logger: spyLogger);
             await sut.OperateAsync(_scrollViewVertical);
 
             Assert.That(spyLogger.Messages[0], Does.Contain("direction=(0,-1)").Or.Contain("direction=(0,1)"));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollbarHorizontal_RandomScrollingHorizontal()
+        {
+            var spyLogger = new SpyLogger();
+            var sut = new UguiScrollWheelOperator(logger: spyLogger);
+            await sut.OperateAsync(_scrollViewHorizontal.GetComponent<ScrollRect>().horizontalScrollbar.gameObject);
+
+            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(-1,0)").Or.Contain("direction=(1,0)"));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirectionAndDistance_ScrollbarVertical_RandomScrollingVertical()
+        {
+            var spyLogger = new SpyLogger();
+            var sut = new UguiScrollWheelOperator(logger: spyLogger);
+            await sut.OperateAsync(_scrollViewVertical.GetComponent<ScrollRect>().verticalScrollbar.gameObject);
+
+            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(0,-1)").Or.Contain("direction=(0,1)"));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(10)]
+        public async Task OperateAsync_WithoutDirectionAndDistance_NotScrollRectOrScrollbar_RandomScrolling()
+        {
+            var gameObject = new GameObject(null, typeof(Image));
+            var spyOnScrollHandler = gameObject.AddComponent<SpyOnScrollHandler>();
+
+            var sut = new UguiScrollWheelOperator();
+            await sut.OperateAsync(gameObject);
+
+            Assert.That(spyOnScrollHandler.LastScrollDelta.magnitude, Is.GreaterThan(0f));
         }
 
         [Test]

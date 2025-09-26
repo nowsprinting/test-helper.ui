@@ -463,7 +463,7 @@ namespace TestHelper.UI.Operators
             await sut.OperateAsync(gameObject);
 
             var actual = Vector3.Distance(spyOnDragHandler.LastDragPosition, beforePosition);
-            Assert.That(actual, Is.Not.EqualTo(SwipeDistance));
+            Assert.That(actual, Is.GreaterThan(0f));
         }
 
         [Test]
