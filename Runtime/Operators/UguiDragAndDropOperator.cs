@@ -130,7 +130,7 @@ namespace TestHelper.UI.Operators
         public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
-            var dropAnnotations = FindDropAnnotations() as Component[];
+            var dropAnnotations = FindDropAnnotations().Where(x => x.isActiveAndEnabled).ToArray<Component>();
             var dropAnnotation = LotteryComponent(dropAnnotations);
             if (dropAnnotation != null)
             {
