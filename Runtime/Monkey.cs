@@ -36,10 +36,12 @@ namespace TestHelper.UI
         /// Run monkey testing by repeating to call <c cref="RunStep">RunStep</c> and wait.
         /// </summary>
         /// <param name="config">Run configuration for monkey testing</param>
+        /// <param name="oneStepMode">Run only one step</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <exception cref="InfiniteLoopException">Thrown if a repeating operation is detected within the specified buffer length</exception>
         /// <exception cref="TimeoutException">Thrown if an object that can be interacted with does not exist</exception>
-        public static async UniTask Run(MonkeyConfig config, CancellationToken cancellationToken = default)
+        public static async UniTask Run(MonkeyConfig config, bool oneStepMode = false,
+            CancellationToken cancellationToken = default)
         {
             var endTime = config.Lifetime == TimeSpan.MaxValue
                 ? TimeSpan.MaxValue.TotalSeconds
@@ -101,6 +103,11 @@ namespace TestHelper.UI
                         throw new TimeoutException(message.ToString());
                     }
 
+                    if (oneStepMode)
+                    {
+                        break;
+                    }
+
                     await UniTask.Delay(config.DelayMillis, ignoreTimeScale: true,
                         cancellationToken: cancellationToken);
                 }
@@ -138,7 +145,7 @@ namespace TestHelper.UI
             }
         }
 
-        [Obsolete("The public release of RunStep will be discontinued in the future.")]
+        [Obsolete("Use Run(oneStepMode: true) instead")]
         public static UniTask<(bool, int)> RunStep(
             IRandom random,
             ILogger logger,
@@ -153,18 +160,6 @@ namespace TestHelper.UI
                 cancellationToken);
         }
 
-        /// <summary>
-        /// Run a step of monkey testing.
-        /// This method is internal by nature, called from <c cref="Run">Run</c> method.
-        /// </summary>
-        /// <param name="random">Random number generator from <c>MonkeyConfig</c></param>
-        /// <param name="logger">Logger from <c>MonkeyConfig</c></param>
-        /// <param name="interactableComponentsFinder">InteractableComponentsFinder instance includes isInteractable and operators</param>
-        /// <param name="ignoreStrategy">Strategy to examine whether <c>GameObject</c> should be ignored. from <c>MonkeyConfig</c></param>
-        /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. from <c>MonkeyConfig</c></param>
-        /// <param name="verbose">Output verbose logs</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>True if any operator was executed, and the instance ID of operated <c>GameObject</c></returns>
         internal static async UniTask<(bool, int)> RunStep(
             IRandom random,
             ILogger logger,

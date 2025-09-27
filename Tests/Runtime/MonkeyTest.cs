@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Random;
+using TestHelper.RuntimeInternals;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Exceptions;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
 using TestHelper.UI.TestDoubles;
-using TestHelper.Random;
-using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -82,6 +82,28 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene(TestScene)]
+        public async Task Run_oneStepMode_finish()
+        {
+            var spyLogger = new SpyLogger();
+            var config = new MonkeyConfig
+            {
+                Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
+                DelayMillis = 1,                           // 1ms
+                BufferLengthForDetectLooping = 0,          // disable loop detection
+                Logger = spyLogger,
+                Operators = _operators,
+            };
+
+            await Monkey.Run(config, oneStepMode: true);
+
+            Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
+            Assert.That(spyLogger.Messages[0], Does.StartWith("Using RandomWrapper"));
+            Assert.That(spyLogger.Messages[1], Does.Contain("Operator operates to"));
+            // Note: Only one operator logged
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
         public async Task Run_finish()
         {
             var config = new MonkeyConfig
@@ -108,7 +130,7 @@ namespace TestHelper.UI
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                var task = Monkey.Run(config, cancellationTokenSource.Token);
+                var task = Monkey.Run(config, cancellationToken: cancellationTokenSource.Token);
                 await UniTask.Delay(1000, DelayType.DeltaTime);
 
                 cancellationTokenSource.Cancel();

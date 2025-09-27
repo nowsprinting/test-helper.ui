@@ -67,7 +67,7 @@ namespace TestHelper.UI.Samples.UguiDemo
                 };
 
                 _cts = new CancellationTokenSource();
-                await Monkey.Run(config, _cts.Token).SuppressCancellationThrow();
+                await Monkey.Run(config, cancellationToken: _cts.Token).SuppressCancellationThrow();
                 _cts.Dispose();
                 _cts = null;
             }
