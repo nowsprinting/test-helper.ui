@@ -13,11 +13,17 @@ namespace TestHelper.UI.TestDoubles
     [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class SpyOnPointerUpHandler : MonoBehaviour, IPointerUpHandler
     {
+        public bool WasOnPointerUp { get; private set; }
+
         private void Log([CallerMemberName] string member = null)
         {
             Debug.Log($"{this.name}.{member}");
         }
 
-        public void OnPointerUp(PointerEventData eventData) => Log();
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            Log();
+            WasOnPointerUp = true;
+        }
     }
 }

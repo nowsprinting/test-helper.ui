@@ -257,18 +257,20 @@ namespace TestHelper.UI.Operators
         public async Task OperateAsync_NotExistDropTarget_DropOnRandomScreenPoint()
         {
             var dragHandler = CreateSpyDragHandler();
+            var pointerDownHandler = dragHandler.gameObject.AddComponent<SpyOnPointerDownHandler>();
+            var pointerUpHandler = dragHandler.gameObject.AddComponent<SpyOnPointerUpHandler>();
 
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
             await sut.OperateAsync(dragHandler.gameObject);
 
-            Assert.That(dragHandler.WasPointerDown, Is.True);
+            Assert.That(pointerDownHandler.WasOnPointerDown, Is.True);
             Assert.That(dragHandler.WasInitializePotentialDrag, Is.True);
             Assert.That(dragHandler.WasBeginDrag, Is.True);
-            Assert.That(dragHandler.WasPointerUp, Is.True);
             Assert.That(dragHandler.WasEndDrag, Is.True);
             Assert.That(dragHandler.LastDragPosition, Is.Not.EqualTo(default(Vector2)));
+            Assert.That(pointerUpHandler.WasOnPointerUp, Is.True);
         }
 
         [Test]
