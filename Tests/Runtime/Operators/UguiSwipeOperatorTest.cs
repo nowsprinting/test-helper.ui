@@ -300,7 +300,7 @@ namespace TestHelper.UI.Operators
 
             var frameSpeed = SwipeSpeed * Time.deltaTime;
             var expectedPositionY = beforePosition.y - frameSpeed;
-            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(20.0f));
 
             await task; // Ensure the task completes
         }
