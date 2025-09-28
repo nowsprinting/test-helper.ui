@@ -42,8 +42,7 @@ namespace TestHelper.UI.Samples.UguiDemo
 
             var width = Mathf.Max(text.preferredWidth + 8.0f, 60.0f);
             var height = text.preferredHeight + 4.0f;
-            var rectTransform = transform as RectTransform;
-            rectTransform!.sizeDelta = new Vector2(width, height);
+            _background.rectTransform.sizeDelta = new Vector2(width, height);
 
             transform.localPosition -= Vector3.down * (height * 0.5f);
 
