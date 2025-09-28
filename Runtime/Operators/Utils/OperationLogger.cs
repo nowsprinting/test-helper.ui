@@ -110,12 +110,12 @@ namespace TestHelper.UI.Operators.Utils
         {
             if (value is Vector2 vector2)
             {
-                return $"({vector2.x:F0},{vector2.y:F0})"; // format as an integer because the screen position
+                return $"({vector2.x:F2}, {vector2.y:F2})"; // C#8.0 or older have different formats
             }
 
             if (value is Vector3 vector3)
             {
-                return $"({vector3.x:F2},{vector3.y:F2},{vector3.z:F2})"; // C#8.0 or older have different formats
+                return $"({vector3.x:F2}, {vector3.y:F2}, {vector3.z:F2})"; // C#8.0 or older have different formats
             }
 
             return value.ToString();
