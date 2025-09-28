@@ -37,6 +37,7 @@ namespace TestHelper.UI.Samples.UguiDemo
                 if (gameObject.TryGetEnabledComponent<Image>(out var image))
                 {
                     var draggingImage = _draggingObject.AddComponent<Image>();
+                    draggingImage.raycastTarget = false;
                     var color = image.color;
                     color.a = 0.5f;
                     draggingImage.color = color;

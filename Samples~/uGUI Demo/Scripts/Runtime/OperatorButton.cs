@@ -13,9 +13,13 @@ namespace TestHelper.UI.Samples.UguiDemo
         SingleClick,
         DoubleClick,
         ClickAndHold,
+        RightClick,
+        Hover,
         DragAndDrop,
+        Flick,
         Swipe,
         ScrollWheel,
+        Pinch,
         TextInput,
     }
 
@@ -49,6 +53,9 @@ namespace TestHelper.UI.Samples.UguiDemo
                     break;
                 case OperatorType.Swipe:
                     _operator = new UguiSwipeOperator();
+                    break;
+                case OperatorType.Flick:
+                    _operator = new UguiSwipeOperator(swipeSpeed: 2000, swipeDistance: 80f);
                     break;
                 case OperatorType.ScrollWheel:
                     _operator = new UguiScrollWheelOperator();
