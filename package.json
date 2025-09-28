@@ -41,8 +41,8 @@
   "repository": "https://github.com/nowsprinting/test-helper.ui",
   "samples": [
     {
-      "displayName": "uGUI Demo",
-      "description": "Monkey and scenario testing demo for uGUI based app",
+      "displayName": "uGUI demo",
+      "description": "uGUI operators and monkey testing demo",
       "path": "Samples~/uGUI Demo"
     }
   ],
