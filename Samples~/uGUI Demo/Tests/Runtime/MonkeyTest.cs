@@ -33,7 +33,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         private static void SetControlsInteractable(bool interactable)
         {
             // run monkey button 
-            var monkeyTestsButton = Object.FindAnyObjectByType<MonkeyTestsButton>();
+            var monkeyTestsButton = Object.FindObjectOfType<MonkeyTestsButton>();
             monkeyTestsButton.GetComponent<Button>().interactable = interactable;
 
             // settings
@@ -43,7 +43,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             }
 
             // controls in content pane
-            foreach (var content in GameObject.FindObjectsByType<TabContent>(FindObjectsSortMode.None))
+            foreach (var content in GameObject.FindObjectsOfType<TabContent>())
             {
                 content.SetControlsInteractable(interactable);
             }

@@ -17,7 +17,7 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         private void Start()
         {
-            _tabContents = FindObjectsByType<TabContent>(FindObjectsSortMode.None).ToList();
+            _tabContents = FindObjectsOfType<TabContent>().ToList();
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace TestHelper.UI.Samples.UguiDemo
                 tabContent.gameObject.SetActive(tabContent == this);
             }
 
-            var monkeyTestsButton = FindAnyObjectByType<MonkeyTestsButton>();
+            var monkeyTestsButton = FindObjectOfType<MonkeyTestsButton>();
             var interactable = monkeyTestsButton.GetComponent<Button>().interactable;
             SetControlsInteractable(interactable);
         }

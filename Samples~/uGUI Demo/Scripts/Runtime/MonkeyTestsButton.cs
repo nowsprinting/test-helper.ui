@@ -75,7 +75,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             }
 
             // controls in content pane
-            foreach (var content in FindObjectsByType<TabContent>(FindObjectsSortMode.None))
+            foreach (var content in FindObjectsOfType<TabContent>())
             {
                 content.SetControlsInteractable(interactable);
             }

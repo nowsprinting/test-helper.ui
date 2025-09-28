@@ -29,7 +29,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         {
             _popupPrefab = Resources.Load<GameObject>("TestHelper.UI.Samples.UguiDemo/EventPopup");
 
-            foreach (var toggle in FindObjectsByType<Toggle>(FindObjectsSortMode.None))
+            foreach (var toggle in FindObjectsOfType<Toggle>())
             {
                 switch (toggle.name)
                 {
