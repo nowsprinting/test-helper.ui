@@ -72,7 +72,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         {
             if (OperationTarget == null)
             {
-                Debug.LogError("ClickTarget is not assigned");
+                Debug.LogError("OperationTarget is not assigned");
                 return;
             }
 
