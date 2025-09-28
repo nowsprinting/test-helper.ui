@@ -3,6 +3,7 @@
     "rootNamespace": "",
     "references": [
         "TestHelper.UI",
+        "TestHelper.Random",
         "UniTask"
     ],
     "includePlatforms": [],
