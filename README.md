@@ -190,7 +190,7 @@ Built-in operators:
     2. Drop to the position that `GameObject` with implement `IDropHandler` component if it exists. It will be random if there are multiple.
     3. Drop to the random screen position.
 - `UguiScrollWheelOperator`: Performs the scroll; scroll speed, direction, and distance can be specified. If direction and/or distance is omitted, it will be random.
-- `UguiSwipeOperator`: Performs the swipe; swipe speed, distance, and direction can be specified. If direction is omitted, it will be random.
+- `UguiSwipeOperator`: Performs the swipe (including flick); swipe speed, distance, and direction can be specified. If direction is omitted, it will be random.
 - `UguiTextInputOperator`: Inputs text into `InputField` and `TMP_InputField`; text can be specified. If omitted, it will be randomized text.
 - `UguiToggleOperator`: Toggles the `Toggle` component; target value can be specified. If omitted, it will always be flipped (same as click).
 
