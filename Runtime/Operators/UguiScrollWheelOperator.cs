@@ -102,7 +102,7 @@ namespace TestHelper.UI.Operators
 
             // Generate random distance (10 to max distance)
             var maxDistance = CalcMaxScrollDistance(gameObject);
-            var distance = Random.Next(10, maxDistance);
+            var distance = Random.Next(maxDistance / 2, maxDistance);
 
             // Call the direction/distance overload
             await OperateAsync(gameObject, direction, distance, raycastResult, cancellationToken);

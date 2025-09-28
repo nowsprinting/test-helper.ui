@@ -83,7 +83,7 @@ namespace TestHelper.UI.Operators
         /// This method does not use a <c>raycastResult</c>.
         /// </remarks>
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-        public async UniTask OperateAsync(GameObject gameObject, RaycastResult _,
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult _ = default,
             CancellationToken cancellationToken = default)
         {
             Func<GameObject, RandomStringParameters> randomStringParams;

@@ -363,7 +363,8 @@ namespace TestHelper.UI.Operators
             var sut = new UguiScrollWheelOperator(logger: spyLogger);
             await sut.OperateAsync(_scrollViewHorizontal);
 
-            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(-1,0)").Or.Contain("direction=(1,0)"));
+            Assert.That(spyLogger.Messages[0], Does.Contain(
+                "direction=(-1.00, 0.00)").Or.Contain("direction=(1.00, 0.00)"));
         }
 
         [Test]
@@ -375,7 +376,8 @@ namespace TestHelper.UI.Operators
             var sut = new UguiScrollWheelOperator(logger: spyLogger);
             await sut.OperateAsync(_scrollViewVertical);
 
-            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(0,-1)").Or.Contain("direction=(0,1)"));
+            Assert.That(spyLogger.Messages[0], Does.Contain(
+                "direction=(0.00, -1.00)").Or.Contain("direction=(0.00, 1.00)"));
         }
 
         [Test]
@@ -387,7 +389,8 @@ namespace TestHelper.UI.Operators
             var sut = new UguiScrollWheelOperator(logger: spyLogger);
             await sut.OperateAsync(_scrollViewHorizontal.GetComponent<ScrollRect>().horizontalScrollbar.gameObject);
 
-            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(-1,0)").Or.Contain("direction=(1,0)"));
+            Assert.That(spyLogger.Messages[0], Does.Contain(
+                "direction=(-1.00, 0.00)").Or.Contain("direction=(1.00, 0.00)"));
         }
 
         [Test]
@@ -399,7 +402,8 @@ namespace TestHelper.UI.Operators
             var sut = new UguiScrollWheelOperator(logger: spyLogger);
             await sut.OperateAsync(_scrollViewVertical.GetComponent<ScrollRect>().verticalScrollbar.gameObject);
 
-            Assert.That(spyLogger.Messages[0], Does.Contain("direction=(0,-1)").Or.Contain("direction=(0,1)"));
+            Assert.That(spyLogger.Messages[0], Does.Contain(
+                "direction=(0.00, -1.00)").Or.Contain("direction=(0.00, 1.00)"));
         }
 
         [Test]

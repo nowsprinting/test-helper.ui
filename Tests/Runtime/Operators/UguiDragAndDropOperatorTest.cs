@@ -224,17 +224,22 @@ namespace TestHelper.UI.Operators
         public async Task OperateAsync_ExistDropAnnotation_DropOnTarget()
         {
             var dragHandler = CreateSpyDragHandler();
-            var dropHandler = CreateSpyDropHandler(); // dummy
             var dropHandlerWithAnnotation = CreateSpyDropHandler();
             dropHandlerWithAnnotation.gameObject.AddComponent<DropAnnotation>();
+
+            var disabledDropHandlerWithAnnotation = CreateSpyDropHandler(); // decoy 1
+            disabledDropHandlerWithAnnotation.gameObject.AddComponent<DropAnnotation>().enabled = false;
+
+            var dropHandler = CreateSpyDropHandler(); // decoy 2
 
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
             await sut.OperateAsync(dragHandler.gameObject);
 
-            Assert.That(dropHandler.WasDrop, Is.False);
             Assert.That(dropHandlerWithAnnotation.WasDrop, Is.True);
+            Assert.That(disabledDropHandlerWithAnnotation.WasDrop, Is.False);
+            Assert.That(dropHandler.WasDrop, Is.False);
         }
 
         [Test]
@@ -244,12 +249,16 @@ namespace TestHelper.UI.Operators
             var dragHandler = CreateSpyDragHandler();
             var dropHandler = CreateSpyDropHandler();
 
+            var disabledDropHandler = CreateSpyDropHandler(); // decoy
+            disabledDropHandler.enabled = false;
+
             await UniTask.NextFrame(); // wait ready for raycaster
 
             var sut = new UguiDragAndDropOperator();
             await sut.OperateAsync(dragHandler.gameObject);
 
             Assert.That(dropHandler.WasDrop, Is.True);
+            Assert.That(disabledDropHandler.WasDrop, Is.False);
         }
 
         [Test]

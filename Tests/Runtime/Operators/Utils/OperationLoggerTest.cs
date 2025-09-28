@@ -103,13 +103,13 @@ namespace TestHelper.UI.Operators.Utils
         public void BuildMessage_WithMultipleProperties()
         {
             var sut = CreateOperationLogger();
-            sut.Properties.Add("screen-pos", new Vector2(1.0f, 2.0f));
+            sut.Properties.Add("screen-pos", new Vector2(1.0f, -2.345f));
             sut.Properties.Add("world-pos", new Vector3(-3.0f, 4.0f, 5.6789f));
 
             var actual = sut.BuildMessage();
 
             Assert.That(actual, Does.Match(
-                @"UguiClickOperator operates to Target\(-?\d+\), screen-pos=\(1,2\), world-pos=\(-3.00,4.00,5.68\)"));
+                @"UguiClickOperator operates to Target\(-?\d+\), screen-pos=\(1.00, -2.35\), world-pos=\(-3.00, 4.00, 5.68\)"));
             // Note: screen-pos is formatted as an integer because the screen position
         }
     }
