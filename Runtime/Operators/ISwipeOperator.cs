@@ -9,8 +9,11 @@ using UnityEngine.EventSystems;
 namespace TestHelper.UI.Operators
 {
     /// <summary>
-    /// Swipe operator interface.
+    /// Swipe operator (including flick) interface.
     /// </summary>
+    /// <remarks>
+    /// If a flick operation is required, increasing the swipe speed parameter will determine it as a flick.
+    /// </remarks>
     public interface ISwipeOperator : IOperator
     {
         /// <summary>

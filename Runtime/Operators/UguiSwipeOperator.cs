@@ -16,8 +16,11 @@ using UnityEngine.UI;
 namespace TestHelper.UI.Operators
 {
     /// <summary>
-    /// Swipe operator for Unity UI (uGUI) components.
+    /// Swipe operator (including flick) for Unity UI (uGUI) components.
     /// </summary>
+    /// <remarks>
+    /// If a flick operation is required, increasing the swipe speed parameter will determine it as a flick.
+    /// </remarks>
     public class UguiSwipeOperator : ISwipeOperator, IRandomizable, IScreenPointCustomizable
     {
         private readonly int _swipeSpeed;
@@ -44,9 +47,9 @@ namespace TestHelper.UI.Operators
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="swipeSpeed">Swipe speed in units per second (must be positive).</param>
+        /// <param name="swipeSpeed">Swipe speed in units per second (must be positive). If a flick operation is required, increasing this parameter.</param>
         /// <param name="swipeDistance">Swipe distance (must be positive).</param>
-        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
+        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c>.</param>
         /// <param name="random">PRNG instance.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console).</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need.</param>
