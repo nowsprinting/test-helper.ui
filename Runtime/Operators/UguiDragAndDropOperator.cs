@@ -207,6 +207,10 @@ namespace TestHelper.UI.Operators
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
+            var canvas = gameObject.GetComponentInParent<Canvas>();
+            var scaleFactor = canvas != null ? canvas.scaleFactor : 1f;
+            var scaledSpeed = (int)(_dragSpeed * scaleFactor);
+
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
@@ -217,7 +221,7 @@ namespace TestHelper.UI.Operators
             using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
             {
                 simulator.BeginDrag();
-                await simulator.DragAsync(destination, _dragSpeed, cancellationToken);
+                await simulator.DragAsync(destination, scaledSpeed, cancellationToken);
 
                 // Wait for delay before drop
                 await UniTask.Delay(TimeSpan.FromSeconds(_delayBeforeDrop), ignoreTimeScale: true,

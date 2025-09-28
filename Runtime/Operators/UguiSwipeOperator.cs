@@ -50,7 +50,7 @@ namespace TestHelper.UI.Operators
         /// <param name="random">PRNG instance.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console).</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need.</param>
-        public UguiSwipeOperator(int swipeSpeed = 2400, float swipeDistance = 400f,
+        public UguiSwipeOperator(int swipeSpeed = 1200, float swipeDistance = 200f,
             Func<GameObject, Vector2> getScreenPoint = null, IRandom random = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
@@ -173,6 +173,11 @@ namespace TestHelper.UI.Operators
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
+            var canvas = gameObject.GetComponentInParent<Canvas>();
+            var scaleFactor = canvas != null ? canvas.scaleFactor : 1f;
+            var scaledDistance = _swipeDistance * scaleFactor;
+            var scaledSpeed = (int)(_swipeSpeed * scaleFactor);
+
             // Log direction and distance
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
@@ -180,12 +185,12 @@ namespace TestHelper.UI.Operators
             await operationLogger.Log();
 
             var normalizedDirection = direction.normalized;
-            var destination = raycastResult.screenPosition + normalizedDirection * _swipeDistance;
+            var destination = raycastResult.screenPosition + normalizedDirection * scaledDistance;
 
             using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
             {
                 simulator.BeginDrag();
-                await simulator.DragAsync(destination, _swipeSpeed, cancellationToken);
+                await simulator.DragAsync(destination, scaledSpeed, cancellationToken);
                 simulator.EndDrag(out _, out _);
             }
         }
