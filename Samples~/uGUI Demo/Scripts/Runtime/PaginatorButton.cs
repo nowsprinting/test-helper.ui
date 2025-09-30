@@ -21,6 +21,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         private readonly List<GameObject> _targets = new List<GameObject>();
         private int _nextIndex;
 
+        private TabContent _content;
         private Button _button;
 
         private readonly GameObjectFinder _finder = new GameObjectFinder(0.2f);
@@ -33,6 +34,8 @@ namespace TestHelper.UI.Samples.UguiDemo
             _paginator = new UguiScrollRectPaginator(scrollRect);
 
             _popupPrefab = Resources.Load<GameObject>("TestHelper.UI.Samples.UguiDemo/EventPopup");
+
+            _content = GetComponentInParent<TabContent>();
 
             _button = GetComponent<Button>();
             _button.onClick.AddListener(() =>
@@ -91,7 +94,7 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         private void Popup(GameObject target, Vector2 position, string eventName)
         {
-            var popup = Instantiate(_popupPrefab, target.transform.parent);
+            var popup = Instantiate(_popupPrefab, _content.transform);
             popup.name = eventName;
             popup.transform.position = position;
         }
