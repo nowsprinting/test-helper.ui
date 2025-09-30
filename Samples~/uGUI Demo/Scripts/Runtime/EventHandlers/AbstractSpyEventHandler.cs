@@ -18,6 +18,8 @@ namespace TestHelper.UI.Samples.UguiDemo
     {
         private GameObject _popupPrefab;
 
+        private TabContent _content;
+
         protected Toggle _togglePointerEnter;
         protected Toggle _togglePointerDown;
         protected Toggle _togglePointerClick;
@@ -28,6 +30,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         private void Awake()
         {
             _popupPrefab = Resources.Load<GameObject>("TestHelper.UI.Samples.UguiDemo/EventPopup");
+            _content = GetComponentInParent<TabContent>();
 
             foreach (var toggle in FindObjectsOfType<Toggle>())
             {
@@ -57,7 +60,7 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         protected void Popup(Vector2 position, string eventName)
         {
-            var popup = Instantiate(_popupPrefab, transform.parent);
+            var popup = Instantiate(_popupPrefab, _content.transform);
             popup.name = eventName;
             popup.transform.position = position;
 

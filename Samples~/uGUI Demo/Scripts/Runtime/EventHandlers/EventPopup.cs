@@ -54,7 +54,7 @@ namespace TestHelper.UI.Samples.UguiDemo
                 if (lastPos.y < height)
                 {
                     // force up to avoid overlap
-                    s_lastPopup.transform.localPosition = new Vector3(lastPos.x, height + 1.0f, lastPos.z);
+                    s_lastPopup.transform.localPosition = new Vector3(lastPos.x, height - 6.0f, lastPos.z);
                 }
             }
 
