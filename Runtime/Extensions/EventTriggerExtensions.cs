@@ -11,6 +11,8 @@ namespace TestHelper.UI.Extensions
     {
         /// <summary>
         /// Returns true if the specified event handler can be handled.
+        /// <p/>
+        /// Note: This method does not check if the GameObject is active or if the EventTrigger component is enabled.
         /// </summary>
         public static bool CanHandle<T>(this EventTrigger eventTrigger) where T : IEventSystemHandler
         {
@@ -55,12 +57,23 @@ namespace TestHelper.UI.Extensions
             return false;
         }
 
-        /// <summary>
-        /// Returns true if the specified <see cref="EventTriggerType"/> can be executed.
-        /// </summary>
         private static bool CanExecuteEventTriggerType(this EventTrigger eventTrigger, EventTriggerType type)
         {
             return eventTrigger.triggers.Any(x => x.eventID == type && x.callback != null);
+        }
+
+        /// <summary>
+        /// Returns true if this <c>EventTrigger</c> has any active (non-passive) event trigger entries.
+        /// A "passive event" is defined as an event that does not initiate a user action and is not interactable.
+        /// e.g., <see cref="EventTriggerType.Drop"/>.
+        /// <p/>
+        /// Note: This method does not check if the GameObject is active or if the EventTrigger component is enabled.
+        /// </summary>
+        /// <see cref="EventTriggerTypeExtensions.IsPassive"/>
+        /// <seealso cref="IEventSystemHandlerExtensions.HasActiveHandler"/>
+        public static bool HasActiveTrigger(this EventTrigger eventTrigger)
+        {
+            return eventTrigger.triggers.Any(x => !x.eventID.IsPassive() && x.callback != null);
         }
     }
 }

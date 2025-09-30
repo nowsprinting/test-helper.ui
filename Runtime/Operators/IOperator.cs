@@ -30,6 +30,8 @@ namespace TestHelper.UI.Operators
 
         /// <summary>
         /// Returns if can operate target <c>GameObject</c> this Operator.
+        /// <p/>
+        /// Note: Does not check if reachable by user. 
         /// </summary>
         /// <param name="gameObject">Operation target <c>GameObject</c></param>
         /// <returns>True if can operate <c>GameObject</c> this Operator.</returns>
