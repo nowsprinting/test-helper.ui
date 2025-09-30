@@ -4559,6 +4559,8 @@ GameObject:
   - component: {fileID: 405075014}
   - component: {fileID: 405075013}
   - component: {fileID: 405075012}
+  - component: {fileID: 405075016}
+  - component: {fileID: 405075015}
   m_Layer: 5
   m_Name: Scrollbar Horizontal
   m_TagString: Untagged
@@ -4673,6 +4675,31 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 405075010}
   m_CullTransparentMesh: 1
+--- !u!114 &405075015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405075010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05b73fc59576413faf1612c7ed6e5e18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <ShowDraggingObject>k__BackingField: 0
+--- !u!114 &405075016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405075010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4f0acd5686a4afb9f98ba15f81642cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &413358938
 GameObject:
   m_ObjectHideFlags: 0
@@ -6261,8 +6288,8 @@ GameObject:
   - component: {fileID: 585075516}
   - component: {fileID: 585075515}
   - component: {fileID: 585075513}
-  - component: {fileID: 585075517}
   - component: {fileID: 585075518}
+  - component: {fileID: 585075517}
   m_Layer: 5
   m_Name: Scrollbar Vertical
   m_TagString: Untagged
@@ -6313,7 +6340,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 136623693}
   m_HandleRect: {fileID: 136623691}
   m_Direction: 2
-  m_Value: 0.50000006
+  m_Value: 0.5
   m_Size: 0.24707031
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -8406,8 +8433,8 @@ GameObject:
   - component: {fileID: 878392440}
   - component: {fileID: 878392439}
   - component: {fileID: 878392437}
-  - component: {fileID: 878392441}
   - component: {fileID: 878392442}
+  - component: {fileID: 878392441}
   m_Layer: 5
   m_Name: Scrollbar Horizontal
   m_TagString: Untagged
@@ -8458,8 +8485,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 425744375}
   m_HandleRect: {fileID: 425744373}
   m_Direction: 0
-  m_Value: 0.50000006
-  m_Size: 0.24934895
+  m_Value: 0.5
+  m_Size: 0.24934894
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11225,6 +11252,8 @@ GameObject:
   - component: {fileID: 1136127922}
   - component: {fileID: 1136127921}
   - component: {fileID: 1136127920}
+  - component: {fileID: 1136127924}
+  - component: {fileID: 1136127923}
   m_Layer: 5
   m_Name: Scrollbar Vertical
   m_TagString: Untagged
@@ -11296,7 +11325,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1692588056}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.1042735
+  m_Size: 0.104273506
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11339,6 +11368,31 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1136127918}
   m_CullTransparentMesh: 1
+--- !u!114 &1136127923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136127918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05b73fc59576413faf1612c7ed6e5e18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <ShowDraggingObject>k__BackingField: 0
+--- !u!114 &1136127924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136127918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4f0acd5686a4afb9f98ba15f81642cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1137777909
 GameObject:
   m_ObjectHideFlags: 0
@@ -13215,9 +13269,9 @@ GameObject:
   - component: {fileID: 1268821425}
   - component: {fileID: 1268821424}
   - component: {fileID: 1268821423}
+  - component: {fileID: 1268821430}
   - component: {fileID: 1268821428}
   - component: {fileID: 1268821427}
-  - component: {fileID: 1268821430}
   m_Layer: 5
   m_Name: Scroll View
   m_TagString: Untagged
@@ -15763,6 +15817,9 @@ GameObject:
   - component: {fileID: 1519704738}
   - component: {fileID: 1519704737}
   - component: {fileID: 1519704736}
+  - component: {fileID: 1519704741}
+  - component: {fileID: 1519704740}
+  - component: {fileID: 1519704739}
   m_Layer: 5
   m_Name: Scroll View
   m_TagString: Untagged
@@ -15860,6 +15917,43 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1519704734}
   m_CullTransparentMesh: 1
+--- !u!114 &1519704739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519704734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6e7830c7994044805303f39659133c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1519704740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519704734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05b73fc59576413faf1612c7ed6e5e18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <ShowDraggingObject>k__BackingField: 0
+--- !u!114 &1519704741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519704734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4f0acd5686a4afb9f98ba15f81642cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1531217755
 GameObject:
   m_ObjectHideFlags: 0
