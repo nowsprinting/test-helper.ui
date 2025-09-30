@@ -88,7 +88,6 @@ namespace TestHelper.UI.Strategies
             var gameObject = new GameObject();
             var eventTrigger = gameObject.AddComponent<EventTrigger>();
             eventTrigger.triggers.Add(CreateDropEntry());
-            eventTrigger.enabled = false;
             Assert.That(DefaultComponentInteractableStrategy.IsInteractable(eventTrigger), Is.False);
         }
 
@@ -132,7 +131,7 @@ namespace TestHelper.UI.Strategies
         }
 
         [Test]
-        public void IsInteractable_ImplementsOnlyPassiveEvetHandler_ReturnsFalse()
+        public void IsInteractable_ImplementsOnlyPassiveEventHandler_ReturnsFalse()
         {
             var handler = new GameObject().AddComponent<FakeDropHandler>();
             Assert.That(DefaultComponentInteractableStrategy.IsInteractable(handler), Is.False);
@@ -144,7 +143,7 @@ namespace TestHelper.UI.Strategies
         }
 
         [Test]
-        public void IsInteractable_ImplementsOnlyMultiplePassiveEvetHandler_ReturnsFalse()
+        public void IsInteractable_ImplementsOnlyMultiplePassiveEventHandler_ReturnsFalse()
         {
             var handler = new GameObject().AddComponent<FakeUpdateAndDeselectHandler>();
             Assert.That(DefaultComponentInteractableStrategy.IsInteractable(handler), Is.False);
@@ -157,7 +156,7 @@ namespace TestHelper.UI.Strategies
         }
 
         [Test]
-        public void IsInteractable_ImplementsPassiveEvetHandlerAndNotHandler_ReturnsFalse()
+        public void IsInteractable_ImplementsPassiveEventHandlerAndNotHandler_ReturnsFalse()
         {
             var handler = new GameObject().AddComponent<FakeDropHandlerAndDisposable>();
             Assert.That(DefaultComponentInteractableStrategy.IsInteractable(handler), Is.False);
