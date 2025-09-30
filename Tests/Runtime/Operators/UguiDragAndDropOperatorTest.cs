@@ -63,7 +63,7 @@ namespace TestHelper.UI.Operators
         [CreateScene]
         public void CanOperate_DestroyedGameObject_ReturnsFalse()
         {
-            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+            var gameObject = new GameObject(null, typeof(FakeDragHandler));
             GameObject.DestroyImmediate(gameObject);
 
             var actual = _sut.CanOperate(gameObject);
@@ -74,7 +74,7 @@ namespace TestHelper.UI.Operators
         [CreateScene]
         public void CanOperate_InactiveGameObject_ReturnsFalse()
         {
-            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+            var gameObject = new GameObject(null, typeof(FakeDragHandler));
             gameObject.SetActive(false);
 
             var actual = _sut.CanOperate(gameObject);
@@ -86,7 +86,7 @@ namespace TestHelper.UI.Operators
         public void CanOperate_InactiveParentGameObject_ReturnsFalse()
         {
             var parent = new GameObject();
-            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+            var gameObject = new GameObject(null, typeof(FakeDragHandler));
             gameObject.transform.SetParent(parent.transform);
             parent.SetActive(false);
 
@@ -150,7 +150,7 @@ namespace TestHelper.UI.Operators
         [CreateScene]
         public void CanOperate_WithPointerDragHandler_ReturnsTrue()
         {
-            var gameObject = new GameObject(null, typeof(DummyDragHandler));
+            var gameObject = new GameObject(null, typeof(FakeDragHandler));
 
             var actual = _sut.CanOperate(gameObject);
             Assert.That(actual, Is.True);
@@ -160,8 +160,8 @@ namespace TestHelper.UI.Operators
         [CreateScene]
         public void CanOperate_WithDisabledPointerDragHandler_ReturnsFalse()
         {
-            var gameObject = new GameObject(null, typeof(DummyDragHandler));
-            var handler = gameObject.GetComponent<DummyDragHandler>();
+            var gameObject = new GameObject();
+            var handler = gameObject.AddComponent<FakeDragHandler>();
             handler.enabled = false;
 
             var actual = _sut.CanOperate(gameObject);
@@ -310,6 +310,11 @@ namespace TestHelper.UI.Operators
             await sut.OperateAsync(dragHandler.gameObject, dropHandler.transform.position);
 
             Assert.That(dropHandler.WasDrop, Is.True);
+        }
+
+        private class FakeDragHandler : MonoBehaviour, IDragHandler
+        {
+            public void OnDrag(PointerEventData eventData) { }
         }
     }
 }

@@ -1,7 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Linq;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -14,17 +14,19 @@ namespace TestHelper.UI.Strategies
     public static class DefaultComponentInteractableStrategy
     {
         /// <summary>
-        /// Make sure the <c>Component</c> is interactable.
-        ///
-        /// If any of the following is true:
+        /// Returns true if this <c>Component</c> is interactable.
+        /// It is considered interactable when the following conditions are met:
         /// <list type="number">
-        ///   <item>Type is <c>Selectable</c> and <c>interactable</c> property is true</item>
-        ///   <item>Type is <c>EventTrigger</c> component</item>
-        ///   <item>Implements <c>IEventSystemHandler</c> interface</item>
+        ///   <item><c>Component</c> is not null, active, and enabled</item>
+        ///   <item>If the <c>Component</c> type is <see cref="Selectable"/>, the <c>interactable</c> property is true</item>
+        ///   <item>If the <c>Component</c> type is <see cref="EventTrigger"/>, has one or more non-passive triggers</item>
+        ///   <item>If the <c>Component</c> type implements <see cref="IEventSystemHandler"/>, contains one or more non-passive events</item>
         /// </list>
+        /// <p/>
+        /// Note: Does not check if reachable by user. 
         /// </summary>
-        /// <param name="component"></param>
-        /// <returns>True if this Component is interactable</returns>
+        /// <see cref="EventTriggerExtensions.HasActiveTrigger"/>
+        /// <see cref="IEventSystemHandlerExtensions.HasActiveHandler"/>
         public static bool IsInteractable(Component component)
         {
             if (component == null || (component is Behaviour behaviour && !behaviour.isActiveAndEnabled))
@@ -32,16 +34,22 @@ namespace TestHelper.UI.Strategies
                 return false;
             }
 
-            // UI element
-            var selectable = component as Selectable;
-            if (selectable)
+            if (component is Selectable selectable)
             {
                 return selectable.interactable;
             }
 
-            // 2D/3D object
-            return component.GetType() == typeof(EventTrigger) ||
-                   component.GetType().GetInterfaces().Contains(typeof(IEventSystemHandler));
+            if (component is EventTrigger eventTrigger)
+            {
+                return eventTrigger.HasActiveTrigger();
+            }
+
+            if (component is IEventSystemHandler eventHandler)
+            {
+                return eventHandler.HasActiveHandler();
+            }
+
+            return false;
         }
     }
 }
