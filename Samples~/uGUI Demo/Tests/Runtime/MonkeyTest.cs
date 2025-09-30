@@ -56,6 +56,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             var config = new MonkeyConfig()
             {
                 Lifetime = TimeSpan.FromSeconds(10),
+                BufferLengthForDetectLooping = 10,
                 Screenshots = new ScreenshotOptions()
                 {
                     FilenameStrategy = new CounterBasedStrategy("UguiDemoTest"),

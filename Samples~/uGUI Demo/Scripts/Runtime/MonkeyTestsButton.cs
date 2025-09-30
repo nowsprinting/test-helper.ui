@@ -35,6 +35,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             {
                 Lifetime = TimeSpan.FromSeconds(LifetimeSeconds),
                 DelayMillis = DelayMillis,
+                BufferLengthForDetectLooping = 10,
                 Screenshots = new ScreenshotOptions()
                 {
                     FilenameStrategy = new CounterBasedStrategy("UguiDemo"),
