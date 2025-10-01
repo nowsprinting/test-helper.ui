@@ -225,6 +225,9 @@ public class MyIntegrationTest
 > [!TIP]  
 > All operators implement an overload method that takes only a `GameObject` for monkey testing.
 
+> [!TIP]  
+> If a flick operation is required, create a `UguiSwipeOperator` instance with arguments, for example, `swipeSpeed: 2000, swipeDistance: 80f`.
+
 
 
 ### Monkey Testing
