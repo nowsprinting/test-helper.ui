@@ -47,7 +47,10 @@ namespace TestHelper.UI.Operators
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="swipeSpeed">Swipe speed in units per second (must be positive). If a flick operation is required, increase this parameter.</param>
+        /// <remarks>
+        /// When creating a flick operation instance, adjust, for example, <c>swipeSpeed: 2000, swipeDistance: 80f</c>.
+        /// </remarks>
+        /// <param name="swipeSpeed">Swipe speed in units per second (must be positive).</param>
         /// <param name="swipeDistance">Swipe distance (must be positive).</param>
         /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c>.</param>
         /// <param name="random">PRNG instance.</param>
