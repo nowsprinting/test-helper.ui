@@ -22,7 +22,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: {}
+permissions: { }
 
 defaults:
   run:
@@ -44,17 +44,17 @@ jobs:
           - 2019.4.40f1
           - 2022.3.62f1
           - 6000.0.58f1
-          - 6000.2.4f1
+          - 6000.2.6f1
         testMode:
           - All # run tests in editor
         include:
-          - unityVersion: 6000.2.4f1
+          - unityVersion: 6000.2.6f1
             octocov: true
-          - unityVersion: 6000.2.4f1
+          - unityVersion: 6000.2.6f1
             testMode: Standalone  # run tests on player
 
     steps:
-      - name: Crete project for tests
+      - name: Create project for tests
         uses: nowsprinting/create-unity-project-action@eeafc6df4ff7584ca8744b866b61a87a94aa3c2d # v3
         with:
           project-path: UnityProject~
