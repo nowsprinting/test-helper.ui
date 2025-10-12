@@ -15,7 +15,7 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE"
+        "UNITY_INCLUDE_TESTS || INCLUDE_COM_NOWSPRINTING_TEST_HELPER || COM_NOWSPRINTING_TEST_HELPER_ENABLE"
     ],
     "versionDefines": [
         {
