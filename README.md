@@ -494,9 +494,9 @@ An operator must implement the `CanOperate` method to determine whether an opera
 
 ## Run on player build
 
-The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE` in this package's assembly definition files, so it is generally excluded from player builds.
+The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || INCLUDE_COM_NOWSPRINTING_TEST_HELPER` in this package's assembly definition files, so it is generally excluded from player builds.
 
-To use the feature in player builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` to the scripting symbols at build time.
+To use the feature in player builds, add `INCLUDE_COM_NOWSPRINTING_TEST_HELPER` to the scripting symbols at build time.
 
 > [!TIP]  
 > How to set custom scripting symbols, see below:  
