@@ -95,7 +95,9 @@ namespace TestHelper.UI
 
         /// <summary>
         /// Operators that the monkey invokes.
-        /// <c>logger</c> and <c>screenshotOptions</c> will be overridden at runtime by the same name properties in this <c>MonkeyConfig</c> instance.
+        /// <p/>
+        /// <c>logger</c>, <c>screenshotOptions</c>, <c>GetScreenPoint</c>, and <c>ReachableStrategy</c> will be overridden at runtime by the same name properties in this <c>MonkeyConfig</c> instance.
+        /// And <c>Random</c> will also be overridden at runtime by a forked instance from the <c>Random</c> property in this <c>MonkeyConfig</c> instance.
         /// </summary>
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {
