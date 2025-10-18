@@ -57,6 +57,7 @@ namespace TestHelper.UI
         /// <summary>
         /// Show Gizmos on <c>GameView</c> during running monkey test if true
         /// </summary>
+        [Obsolete("Use GizmosShowOnGameViewAttribute or GameViewControlHelper.SetGizmos instead.")]
         public bool Gizmos { get; set; }
 
         /// <summary>
