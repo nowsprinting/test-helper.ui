@@ -361,7 +361,7 @@ namespace TestHelper.UI
                 }
             }
 
-            private MonkeyConfig CreateMonkeyConfig(ScreenshotOptions screenshotOptions)
+            private static MonkeyConfig CreateMonkeyConfig(ScreenshotOptions screenshotOptions)
             {
                 var config = new MonkeyConfig
                 {
@@ -377,7 +377,7 @@ namespace TestHelper.UI
                 return config;
             }
 
-            private InteractableComponentsFinder CreateInteractableComponentsFinder(MonkeyConfig config)
+            private static InteractableComponentsFinder CreateInteractableComponentsFinder(MonkeyConfig config)
             {
                 return new InteractableComponentsFinder(operators: config.Operators);
             }
@@ -419,7 +419,6 @@ namespace TestHelper.UI
                 {
                     Directory = relativeDirectory,
                     FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
-                    SuperSize = 2,
                 });
                 var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
 
@@ -511,12 +510,11 @@ namespace TestHelper.UI
             }
 
             [Test]
-            [GameViewResolution(GameViewResolution.VGA)]
             [LoadScene("../Scenes/InfiniteLoop.unity")]
             public async Task Run_withScreenshots_InfiniteLoop_takeScreenshot()
             {
-                _filename = $"{TestContext.CurrentContext.Test.Name}_0011.png"; // 10 steps + 1
-                _path = Path.Combine(_defaultOutputDirectory, _filename);
+                var filename = $"{TestContext.CurrentContext.Test.Name}_0011.png"; // 10 steps + 1
+                var path = Path.Combine(_defaultOutputDirectory, filename);
 
                 var config = CreateMonkeyConfig(new ScreenshotOptions());
                 config.Lifetime = TimeSpan.FromSeconds(2); // 2sec
@@ -530,10 +528,10 @@ namespace TestHelper.UI
                 }
                 catch (InfiniteLoopException e)
                 {
-                    Assert.That(e.Message, Does.Contain(_filename));
+                    Assert.That(e.Message, Does.Contain(filename));
                 }
 
-                Assert.That(_path, Does.Exist);
+                Assert.That(path, Does.Exist);
             }
         }
 
@@ -661,10 +659,10 @@ namespace TestHelper.UI
         }
 
         [TestFixture]
+        [GameViewResolution(GameViewResolution.VGA)]
         public class DetectingInfiniteLoop
         {
             [Test]
-            [GameViewResolution(GameViewResolution.VGA)]
             [LoadScene("../Scenes/InfiniteLoop.unity")]
             public async Task Run_InfiniteLoop_throwsInfiniteLoopException()
             {
