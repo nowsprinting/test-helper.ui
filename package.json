@@ -19,6 +19,8 @@
     "Documentation~",
     "Editor/",
     "Editor.meta",
+    "Resources/",
+    "Resources.meta",
     "Runtime/",
     "Runtime.meta",
     "Samples~",
