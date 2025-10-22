@@ -61,6 +61,11 @@ namespace TestHelper.UI.Operators.Utils
             if (_screenshotOptions != null)
             {
                 _lastScreenshotPath = _screenshotOptions.FilenameStrategy.GetFilename();
+#if UNITY_2023_1_OR_NEWER
+                await ScreenshotHelper.TakeScreenshotAsync(
+                    directory: _screenshotOptions.Directory,
+                    filename: _lastScreenshotPath);
+#else
                 await ScreenshotHelper.TakeScreenshot(
                         directory: _screenshotOptions.Directory,
                         filename: _lastScreenshotPath,
@@ -69,6 +74,7 @@ namespace TestHelper.UI.Operators.Utils
                         logFilepath: false
                     )
                     .ToUniTask(_gameObject.GetComponent<MonoBehaviour>());
+#endif
             }
 
             _logger.Log(BuildMessage());

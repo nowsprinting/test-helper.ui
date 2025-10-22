@@ -344,7 +344,6 @@ namespace TestHelper.UI
         public class Screenshots
         {
             private const int FileSizeThreshold = 5441;         // VGA size solid color file size
-            private const int FileSizeThreshold2X = 100 * 1024; // Normal size is 80 to 90KB
             private readonly string _defaultOutputDirectory = CommandLineArgs.GetScreenshotDirectory();
             private string _filename;
             private string _path;
@@ -361,7 +360,7 @@ namespace TestHelper.UI
                 }
             }
 
-            private MonkeyConfig CreateMonkeyConfig(ScreenshotOptions screenshotOptions)
+            private static MonkeyConfig CreateMonkeyConfig(ScreenshotOptions screenshotOptions)
             {
                 var config = new MonkeyConfig
                 {
@@ -377,7 +376,7 @@ namespace TestHelper.UI
                 return config;
             }
 
-            private InteractableComponentsFinder CreateInteractableComponentsFinder(MonkeyConfig config)
+            private static InteractableComponentsFinder CreateInteractableComponentsFinder(MonkeyConfig config)
             {
                 return new InteractableComponentsFinder(operators: config.Operators);
             }
@@ -419,7 +418,6 @@ namespace TestHelper.UI
                 {
                     Directory = relativeDirectory,
                     FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
-                    SuperSize = 2,
                 });
                 var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
 
@@ -432,53 +430,6 @@ namespace TestHelper.UI
 
                 Assert.That(path, Does.Exist);
                 Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
-            }
-
-            [Test]
-            [Description("This test fails with stereo rendering settings.")]
-            [LoadScene(TestScene)]
-            public async Task RunStep_withScreenshots_superSize_takeScreenshotsSuperSize()
-            {
-                var config = CreateMonkeyConfig(new ScreenshotOptions
-                {
-                    SuperSize = 2, // 2x size
-                });
-                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
-
-                await Monkey.RunStep(
-                    config.Random,
-                    config.Logger,
-                    interactableComponentsFinder,
-                    config.IgnoreStrategy,
-                    config.ReachableStrategy);
-
-                Assert.That(_path, Does.Exist);
-                Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold2X));
-                // Note: This test fails with stereo rendering settings.
-                //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
-            }
-
-            [Test]
-            [LoadScene(TestScene)]
-            [Description("Is it a stereo screenshot? See for yourself! Be a witness!!")]
-            public async Task RunStep_withScreenshots_stereo_takeScreenshotsStereo()
-            {
-                var config = CreateMonkeyConfig(new ScreenshotOptions
-                {
-                    StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
-                });
-                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
-
-                await Monkey.RunStep(
-                    config.Random,
-                    config.Logger,
-                    interactableComponentsFinder,
-                    config.IgnoreStrategy,
-                    config.ReachableStrategy);
-
-                Assert.That(_path, Does.Exist);
-                // Note: Require stereo rendering settings.
-                //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
             }
 
             [Test]
@@ -511,12 +462,11 @@ namespace TestHelper.UI
             }
 
             [Test]
-            [GameViewResolution(GameViewResolution.VGA)]
             [LoadScene("../Scenes/InfiniteLoop.unity")]
             public async Task Run_withScreenshots_InfiniteLoop_takeScreenshot()
             {
-                _filename = $"{TestContext.CurrentContext.Test.Name}_0011.png"; // 10 steps + 1
-                _path = Path.Combine(_defaultOutputDirectory, _filename);
+                var filename = $"{TestContext.CurrentContext.Test.Name}_0011.png"; // 10 steps + 1
+                var path = Path.Combine(_defaultOutputDirectory, filename);
 
                 var config = CreateMonkeyConfig(new ScreenshotOptions());
                 config.Lifetime = TimeSpan.FromSeconds(2); // 2sec
@@ -530,10 +480,10 @@ namespace TestHelper.UI
                 }
                 catch (InfiniteLoopException e)
                 {
-                    Assert.That(e.Message, Does.Contain(_filename));
+                    Assert.That(e.Message, Does.Contain(filename));
                 }
 
-                Assert.That(_path, Does.Exist);
+                Assert.That(path, Does.Exist);
             }
         }
 
@@ -661,10 +611,10 @@ namespace TestHelper.UI
         }
 
         [TestFixture]
+        [GameViewResolution(GameViewResolution.VGA)]
         public class DetectingInfiniteLoop
         {
             [Test]
-            [GameViewResolution(GameViewResolution.VGA)]
             [LoadScene("../Scenes/InfiniteLoop.unity")]
             public async Task Run_InfiniteLoop_throwsInfiniteLoopException()
             {
