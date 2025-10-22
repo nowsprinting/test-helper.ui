@@ -344,7 +344,6 @@ namespace TestHelper.UI
         public class Screenshots
         {
             private const int FileSizeThreshold = 5441;         // VGA size solid color file size
-            private const int FileSizeThreshold2X = 100 * 1024; // Normal size is 80 to 90KB
             private readonly string _defaultOutputDirectory = CommandLineArgs.GetScreenshotDirectory();
             private string _filename;
             private string _path;
@@ -431,53 +430,6 @@ namespace TestHelper.UI
 
                 Assert.That(path, Does.Exist);
                 Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
-            }
-
-            [Test]
-            [Description("This test fails with stereo rendering settings.")]
-            [LoadScene(TestScene)]
-            public async Task RunStep_withScreenshots_superSize_takeScreenshotsSuperSize()
-            {
-                var config = CreateMonkeyConfig(new ScreenshotOptions
-                {
-                    SuperSize = 2, // 2x size
-                });
-                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
-
-                await Monkey.RunStep(
-                    config.Random,
-                    config.Logger,
-                    interactableComponentsFinder,
-                    config.IgnoreStrategy,
-                    config.ReachableStrategy);
-
-                Assert.That(_path, Does.Exist);
-                Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold2X));
-                // Note: This test fails with stereo rendering settings.
-                //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
-            }
-
-            [Test]
-            [LoadScene(TestScene)]
-            [Description("Is it a stereo screenshot? See for yourself! Be a witness!!")]
-            public async Task RunStep_withScreenshots_stereo_takeScreenshotsStereo()
-            {
-                var config = CreateMonkeyConfig(new ScreenshotOptions
-                {
-                    StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
-                });
-                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
-
-                await Monkey.RunStep(
-                    config.Random,
-                    config.Logger,
-                    interactableComponentsFinder,
-                    config.IgnoreStrategy,
-                    config.ReachableStrategy);
-
-                Assert.That(_path, Does.Exist);
-                // Note: Require stereo rendering settings.
-                //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
             }
 
             [Test]

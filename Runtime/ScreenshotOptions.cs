@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using TestHelper.UI.ScreenshotFilenameStrategies;
 using UnityEngine;
 
@@ -27,6 +28,7 @@ namespace TestHelper.UI
         /// The factor to increase resolution with.
         /// SuperSize and StereoCaptureMode cannot be specified at the same time.
         /// </summary>
+        [Obsolete("The way screenshots are taken has changed, so this property is no longer used.")]
         public int SuperSize { get; set; } = 1;
 
         /// <summary>
@@ -37,6 +39,7 @@ namespace TestHelper.UI
         /// Require stereo rendering settings.
         /// See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
         /// </remarks>
+        [Obsolete("The way screenshots are taken has changed, so this property is no longer used.")]
         public ScreenCapture.StereoScreenCaptureMode StereoCaptureMode { get; set; } =
             ScreenCapture.StereoScreenCaptureMode.LeftEye;
     }

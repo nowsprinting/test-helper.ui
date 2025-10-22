@@ -30,8 +30,6 @@ namespace TestHelper.UI
     /// </summary>
     public static class Monkey
     {
-        private static MonoBehaviour s_coroutineRunner; // for take screenshots
-
         /// <summary>
         /// Run monkey testing by repeating to call <c cref="RunStep">RunStep</c> and wait.
         /// </summary>
@@ -288,13 +286,18 @@ namespace TestHelper.UI
                 return;
             }
 
+            var filename = screenshotOptions.FilenameStrategy.GetFilename();
+            message.Append($", screenshot={filename}");
+
+#if UNITY_2023_1_OR_NEWER
+            await ScreenshotHelper.TakeScreenshotAsync(
+                directory: screenshotOptions.Directory,
+                filename: filename);
+#else
             if (!s_coroutineRunner)
             {
                 s_coroutineRunner = new GameObject("CoroutineRunner").AddComponent<CoroutineRunner>();
             }
-
-            var filename = screenshotOptions.FilenameStrategy.GetFilename();
-            message.Append($", screenshot={filename}");
 
             await ScreenshotHelper.TakeScreenshot(
                     directory: screenshotOptions.Directory,
@@ -304,10 +307,15 @@ namespace TestHelper.UI
                     logFilepath: false
                 )
                 .ToUniTask(s_coroutineRunner);
+#endif
         }
+
+#if !UNITY_2023_1_OR_NEWER
+        private static MonoBehaviour s_coroutineRunner; // for take screenshots
 
         private class CoroutineRunner : MonoBehaviour
         {
         }
+#endif
     }
 }
