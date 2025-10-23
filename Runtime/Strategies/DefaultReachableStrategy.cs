@@ -62,7 +62,7 @@ namespace TestHelper.UI.Strategies
                     verboseLogger.Log(message.ToString());
                 }
 
-                raycastResult = default;
+                raycastResult = new RaycastResult() { screenPosition = pointerEventData.position };
                 return false;
             }
 

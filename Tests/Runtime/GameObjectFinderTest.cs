@@ -6,16 +6,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.RuntimeInternals;
 using TestHelper.UI.Exceptions;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.GameObjectMatchers;
 using TestHelper.UI.Paginators;
 using TestHelper.UI.Strategies;
 using TestHelper.UI.TestDoubles;
-using TestHelper.RuntimeInternals;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Is = TestHelper.Constraints.Is;
 #if !UNITY_2022_1_OR_NEWER
 using System.IO;
 #endif
@@ -460,6 +462,125 @@ namespace TestHelper.UI
                 {
                     Assert.That(e.Message, Does.EndWith("is found, but not reachable."));
                 }
+            }
+        }
+
+        [TestFixture]
+        public class Visualizer
+        {
+            private const string TestScenePath = "../Scenes/GameObjectFinderUI.unity";
+            private const float IndicatorLifetime = 0.2f;
+            private readonly GameObjectFinder _sut;
+
+            public Visualizer()
+            {
+                var visualizer = new DefaultDebugVisualizer() { IndicatorLifetime = IndicatorLifetime };
+                _sut = new GameObjectFinder(0.1d, visualizer: visualizer);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindWithVisualizer_Hit_IndicatorIsNotShown()
+            {
+                await _sut.FindByNameAsync("Interactable");
+
+                try
+                {
+                    var matcher = new ComponentMatcher(typeof(FadeOutBehaviour));
+                    await _sut.FindByMatcherAsync(matcher, reachable: false);
+                    Assert.Fail("Indicator should not be shown.");
+                }
+                catch (TimeoutException)
+                {
+                    // pass
+                }
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindWithVisualizer_NotRequiredReachable_IndicatorIsNotShown()
+            {
+                await _sut.FindByNameAsync("BehindTheWall", reachable: false);
+
+                try
+                {
+                    var matcher = new ComponentMatcher(typeof(FadeOutBehaviour));
+                    await _sut.FindByMatcherAsync(matcher, reachable: false);
+                    Assert.Fail("Indicator should not be shown.");
+                }
+                catch (TimeoutException)
+                {
+                    // pass
+                }
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindWithVisualizer_NotHit_NotReachableIndicatorIsShown()
+            {
+                var target = await _sut.FindByNameAsync("Interactable");
+                target.GameObject.GetComponent<Image>().raycastTarget = false;
+                target.GameObject.GetComponentInChildren<Text>().raycastTarget = false;
+
+                try
+                {
+                    await _sut.FindByNameAsync("Interactable", reachable: true);
+                    Assert.Fail("Expected TimeoutException but was not thrown");
+                }
+                catch (TimeoutException)
+                {
+                }
+
+                var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
+                Assert.That(indicator, Is.Not.Null);
+                Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
+                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+                Assert.That(indicator, Is.Destroyed);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindWithVisualizer_Blocked_NotReachableIndicatorIsShown()
+            {
+                try
+                {
+                    await _sut.FindByNameAsync("BehindTheWall", reachable: true);
+                    Assert.Fail("Expected TimeoutException but was not thrown");
+                }
+                catch (TimeoutException)
+                {
+                }
+
+                var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
+                Assert.That(indicator, Is.Not.Null);
+                Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
+                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+                Assert.That(indicator, Is.Destroyed);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindWithVisualizer_Blocked_NotReachableBlockerIndicatorIsShown()
+            {
+                try
+                {
+                    await _sut.FindByNameAsync("BehindTheWall", reachable: true);
+                    Assert.Fail("Expected TimeoutException but was not thrown");
+                }
+                catch (TimeoutException)
+                {
+                }
+
+                var indicator = GameObject.Find("Blocker Indicator"); // exist multiple, so only one
+                Assert.That(indicator, Is.Not.Null);
+                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+                Assert.That(indicator, Is.Destroyed);
             }
         }
     }
