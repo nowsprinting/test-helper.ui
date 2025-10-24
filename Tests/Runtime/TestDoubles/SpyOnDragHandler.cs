@@ -12,10 +12,12 @@ namespace TestHelper.UI.TestDoubles
     public class SpyOnDragHandler : MonoBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler,
         IDragHandler
     {
+        public static readonly Vector2 LastDragPositionInitialValue = new Vector2(float.MinValue, float.MinValue);
+
         public bool WasInitializePotentialDrag { get; private set; }
         public bool WasBeginDrag { get; private set; }
         public bool WasEndDrag { get; private set; }
-        public Vector2 LastDragPosition { get; private set; }
+        public Vector2 LastDragPosition { get; private set; } = LastDragPositionInitialValue;
 
         private Image _image;
         private GameObject _draggingObject;

@@ -16,6 +16,8 @@ namespace TestHelper.UI.Operators
     [TestFixture]
     public class UguiDragAndDropOperatorTest
     {
+        private const int RandomTestRepeatCount = 10;
+
         private readonly IOperator _sut = new UguiDragAndDropOperator();
         private Vector3 _objectPosition;
 
@@ -263,6 +265,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene("../../Scenes/Canvas.unity")]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_NotExistDropTarget_DropOnRandomScreenPoint()
         {
             var dragHandler = CreateSpyDragHandler();
@@ -278,7 +281,7 @@ namespace TestHelper.UI.Operators
             Assert.That(dragHandler.WasInitializePotentialDrag, Is.True);
             Assert.That(dragHandler.WasBeginDrag, Is.True);
             Assert.That(dragHandler.WasEndDrag, Is.True);
-            Assert.That(dragHandler.LastDragPosition, Is.Not.EqualTo(default(Vector2)));
+            Assert.That(dragHandler.LastDragPosition, Is.Not.EqualTo(SpyOnDragHandler.LastDragPositionInitialValue));
             Assert.That(pointerUpHandler.WasOnPointerUp, Is.True);
         }
 
