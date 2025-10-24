@@ -22,6 +22,7 @@ namespace TestHelper.UI.Operators
     public class UguiSwipeOperatorTest
     {
         private const string TestScene = "../../Scenes/ScrollViews.unity";
+        private const int RandomTestRepeatCount = 10;
 
         private readonly ISwipeOperator _sut = new UguiSwipeOperator();
         private GameObject _scrollView;
@@ -359,15 +360,15 @@ namespace TestHelper.UI.Operators
         [LoadScene(TestScene)]
         public async Task OperateAsync_OnDragCalled()
         {
-            var spyEventHandler = _scrollView.AddComponent<SpyOnDragHandler>();
+            var spyDragHandler = _scrollView.AddComponent<SpyOnDragHandler>();
 
             var sut = new UguiSwipeOperator();
             await sut.OperateAsync(_scrollView, Vector2.up);
 
-            Assert.That(spyEventHandler.WasInitializePotentialDrag, Is.True);
-            Assert.That(spyEventHandler.WasBeginDrag, Is.True);
-            Assert.That(spyEventHandler.WasEndDrag, Is.True);
-            Assert.That(spyEventHandler.LastDragPosition, Is.Not.EqualTo(Vector2.zero));
+            Assert.That(spyDragHandler.WasInitializePotentialDrag, Is.True);
+            Assert.That(spyDragHandler.WasBeginDrag, Is.True);
+            Assert.That(spyDragHandler.WasEndDrag, Is.True);
+            Assert.That(spyDragHandler.LastDragPosition, Is.Not.EqualTo(SpyOnDragHandler.LastDragPositionInitialValue));
         }
 
         [Test]
@@ -386,7 +387,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirection_ScrollRectBoth_RandomSwipe()
         {
             const int SwipeDistance = 200;
@@ -402,7 +403,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirection_ScrollRectHorizontal_RandomSwipeHorizontal()
         {
             var spyLogger = new SpyLogger();
@@ -415,7 +416,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirection_ScrollRectVertical_RandomSwipeVertical()
         {
             var spyLogger = new SpyLogger();
@@ -428,7 +429,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirection_ScrollbarHorizontal_RandomSwipeHorizontal()
         {
             var spyLogger = new SpyLogger();
@@ -441,7 +442,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirection_ScrollbarVertical_RandomSwipeVertical()
         {
             var spyLogger = new SpyLogger();
@@ -454,7 +455,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirection_NotScrollRectOrScrollbar_RandomSwipe()
         {
             const int SwipeDistance = 200;

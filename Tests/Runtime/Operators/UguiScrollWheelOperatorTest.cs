@@ -22,6 +22,7 @@ namespace TestHelper.UI.Operators
     public class UguiScrollWheelOperatorTest
     {
         private const string TestScene = "../../Scenes/ScrollViews.unity";
+        private const int RandomTestRepeatCount = 10;
 
         private readonly IOperator _sut = new UguiScrollWheelOperator();
         private GameObject _scrollView;
@@ -341,7 +342,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirectionAndDistance_ScrollRectBoth_RandomScrolling()
         {
             var scrollRect = _scrollView.GetComponent<ScrollRect>();
@@ -356,7 +357,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirectionAndDistance_ScrollRectHorizontal_RandomScrollingHorizontal()
         {
             var spyLogger = new SpyLogger();
@@ -369,7 +370,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirectionAndDistance_ScrollRectVertical_RandomScrollingVertical()
         {
             var spyLogger = new SpyLogger();
@@ -382,7 +383,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirectionAndDistance_ScrollbarHorizontal_RandomScrollingHorizontal()
         {
             var spyLogger = new SpyLogger();
@@ -395,7 +396,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirectionAndDistance_ScrollbarVertical_RandomScrollingVertical()
         {
             var spyLogger = new SpyLogger();
@@ -408,7 +409,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(10)]
+        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_WithoutDirectionAndDistance_NotScrollRectOrScrollbar_RandomScrolling()
         {
             var gameObject = new GameObject(null, typeof(Image));
