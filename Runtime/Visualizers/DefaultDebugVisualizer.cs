@@ -15,7 +15,7 @@ namespace TestHelper.UI.Visualizers
     /// Implementation of visualizers for debugging that use default pictograms.
     /// </summary>
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class DefaultDebugVisualizer : IVisualizer
+    public sealed class DefaultDebugVisualizer : IVisualizer, IDisposable
     {
         private const string ResourcesBasePath = "Packages/com.nowsprinting.test-helper.ui";
 
@@ -68,6 +68,14 @@ namespace TestHelper.UI.Visualizers
 
         private readonly Dictionary<string, Sprite> _pics = new Dictionary<string, Sprite>();
         private Canvas _overlayCanvas;
+
+        public void Dispose()
+        {
+            if (_overlayCanvas)
+            {
+                Object.Destroy(_overlayCanvas);
+            }
+        }
 
         /// <inheritdoc/>
         public void ShowNotReachableIndicator(Vector2 screenPoint, GameObject blocker = null)
@@ -174,7 +182,7 @@ namespace TestHelper.UI.Visualizers
 
         private Canvas GetOrCreateOverlayCanvas()
         {
-            if (_overlayCanvas != null)
+            if (_overlayCanvas)
             {
                 return _overlayCanvas;
             }

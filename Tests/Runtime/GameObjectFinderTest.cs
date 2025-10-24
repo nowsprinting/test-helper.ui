@@ -470,12 +470,20 @@ namespace TestHelper.UI
         {
             private const string TestScenePath = "../Scenes/GameObjectFinderUI.unity";
             private const float IndicatorLifetime = 0.2f;
-            private readonly GameObjectFinder _sut;
+            private DefaultDebugVisualizer _visualizer;
+            private GameObjectFinder _sut;
 
-            public Visualizer()
+            [OneTimeSetUp]
+            public void OneTimeSetUp()
             {
-                var visualizer = new DefaultDebugVisualizer() { IndicatorLifetime = IndicatorLifetime };
-                _sut = new GameObjectFinder(0.1d, visualizer: visualizer);
+                _visualizer = new DefaultDebugVisualizer() { IndicatorLifetime = IndicatorLifetime };
+                _sut = new GameObjectFinder(0.1d, visualizer: _visualizer);
+            }
+
+            [OneTimeTearDown]
+            public void OneTimeTearDown()
+            {
+                _visualizer.Dispose();
             }
 
             [Test]

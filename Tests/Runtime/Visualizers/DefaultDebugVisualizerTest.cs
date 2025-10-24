@@ -18,14 +18,26 @@ namespace TestHelper.UI.Visualizers
     {
         private const string TestScenePath = "../../Scenes/Canvas.unity";
         private const float IndicatorLifetime = 0.2f;
-        private readonly GameObjectFinder _finder = new GameObjectFinder(0.1d);
-        private readonly IVisualizer _sut = new DefaultDebugVisualizer() { IndicatorLifetime = IndicatorLifetime };
         private readonly List<GameObject> _referenceObjects = new List<GameObject>();
+        private DefaultDebugVisualizer _sut;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _sut = new DefaultDebugVisualizer() { IndicatorLifetime = IndicatorLifetime };
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            _sut.Dispose();
+        }
 
         [SetUp]
         public async Task SetUp()
         {
-            var canvas = await _finder.FindByNameAsync("Canvas", reachable: false);
+            var finder = new GameObjectFinder(0.1d);
+            var canvas = await finder.FindByNameAsync("Canvas", reachable: false);
             // Note: CanvasScaler settings: Scale With Screen Size, Reference Resolution: 640x480, Match Width Or Height: 0
 
             // Create reference images and screen points
