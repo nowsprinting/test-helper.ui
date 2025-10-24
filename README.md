@@ -159,12 +159,13 @@ public class MyIntegrationTest
     public async Task FindButtonInScrollView()
     {
         var finder = new GameObjectFinder();
-        var matcher = new NameMatcher("Button_10");
 
-        var scrollView = GameObject.Find("Scroll View");
-        var scrollRect = scrollView.GetComponent<ScrollRect>();
+        var scrollViewMatcher = new NameMatcher("Scroll View");
+        var scrollViewResult = await finder.FindByMatcherAsync(scrollViewMatcher);
+        var scrollRect = scrollViewResult.GameObject.GetComponent<ScrollRect>();
         var paginator = new UguiScrollRectPaginator(scrollRect);
 
+        var matcher = new NameMatcher("Button_10");
         var result = await finder.FindByMatcherAsync(matcher, paginator: paginator);
         var button = result.GameObject;
     }
