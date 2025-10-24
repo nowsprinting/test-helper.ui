@@ -7,6 +7,7 @@ using TestHelper.Random;
 using TestHelper.UI.Exceptions;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 
 namespace TestHelper.UI
@@ -53,6 +54,11 @@ namespace TestHelper.UI
         /// Output verbose log if true
         /// </summary>
         public bool Verbose { get; set; }
+
+        /// <summary>
+        /// Show the visual indication if set a instance.
+        /// </summary>
+        public IVisualizer Visualizer { get; set; }
 
         /// <summary>
         /// Show Gizmos on <c>GameView</c> during running monkey test if true

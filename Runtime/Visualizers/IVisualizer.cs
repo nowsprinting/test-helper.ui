@@ -23,5 +23,11 @@ namespace TestHelper.UI.Visualizers
         /// </summary>
         /// <param name="gameObject"></param>
         void ShowNotInteractableIndicator(GameObject gameObject);
+
+        /// <summary>
+        /// Show the visual indication of the "ignored" <c>GameObject</c>.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        void ShowIgnoredIndicator(GameObject gameObject);
     }
 }

@@ -14,6 +14,7 @@ using TestHelper.UI.Exceptions;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Random;
 using TestHelper.UI.Strategies;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -72,6 +73,7 @@ namespace TestHelper.UI
                         config.IgnoreStrategy,
                         config.ReachableStrategy,
                         config.Verbose,
+                        config.Visualizer,
                         cancellationToken);
                     if (didAction)
                     {
@@ -152,10 +154,11 @@ namespace TestHelper.UI
             IIgnoreStrategy ignoreStrategy,
             IReachableStrategy reachableStrategy,
             bool verbose = false,
+            IVisualizer visualizer = null,
             CancellationToken cancellationToken = default)
         {
-            return RunStep(random, logger, interactableComponentsFinder, ignoreStrategy, reachableStrategy, verbose,
-                cancellationToken);
+            return RunStep(random, logger, interactableComponentsFinder, ignoreStrategy, reachableStrategy,
+                verbose, visualizer, cancellationToken);
         }
 
         internal static async UniTask<(bool, int)> RunStep(
@@ -165,11 +168,13 @@ namespace TestHelper.UI
             IIgnoreStrategy ignoreStrategy,
             IReachableStrategy reachableStrategy,
             bool verbose = false,
+            IVisualizer visualizer = null,
             CancellationToken cancellationToken = default)
         {
             var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null).Distinct();
             var (selectedObject, selectedOperator, raycastResult) = LotteryOperator(
-                lotteryEntries, random, ignoreStrategy, reachableStrategy, verbose ? logger : null);
+                lotteryEntries, random, ignoreStrategy, reachableStrategy,
+                verbose ? logger : null, visualizer: visualizer);
             if (selectedObject == null || selectedOperator == null)
             {
                 return (false, 0);
@@ -220,15 +225,23 @@ namespace TestHelper.UI
             IRandom random,
             IIgnoreStrategy ignoreStrategy,
             IReachableStrategy reachableStrategy,
-            ILogger verboseLogger = null)
+            ILogger verboseLogger = null,
+            IVisualizer visualizer = null)
         {
             var operatorList = operators.ToList();
 
             while (operatorList.Count > 0)
             {
                 var (selectedObject, selectedOperator) = operatorList[random.Next(operatorList.Count)];
-                if (!ignoreStrategy.IsIgnored(selectedObject, verboseLogger) &&
-                    reachableStrategy.IsReachable(selectedObject, out var raycastResult, verboseLogger))
+                if (ignoreStrategy.IsIgnored(selectedObject, verboseLogger))
+                {
+                    visualizer?.ShowIgnoredIndicator(selectedObject);
+                }
+                else if (!reachableStrategy.IsReachable(selectedObject, out var raycastResult, verboseLogger))
+                {
+                    visualizer?.ShowNotReachableIndicator(raycastResult.screenPosition, raycastResult.gameObject);
+                }
+                else
                 {
                     return (selectedObject, selectedOperator, raycastResult);
                 }

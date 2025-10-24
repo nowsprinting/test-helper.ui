@@ -45,6 +45,16 @@ namespace TestHelper.UI.Visualizers
         public Color NotInteractablePictColor { private get; set; } = new Color(1f, 0f, 0f);
 
         /// <summary>
+        /// Image file path with the "ignored" state in the Resources folder.
+        /// </summary>
+        public string IgnoredPictPath { private get; set; } = $"{ResourcesBasePath}/lock";
+
+        /// <summary>
+        /// Image color for the "ignored" state.
+        /// </summary>
+        public Color IgnoredPictColor { private get; set; } = new Color(1f, 0.68f, 0f);
+
+        /// <summary>
         /// Screen resolution (short side) for which the pictograms size is intended.
         /// </summary>
         public int ReferenceScreenResolutionShortSide { private get; set; } = 480;
@@ -109,6 +119,20 @@ namespace TestHelper.UI.Visualizers
             catch (Exception e)
             {
                 Debug.LogWarning($"Failed to show not interactable indicator: {e}");
+            }
+        }
+
+        /// <inheritdoc/>
+        public void ShowIgnoredIndicator(GameObject gameObject)
+        {
+            try
+            {
+                var indicator = CreateIndicator(IgnoredPictPath, IgnoredPictColor);
+                indicator.transform.position = GetScreenPoint(gameObject);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to show ignored indicator: {e}");
             }
         }
 
