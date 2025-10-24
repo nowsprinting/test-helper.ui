@@ -17,5 +17,11 @@ namespace TestHelper.UI.Visualizers
         /// <param name="screenPoint">Screen point of "not reachable".</param>
         /// <param name="blocker"><c>GameObject</c> that blocked the raycaster.</param>
         void ShowNotReachableIndicator(Vector2 screenPoint, GameObject blocker = null);
+
+        /// <summary>
+        /// Show the visual indication of the "not interactable" <c>GameObject</c>.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        void ShowNotInteractableIndicator(GameObject gameObject);
     }
 }

@@ -35,6 +35,16 @@ namespace TestHelper.UI.Visualizers
         public Color NotReachableBlockerColor { private get; set; } = new Color(1f, 1f, 1f);
 
         /// <summary>
+        /// Image file path with the "not interactable" state in the Resources folder.
+        /// </summary>
+        public string NotInteractablePictPath { private get; set; } = $"{ResourcesBasePath}/hand_slash";
+
+        /// <summary>
+        /// Image color for the "not interactable" state.
+        /// </summary>
+        public Color NotInteractablePictColor { private get; set; } = new Color(1f, 0f, 0f);
+
+        /// <summary>
         /// Screen resolution (short side) for which the pictograms size is intended.
         /// </summary>
         public int ReferenceScreenResolutionShortSide { private get; set; } = 480;
@@ -77,6 +87,20 @@ namespace TestHelper.UI.Visualizers
             catch (Exception e)
             {
                 Debug.LogWarning($"Failed to show not reachable indicator: {e}");
+            }
+        }
+
+        /// <inheritdoc/>
+        public void ShowNotInteractableIndicator(GameObject gameObject)
+        {
+            try
+            {
+                var indicator = CreateIndicator(NotInteractablePictPath, NotInteractablePictColor);
+                indicator.transform.position = GetScreenPoint(gameObject);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to show not interactable indicator: {e}");
             }
         }
 

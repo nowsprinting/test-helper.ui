@@ -132,6 +132,24 @@ namespace TestHelper.UI
             return reachable;
         }
 
+        private List<GameObject> FilterToOnlyInteractable(List<GameObject> gameObjects)
+        {
+            var interactable = new List<GameObject>();
+            foreach (var gameObject in gameObjects)
+            {
+                if (gameObject.GetComponents<Component>().Any(_isInteractable))
+                {
+                    interactable.Add(gameObject);
+                }
+                else
+                {
+                    _visualizer?.ShowNotInteractableIndicator(gameObject);
+                }
+            }
+
+            return interactable;
+        }
+
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
             bool reachable, bool interactable, Scene scene = default)
         {
@@ -156,7 +174,7 @@ namespace TestHelper.UI
 
             if (interactable)
             {
-                foundObjects = foundObjects.Where(obj => obj.GetComponents<Component>().Any(_isInteractable)).ToList();
+                foundObjects = FilterToOnlyInteractable(foundObjects);
                 if (!foundObjects.Any())
                 {
                     return (null, default, Reason.NotInteractable);

@@ -516,6 +516,24 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene(TestScenePath)]
+            public async Task FindWithVisualizer_NotRequiredInteractable_IndicatorIsNotShown()
+            {
+                await _sut.FindByNameAsync("NotInteractable", interactable: false);
+
+                try
+                {
+                    var matcher = new ComponentMatcher(typeof(FadeOutBehaviour));
+                    await _sut.FindByMatcherAsync(matcher, reachable: false);
+                    Assert.Fail("Indicator should not be shown.");
+                }
+                catch (TimeoutException)
+                {
+                    // pass
+                }
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
             public async Task FindWithVisualizer_NotHit_NotReachableIndicatorIsShown()
             {
                 var target = await _sut.FindByNameAsync("Interactable");
@@ -577,6 +595,28 @@ namespace TestHelper.UI
 
                 var indicator = GameObject.Find("Blocker Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
+                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+                Assert.That(indicator, Is.Destroyed);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindWithVisualizer_NotInteractable_NotInteractableIndicatorIsShown()
+            {
+                try
+                {
+                    await _sut.FindByNameAsync("NotInteractable", interactable: true);
+                    Assert.Fail("Expected TimeoutException but was not thrown");
+                }
+                catch (TimeoutException)
+                {
+                }
+
+                var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
+                Assert.That(indicator, Is.Not.Null);
+                Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("hand_slash"));
                 Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
 
                 await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
