@@ -18,8 +18,11 @@ using TestHelper.UI.Exceptions;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
 using TestHelper.UI.TestDoubles;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
+using Is = TestHelper.Constraints.Is;
 
 namespace TestHelper.UI
 {
@@ -343,7 +346,7 @@ namespace TestHelper.UI
         [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
         public class Screenshots
         {
-            private const int FileSizeThreshold = 5441;         // VGA size solid color file size
+            private const int FileSizeThreshold = 5441; // VGA size solid color file size
             private readonly string _defaultOutputDirectory = CommandLineArgs.GetScreenshotDirectory();
             private string _filename;
             private string _path;
@@ -607,6 +610,82 @@ namespace TestHelper.UI
                     Does.Match(
                         @"Not reachable to Cube\(\d+\), position=\(\d+,\d+\), camera=Main Camera\(\d+\)\. Raycast is not hit\."));
                 Assert.That(spyLogger.Messages[1], Is.EqualTo("Lottery entries are empty or all of not reachable."));
+            }
+        }
+
+        [TestFixture]
+        public class Visualizer
+        {
+            private const float IndicatorLifetime = 0.5f;
+            private DefaultDebugVisualizer _visualizer;
+
+            [OneTimeSetUp]
+            public void OneTimeSetUp()
+            {
+                _visualizer = new DefaultDebugVisualizer() { IndicatorLifetime = IndicatorLifetime };
+            }
+
+            [OneTimeTearDown]
+            public void OneTimeTearDown()
+            {
+                _visualizer.Dispose();
+            }
+
+            [Test]
+            [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+            public async Task LotteryOperator_IgnoredObjectOnly_IgnoredIndicatorIsShown()
+            {
+                var cube = GameObject.Find("Cube");
+                cube.transform.position = new Vector3(0, 0, 0);
+                cube.AddComponent<IgnoreAnnotation>(); // ignored
+
+                await UniTask.DelayFrame(5); // warm up for physics raycaster (maybe)
+
+                var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
+                var random = new RandomWrapper();
+                var ignoreStrategy = new DefaultIgnoreStrategy();
+                var reachableStrategy = new DefaultReachableStrategy();
+                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, visualizer: _visualizer);
+
+                await UniTask.NextFrame();
+
+                var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
+                Assert.That(indicator, Is.Not.Null);
+                Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("lock"));
+                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+                Assert.That(indicator, Is.Destroyed);
+            }
+
+            [Test]
+            [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+            public async Task LotteryOperator_NotReachableObjectOnly_NotReachableIndicatorIsShown()
+            {
+                var cube = GameObject.Find("Cube");
+                cube.transform.position = new Vector3(0, 0, 0);
+
+                var blocker = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                blocker.transform.position = new Vector3(0, 1, -7);
+                blocker.GetComponent<MeshRenderer>().materials[0].color = Color.gray;
+
+                await UniTask.DelayFrame(5); // warm up for physics raycaster (maybe)
+
+                var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
+                var random = new RandomWrapper();
+                var ignoreStrategy = new DefaultIgnoreStrategy();
+                var reachableStrategy = new DefaultReachableStrategy();
+                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, visualizer: _visualizer);
+
+                await UniTask.NextFrame();
+
+                var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
+                Assert.That(indicator, Is.Not.Null);
+                Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
+                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+                Assert.That(indicator, Is.Destroyed);
             }
         }
 

@@ -25,7 +25,7 @@ namespace TestHelper.UI.Strategies
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
+        /// <param name="getScreenPoint">Function returns the screen point of <c>GameObject</c></param>
         /// <param name="verboseLogger">Logger set if you need verbose output</param>
         public DefaultReachableStrategy(Func<GameObject, Vector2> getScreenPoint = null, ILogger verboseLogger = null)
         {
@@ -33,14 +33,10 @@ namespace TestHelper.UI.Strategies
             _verboseLogger = verboseLogger;
         }
 
-        /// <summary>
-        /// Returns whether the <c>GameObject</c> is reachable from the user or not and screen position.
+        ///<inheritdoc/>
+        /// <remarks>
         /// Default implementation uses <c>DefaultScreenPointStrategy</c>, checks whether a raycast from <c>Camera.main</c> to the pivot position passes through.
-        /// </summary>
-        /// <param name="gameObject">Target <c>GameObject</c></param>
-        /// <param name="raycastResult">Returns the front-most raycast hit result, even if it can not handle the press event</param>
-        /// <param name="verboseLogger">Logger set if you need verbose output</param>
-        /// <returns>True if <c>GameObject</c> is reachable from user, Raycast screen position</returns>
+        /// </remarks>
         public bool IsReachable(GameObject gameObject, out RaycastResult raycastResult, ILogger verboseLogger = null)
         {
             verboseLogger = verboseLogger ?? _verboseLogger; // If null, use the specified in the constructor.
@@ -66,7 +62,7 @@ namespace TestHelper.UI.Strategies
                     verboseLogger.Log(message.ToString());
                 }
 
-                raycastResult = default;
+                raycastResult = new RaycastResult() { screenPosition = pointerEventData.position };
                 return false;
             }
 

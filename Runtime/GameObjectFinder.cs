@@ -10,6 +10,7 @@ using TestHelper.UI.Exceptions;
 using TestHelper.UI.GameObjectMatchers;
 using TestHelper.UI.Paginators;
 using TestHelper.UI.Strategies;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
@@ -28,6 +29,7 @@ namespace TestHelper.UI
         private readonly double _timeoutSeconds;
         private readonly IReachableStrategy _reachableStrategy;
         private readonly Func<Component, bool> _isInteractable;
+        private readonly IVisualizer _visualizer;
 
         private const double MinTimeoutSeconds = 0.01d;
         private const double MaxPollingIntervalSeconds = 1.0d;
@@ -38,9 +40,11 @@ namespace TestHelper.UI
         /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appears.</param>
         /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. Default is <c>DefaultReachableStrategy</c>.</param>
         /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not. Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="visualizer">Visualizer set if you need to show fault indicators.</param>
         public GameObjectFinder(double timeoutSeconds = 1.0d,
             IReachableStrategy reachableStrategy = null,
-            Func<Component, bool> isInteractable = null)
+            Func<Component, bool> isInteractable = null,
+            IVisualizer visualizer = null)
         {
             Assert.IsTrue(timeoutSeconds > MinTimeoutSeconds,
                 $"TimeoutSeconds must be greater than {MinTimeoutSeconds}.");
@@ -48,6 +52,7 @@ namespace TestHelper.UI
             _timeoutSeconds = timeoutSeconds;
             _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy();
             _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+            _visualizer = visualizer;
         }
 
         private static Scene GetDontDestroyOnLoadScene()
@@ -109,6 +114,40 @@ namespace TestHelper.UI
             None
         }
 
+        private bool FilterToOnlyReachable(ref List<GameObject> objects)
+        {
+            for (var i = objects.Count - 1; i >= 0; i--)
+            {
+                var current = objects[i];
+                if (_reachableStrategy.IsReachable(current, out var raycastResult))
+                {
+                    continue;
+                }
+
+                _visualizer?.ShowNotReachableIndicator(raycastResult.screenPosition, raycastResult.gameObject);
+                objects.RemoveAt(i);
+            }
+
+            return objects.Count > 0;
+        }
+
+        private bool FilterToOnlyInteractable(ref List<GameObject> objects)
+        {
+            for (var i = objects.Count - 1; i >= 0; i--)
+            {
+                var current = objects[i];
+                if (current.GetComponents<Component>().Any(c => _isInteractable(c)))
+                {
+                    continue;
+                }
+
+                _visualizer?.ShowNotInteractableIndicator(current);
+                objects.RemoveAt(i);
+            }
+
+            return objects.Count > 0;
+        }
+
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
             bool reachable, bool interactable, Scene scene = default)
         {
@@ -122,22 +161,14 @@ namespace TestHelper.UI
                 return (null, default, Reason.NotFound);
             }
 
-            if (reachable)
+            if (reachable && !FilterToOnlyReachable(ref foundObjects))
             {
-                foundObjects = foundObjects.Where(obj => _reachableStrategy.IsReachable(obj, out _)).ToList();
-                if (!foundObjects.Any())
-                {
-                    return (null, default, Reason.NotReachable);
-                }
+                return (null, default, Reason.NotReachable);
             }
 
-            if (interactable)
+            if (interactable && !FilterToOnlyInteractable(ref foundObjects))
             {
-                foundObjects = foundObjects.Where(obj => obj.GetComponents<Component>().Any(_isInteractable)).ToList();
-                if (!foundObjects.Any())
-                {
-                    return (null, default, Reason.NotInteractable);
-                }
+                return (null, default, Reason.NotInteractable);
             }
 
             if (foundObjects.Count > 1)

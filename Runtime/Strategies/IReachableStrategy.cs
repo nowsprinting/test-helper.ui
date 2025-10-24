@@ -13,7 +13,7 @@ namespace TestHelper.UI.Strategies
     public interface IReachableStrategy
     {
         /// <summary>
-        /// Returns whether the <c>GameObject</c> is reachable from the user or not and screen position.
+        /// Returns whether the <c>GameObject</c> is reachable from the user or not and screen point.
         /// </summary>
         /// <param name="gameObject">Target <c>GameObject</c></param>
         /// <param name="raycastResult">Returns the front-most raycast hit result, even if it can not handle the press event</param>
