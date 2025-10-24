@@ -587,6 +587,18 @@ If multiple `GameObjects` matching the condition are found, throw `MultipleGameO
 Multiple GameObjects matching the condition (name=Button) were found.
 ```
 
+#### Debug Visualizer
+
+Using the Debug Visualizer can help you investigate why a `GameObject` cannot be found.
+`DefaultDebugVisualizer` shows visual indicators when "not reachable" or "not interactable" occurs.
+
+To use it, simply pass an instance to the `GameObjectFinder` constructor, like this:
+
+```csharp
+var visualizer = new DefaultDebugVisualizer();
+var finder = new GameObjectFinder(visualizer: _visualizer);
+```
+
 
 
 ### Monkey
@@ -697,6 +709,21 @@ If this condition persists, a `TimeoutException` will be thrown.
 
 ```
 Lottery entries are empty or all of not reachable.
+```
+
+#### Debug Visualizer
+
+Using the Debug Visualizer can help you investigate why a `GameObject` cannot be operation.
+`DefaultDebugVisualizer` shows visual indicators when "not reachable" or "ignored" occurs.
+
+To use it, simply set an instance to the `ConkeyConfig.Visualizer`, like this:
+
+```csharp
+var config = new MonkeyConfig()
+{
+    Visualizer = new DefaultDebugVisualizer(),
+};
+await Monkey.Run(config);
 ```
 
 
