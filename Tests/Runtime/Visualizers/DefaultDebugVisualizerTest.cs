@@ -82,7 +82,7 @@ namespace TestHelper.UI.Visualizers
         public async Task ShowNotReachableIndicator_Vertical([Values] GameViewResolution resolution)
         {
             var (width, height, name) = resolution.GetParameter();
-            GameViewControlHelper.SetResolution(height, width, name); // flip
+            GameViewControlHelper.SetResolution(height, width, $"{name} Portrait");
             await UniTask.NextFrame();
 
             foreach (var reference in _referenceObjects)

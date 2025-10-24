@@ -616,7 +616,7 @@ namespace TestHelper.UI
         [TestFixture]
         public class Visualizer
         {
-            private const float IndicatorLifetime = 0.2f;
+            private const float IndicatorLifetime = 0.5f;
             private DefaultDebugVisualizer _visualizer;
 
             [OneTimeSetUp]
@@ -636,11 +636,10 @@ namespace TestHelper.UI
             public async Task LotteryOperator_IgnoredObjectOnly_IgnoredIndicatorIsShown()
             {
                 var cube = GameObject.Find("Cube");
-                cube.AddComponent<SpyOnPointerClickHandler>();
                 cube.transform.position = new Vector3(0, 0, 0);
                 cube.AddComponent<IgnoreAnnotation>(); // ignored
 
-                await UniTask.NextFrame();
+                await UniTask.DelayFrame(5); // warm up for physics raycaster (maybe)
 
                 var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
                 var random = new RandomWrapper();
@@ -648,7 +647,7 @@ namespace TestHelper.UI
                 var reachableStrategy = new DefaultReachableStrategy();
                 Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, visualizer: _visualizer);
 
-                await UniTask.DelayFrame(5);
+                await UniTask.NextFrame();
 
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
@@ -664,13 +663,13 @@ namespace TestHelper.UI
             public async Task LotteryOperator_NotReachableObjectOnly_NotReachableIndicatorIsShown()
             {
                 var cube = GameObject.Find("Cube");
-                cube.AddComponent<SpyOnPointerClickHandler>();
                 cube.transform.position = new Vector3(0, 0, 0);
 
                 var blocker = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                blocker.transform.position = new Vector3(0, 1, -9);
+                blocker.transform.position = new Vector3(0, 1, -7);
+                blocker.GetComponent<MeshRenderer>().materials[0].color = Color.gray;
 
-                await UniTask.NextFrame();
+                await UniTask.DelayFrame(5); // warm up for physics raycaster (maybe)
 
                 var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
                 var random = new RandomWrapper();
@@ -678,7 +677,7 @@ namespace TestHelper.UI
                 var reachableStrategy = new DefaultReachableStrategy();
                 Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, visualizer: _visualizer);
 
-                await UniTask.DelayFrame(5);
+                await UniTask.NextFrame();
 
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
