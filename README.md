@@ -713,10 +713,10 @@ Lottery entries are empty or all of not reachable.
 
 #### Debug Visualizer
 
-Using the Debug Visualizer can help you investigate why a `GameObject` cannot be operation.
+Using the Debug Visualizer can help you investigate why a `GameObject` cannot be operated on.
 `DefaultDebugVisualizer` shows visual indicators when "not reachable" or "ignored" occurs.
 
-To use it, simply set an instance to the `ConkeyConfig.Visualizer`, like this:
+To use it, simply set an instance to the `MonkeyConfig.Visualizer`, like this:
 
 ```csharp
 var config = new MonkeyConfig()

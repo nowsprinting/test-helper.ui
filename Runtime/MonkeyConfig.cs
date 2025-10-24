@@ -56,7 +56,7 @@ namespace TestHelper.UI
         public bool Verbose { get; set; }
 
         /// <summary>
-        /// Show the visual indication if set a instance.
+        /// Show the visual indication if set an instance.
         /// </summary>
         public IVisualizer Visualizer { get; set; }
 
