@@ -114,40 +114,38 @@ namespace TestHelper.UI
             None
         }
 
-        private List<GameObject> FilterToOnlyReachable(List<GameObject> gameObjects)
+        private bool FilterToOnlyReachable(ref List<GameObject> objects)
         {
-            var reachable = new List<GameObject>();
-            foreach (var gameObject in gameObjects)
+            for (var i = objects.Count - 1; i >= 0; i--)
             {
-                if (_reachableStrategy.IsReachable(gameObject, out var raycastResult))
+                var current = objects[i];
+                if (_reachableStrategy.IsReachable(current, out var raycastResult))
                 {
-                    reachable.Add(gameObject);
+                    continue;
                 }
-                else
-                {
-                    _visualizer?.ShowNotReachableIndicator(raycastResult.screenPosition, raycastResult.gameObject);
-                }
+
+                _visualizer?.ShowNotReachableIndicator(raycastResult.screenPosition, raycastResult.gameObject);
+                objects.RemoveAt(i);
             }
 
-            return reachable;
+            return objects.Count > 0;
         }
 
-        private List<GameObject> FilterToOnlyInteractable(List<GameObject> gameObjects)
+        private bool FilterToOnlyInteractable(ref List<GameObject> objects)
         {
-            var interactable = new List<GameObject>();
-            foreach (var gameObject in gameObjects)
+            for (var i = objects.Count - 1; i >= 0; i--)
             {
-                if (gameObject.GetComponents<Component>().Any(_isInteractable))
+                var current = objects[i];
+                if (current.GetComponents<Component>().Any(c => _isInteractable(c)))
                 {
-                    interactable.Add(gameObject);
+                    continue;
                 }
-                else
-                {
-                    _visualizer?.ShowNotInteractableIndicator(gameObject);
-                }
+
+                _visualizer?.ShowNotInteractableIndicator(current);
+                objects.RemoveAt(i);
             }
 
-            return interactable;
+            return objects.Count > 0;
         }
 
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
@@ -163,22 +161,14 @@ namespace TestHelper.UI
                 return (null, default, Reason.NotFound);
             }
 
-            if (reachable)
+            if (reachable && !FilterToOnlyReachable(ref foundObjects))
             {
-                foundObjects = FilterToOnlyReachable(foundObjects);
-                if (!foundObjects.Any())
-                {
-                    return (null, default, Reason.NotReachable);
-                }
+                return (null, default, Reason.NotReachable);
             }
 
-            if (interactable)
+            if (interactable && !FilterToOnlyInteractable(ref foundObjects))
             {
-                foundObjects = FilterToOnlyInteractable(foundObjects);
-                if (!foundObjects.Any())
-                {
-                    return (null, default, Reason.NotInteractable);
-                }
+                return (null, default, Reason.NotInteractable);
             }
 
             if (foundObjects.Count > 1)
