@@ -113,7 +113,8 @@ namespace TestHelper.UI.Operators.Utils
             }
 
             // Dragging
-            while (!cancellationToken.IsCancellationRequested)
+            var arrived = false;
+            while (!arrived && !cancellationToken.IsCancellationRequested)
             {
                 var currentPosition = _eventData.position;
                 var direction = (destination - currentPosition).normalized;
@@ -122,7 +123,7 @@ namespace TestHelper.UI.Operators.Utils
                 if (distance < frameSpeed)
                 {
                     _eventData.position = destination;
-                    break;
+                    arrived = true;
                 }
 
                 _eventData.position = currentPosition + direction * frameSpeed;
