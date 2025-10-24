@@ -649,7 +649,6 @@ namespace TestHelper.UI
                 Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, visualizer: _visualizer);
 
                 await UniTask.DelayFrame(5);
-                await ScreenshotHelper.TakeScreenshotAsync();
 
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
@@ -680,7 +679,6 @@ namespace TestHelper.UI
                 Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, visualizer: _visualizer);
 
                 await UniTask.DelayFrame(5);
-                await ScreenshotHelper.TakeScreenshotAsync();
 
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);

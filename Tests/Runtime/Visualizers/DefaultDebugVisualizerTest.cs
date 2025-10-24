@@ -74,7 +74,6 @@ namespace TestHelper.UI.Visualizers
                 _sut.ShowNotReachableIndicator(screenPoint, reference);
             }
 
-            await ScreenshotHelper.TakeScreenshotAsync();
             await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
         }
 
@@ -92,7 +91,6 @@ namespace TestHelper.UI.Visualizers
                 _sut.ShowNotReachableIndicator(screenPoint, reference);
             }
 
-            await ScreenshotHelper.TakeScreenshotAsync();
             await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
         }
     }
