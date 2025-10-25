@@ -4,15 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TestHelper.UI.Samples.UguiDemo
 {
     public class TabContent : MonoBehaviour
     {
-        [field: SerializeField]
-        public GameObject ControlPanel { get; set; }
-
         private List<TabContent> _tabContents = new List<TabContent>();
 
         private void Start()
@@ -28,27 +24,6 @@ namespace TestHelper.UI.Samples.UguiDemo
             foreach (var tabContent in _tabContents)
             {
                 tabContent.gameObject.SetActive(tabContent == this);
-            }
-
-            var monkeyTestsButton = FindObjectOfType<MonkeyTestsButton>();
-            var interactable = monkeyTestsButton.GetComponent<Button>().interactable;
-            SetControlsInteractable(interactable);
-        }
-
-        /// <summary>
-        /// Set interactable state for all Selectable components in ControlPanel.
-        /// </summary>
-        /// <param name="interactable"></param>
-        public void SetControlsInteractable(bool interactable)
-        {
-            if (ControlPanel == null)
-            {
-                return;
-            }
-
-            foreach (var selectable in ControlPanel.GetComponentsInChildren<Selectable>())
-            {
-                selectable.interactable = interactable;
             }
         }
     }

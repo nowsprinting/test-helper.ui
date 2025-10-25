@@ -6,6 +6,7 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.UI.GameObjectMatchers;
 using TestHelper.UI.Operators;
+using UnityEngine.UI;
 
 namespace TestHelper.UI.Samples.UguiDemo
 {
@@ -13,17 +14,14 @@ namespace TestHelper.UI.Samples.UguiDemo
     public class TextInputOperatorTest
     {
         private const string ScenePath = "../../Scenes/uGUIDemo.unity";
-
         private readonly GameObjectFinder _finder = new GameObjectFinder();
 
         [SetUp]
         public async Task SetUp()
         {
-            var button = await _finder.FindByMatcherAsync(new ButtonMatcher(text: "TextInput Operator"));
-            var clickOperator = new UguiClickOperator();
-            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
-
-            await clickOperator.OperateAsync(button.GameObject);
+            var matcher = new ComponentMatcher(componentType: typeof(Dropdown), name: "TabSwitcher");
+            var dropdown = await _finder.FindByMatcherAsync(matcher);
+            dropdown.GameObject.GetComponent<Dropdown>().value = 4; // TextInputDemo
         }
 
         [Test]

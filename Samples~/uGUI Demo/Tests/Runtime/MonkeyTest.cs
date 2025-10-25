@@ -5,11 +5,11 @@ using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.UI.GameObjectMatchers;
 using TestHelper.UI.Operators;
 using TestHelper.UI.ScreenshotFilenameStrategies;
-using UnityEngine;
+using TestHelper.UI.Visualizers;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
 
 namespace TestHelper.UI.Samples.UguiDemo
 {
@@ -17,58 +17,36 @@ namespace TestHelper.UI.Samples.UguiDemo
     public class MonkeyTest
     {
         private const string ScenePath = "../../Scenes/uGUIDemo.unity";
+        private readonly GameObjectFinder _finder = new GameObjectFinder();
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
-            SetControlsInteractable(false);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            SetControlsInteractable(true);
-        }
-
-        private static void SetControlsInteractable(bool interactable)
-        {
-            // run monkey button 
-            var monkeyTestsButton = Object.FindObjectOfType<MonkeyTestsButton>();
-            monkeyTestsButton.GetComponent<Button>().interactable = interactable;
-
-            // settings
-            foreach (var toggle in GameObject.Find("SettingsPane").GetComponentsInChildren<Toggle>())
-            {
-                toggle.interactable = interactable;
-            }
-
-            // controls in content pane
-            foreach (var content in GameObject.FindObjectsOfType<TabContent>())
-            {
-                content.SetControlsInteractable(interactable);
-            }
+            var matcher = new ComponentMatcher(componentType: typeof(Dropdown), name: "TabSwitcher");
+            var dropdown = await _finder.FindByMatcherAsync(matcher);
+            dropdown.GameObject.GetComponent<Dropdown>().value = 0; // FinderDemo
         }
 
         [Test]
         [LoadScene(ScenePath)]
-        public async Task RunMonkeyTests()
+        public async Task MonkeyTesting()
         {
             var config = new MonkeyConfig()
             {
                 Lifetime = TimeSpan.FromSeconds(10),
-                BufferLengthForDetectLooping = 10,
+                Visualizer = new DefaultDebugVisualizer(),
                 Screenshots = new ScreenshotOptions()
                 {
                     FilenameStrategy = new CounterBasedStrategy("UguiDemoTest"),
                 },
                 Operators = new IOperator[]
                 {
+                    new UguiClickAndHoldOperator(),
                     new UguiClickOperator(),
                     new UguiDoubleClickOperator(),
-                    new UguiClickAndHoldOperator(),
                     new UguiDragAndDropOperator(),
-                    new UguiSwipeOperator(),
                     new UguiScrollWheelOperator(),
+                    new UguiSwipeOperator(),
                     new UguiTextInputOperator(),
                 }
             };
