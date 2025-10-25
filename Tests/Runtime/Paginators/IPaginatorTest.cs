@@ -3,8 +3,8 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
-using UnityEditor;
 using UnityEngine;
 
 namespace TestHelper.UI.Paginators
@@ -14,7 +14,25 @@ namespace TestHelper.UI.Paginators
     {
         private static Type[] GetPaginators()
         {
-            return TypeCache.GetTypesDerivedFrom<IPaginator>().ToArray();
+            var interfaceType = typeof(IPaginator);
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly =>
+                {
+                    try
+                    {
+                        return assembly.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException ex)
+                    {
+                        return ex.Types.Where(t => t != null);
+                    }
+                    catch
+                    {
+                        return Enumerable.Empty<Type>();
+                    }
+                })
+                .Where(t => t != null && interfaceType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
+                .ToArray();
         }
 
         /// <summary>
