@@ -213,7 +213,7 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene(TestScene)]
-        [Description("Shown Gizmos, See for yourself! Be a witness!!")]
+        [Obsolete("MonkeyConfig.Gizmos is obsolete.")]
         public async Task Run_withGizmos_showGizmosAndReverted()
         {
             Assume.That(GameViewControlHelper.GetGizmos(), Is.False);

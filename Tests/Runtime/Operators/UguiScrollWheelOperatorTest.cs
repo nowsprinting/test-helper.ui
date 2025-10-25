@@ -322,6 +322,7 @@ namespace TestHelper.UI.Operators
         [TestCase(30f, 20f)]
         [TestCase(-30f, -20f)]
         [LoadScene(TestScene)]
+        [Obsolete("UguiScrollWheelOperator.OperateAsync(GameObject, Vector2) is obsoleted.")]
         public async Task OperateAsync_WithDestination_Scrolled(float x, float y)
         {
             var destination = new Vector2(x, y);
