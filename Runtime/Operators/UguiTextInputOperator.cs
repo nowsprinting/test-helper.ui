@@ -20,7 +20,7 @@ using TMPro;
 namespace TestHelper.UI.Operators
 {
     /// <summary>
-    /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.
+    /// Text input operator for Unity UI (uGUI) <c>InputField</c> and <c>TMP_InputField</c> component.
     /// </summary>
     /// <remarks>
     /// If no text is specified (e.g., in the case of monkey tests), a random string will be entered.
