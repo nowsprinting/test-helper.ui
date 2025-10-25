@@ -26,24 +26,38 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         [Test]
         [LoadScene(ScenePath)]
-        public async Task DragAndDrop()
+        public async Task ClickDragButton()
         {
-            var image = await _finder.FindByNameAsync("DraggableImage");
-            var dragOperator = new UguiDragAndDropOperator();
-            Assume.That(dragOperator.CanOperate(image.GameObject), Is.True);
+            var button = await _finder.FindByNameAsync("DragButton");
+            var clickOperator = new UguiClickOperator();
+            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
-            await dragOperator.OperateAsync(image.GameObject);
+            await clickOperator.OperateAsync(button.GameObject);
+            await Task.Delay(400 + 1000); // wait for drag and show popup
         }
 
         [Test]
         [LoadScene(ScenePath)]
-        public async Task Swipe()
+        public async Task ClickFlickButton()
         {
-            var image = await _finder.FindByNameAsync("DraggableImage");
-            var dragOperator = new UguiSwipeOperator();
-            Assume.That(dragOperator.CanOperate(image.GameObject), Is.True);
+            var button = await _finder.FindByNameAsync("FlickButton");
+            var clickOperator = new UguiClickOperator();
+            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
-            await dragOperator.OperateAsync(image.GameObject);
+            await clickOperator.OperateAsync(button.GameObject);
+            await Task.Delay(400 + 1000); // wait for drag and show popup
+        }
+
+        [Test]
+        [LoadScene(ScenePath)]
+        public async Task ClickSwipeButton()
+        {
+            var button = await _finder.FindByNameAsync("SwipeButton");
+            var clickOperator = new UguiClickOperator();
+            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
+
+            await clickOperator.OperateAsync(button.GameObject);
+            await Task.Delay(400 + 1000); // wait for swipe and show popup
         }
     }
 }

@@ -15,7 +15,7 @@ namespace TestHelper.UI.Samples.UguiDemo
     public class MonkeyTestButton : MonoBehaviour
     {
         [field: SerializeField]
-        private int LifetimeSeconds { get; set; } = 10;
+        public int LifetimeSeconds { get; set; } = 10;
 
         [field: SerializeField]
         private int DelayMillis { get; set; } = 200;

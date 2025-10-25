@@ -26,13 +26,14 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         [Test]
         [LoadScene(ScenePath)]
-        public async Task ScrollWheel()
+        public async Task ClickScrollButton()
         {
-            var image = await _finder.FindByNameAsync("Scroll View");
-            var scrollOperator = new UguiScrollWheelOperator();
-            Assume.That(scrollOperator.CanOperate(image.GameObject), Is.True);
+            var button = await _finder.FindByNameAsync("ScrollButton");
+            var clickOperator = new UguiClickOperator();
+            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
-            await scrollOperator.OperateAsync(image.GameObject);
+            await clickOperator.OperateAsync(button.GameObject);
+            await Task.Delay(400 + 1000); // wait for scroll and show popup
         }
     }
 }

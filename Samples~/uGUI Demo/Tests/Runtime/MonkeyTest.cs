@@ -7,8 +7,6 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.UI.GameObjectMatchers;
 using TestHelper.UI.Operators;
-using TestHelper.UI.ScreenshotFilenameStrategies;
-using TestHelper.UI.Visualizers;
 using UnityEngine.UI;
 
 namespace TestHelper.UI.Samples.UguiDemo
@@ -29,29 +27,18 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         [Test]
         [LoadScene(ScenePath)]
-        public async Task MonkeyTesting()
+        public async Task ClickRunMonkeyTestButton()
         {
-            var config = new MonkeyConfig()
-            {
-                Lifetime = TimeSpan.FromSeconds(10),
-                Visualizer = new DefaultDebugVisualizer(),
-                Screenshots = new ScreenshotOptions()
-                {
-                    FilenameStrategy = new CounterBasedStrategy("UguiDemoTest"),
-                },
-                Operators = new IOperator[]
-                {
-                    new UguiClickAndHoldOperator(),
-                    new UguiClickOperator(),
-                    new UguiDoubleClickOperator(),
-                    new UguiDragAndDropOperator(),
-                    new UguiScrollWheelOperator(),
-                    new UguiSwipeOperator(),
-                    new UguiTextInputOperator(),
-                }
-            };
+            var button = await _finder.FindByNameAsync("RunMonkeyTest");
+            var clickOperator = new UguiClickOperator();
+            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
-            await Monkey.Run(config);
+            var monkeyTestButton = button.GameObject.GetComponent<MonkeyTestButton>();
+            var lifetimeSeconds = monkeyTestButton.LifetimeSeconds;
+
+            await clickOperator.OperateAsync(button.GameObject);
+            await Task.Delay(TimeSpan.FromSeconds(lifetimeSeconds)); // wait for monkey test to finish
+            await Task.Delay(1000);                                  // wait for show popup
         }
     }
 }
