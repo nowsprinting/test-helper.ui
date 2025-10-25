@@ -33,7 +33,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
             await clickOperator.OperateAsync(button.GameObject);
-            await Task.Delay(200 * 3 + 1000); // wait for GameObjectFinder timeout and show popup
+            await Task.Delay(200 + 1000); // wait for GameObjectFinder timeout and show popup
         }
 
         [Test]

@@ -1,7 +1,6 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,7 +16,6 @@ namespace TestHelper.UI.Samples.UguiDemo
         ICancelHandler
     {
         private GameObject _popupPrefab;
-
         private TabContent _content;
 
         protected Toggle _togglePointerEnter;
@@ -25,7 +23,10 @@ namespace TestHelper.UI.Samples.UguiDemo
         protected Toggle _togglePointerClick;
         protected Toggle _toggleDrag;
         protected Toggle _toggleScroll;
+        protected Toggle _toggleInputField;
+        private Toggle _toggleKeyboard;
         private Toggle _toggleSelect;
+        private Toggle _toggleUpdateSelected;
 
         private void Awake()
         {
@@ -51,8 +52,17 @@ namespace TestHelper.UI.Samples.UguiDemo
                     case "ToggleScroll":
                         _toggleScroll = toggle;
                         break;
+                    case "ToggleInputField":
+                        _toggleInputField = toggle;
+                        break;
+                    case "ToggleKeyboard":
+                        _toggleKeyboard = toggle;
+                        break;
                     case "ToggleSelect":
                         _toggleSelect = toggle;
+                        break;
+                    case "ToggleUpdateSelected":
+                        _toggleUpdateSelected = toggle;
                         break;
                 }
             }
@@ -73,7 +83,7 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         public void OnUpdateSelected(BaseEventData eventData)
         {
-            if (_toggleSelect.isOn)
+            if (_toggleUpdateSelected.isOn)
             {
                 Popup(eventData.selectedObject.transform.position, "update selected");
             }
@@ -81,7 +91,7 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         public void OnSelect(BaseEventData eventData)
         {
-            if (_toggleSelect.isOn)
+            if (_toggleSelect.isOn && eventData.selectedObject)
             {
                 Popup(eventData.selectedObject.transform.position, "select");
             }
@@ -97,17 +107,26 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         public void OnMove(AxisEventData eventData)
         {
-            throw new NotImplementedException();
+            if (_toggleKeyboard.isOn)
+            {
+                Popup(eventData.selectedObject.transform.position, "move");
+            }
         }
 
         public void OnSubmit(BaseEventData eventData)
         {
-            throw new NotImplementedException();
+            if (_toggleKeyboard.isOn)
+            {
+                Popup(eventData.selectedObject.transform.position, "submit");
+            }
         }
 
         public void OnCancel(BaseEventData eventData)
         {
-            throw new NotImplementedException();
+            if (_toggleKeyboard.isOn)
+            {
+                Popup(eventData.selectedObject.transform.position, "cancel");
+            }
         }
     }
 }

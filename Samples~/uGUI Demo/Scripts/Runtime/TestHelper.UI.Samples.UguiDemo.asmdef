@@ -2,6 +2,7 @@
     "name": "TestHelper.UI.Samples.UguiDemo",
     "rootNamespace": "",
     "references": [
+        "Unity.TextMeshPro",
         "TestHelper.UI",
         "TestHelper.Random",
         "UniTask"

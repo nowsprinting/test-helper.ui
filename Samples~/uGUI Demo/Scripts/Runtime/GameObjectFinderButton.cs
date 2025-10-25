@@ -44,11 +44,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             try
             {
                 _button.interactable = false;
-
-                foreach (var target in OperationTargets)
-                {
-                    await FindByPath(target);
-                }
+                await UniTask.WhenAll(OperationTargets.Select(FindByPath));
             }
             finally
             {

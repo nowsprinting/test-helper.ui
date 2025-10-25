@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2025 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             dropdown.options.Clear();
             foreach (var content in TargetContents)
             {
-                dropdown.options.Add(new Dropdown.OptionData(content.gameObject.name)); // TODO: 仮
+                dropdown.options.Add(new Dropdown.OptionData(content.gameObject.name));
             }
 
             dropdown.onValueChanged.AddListener(_ =>
