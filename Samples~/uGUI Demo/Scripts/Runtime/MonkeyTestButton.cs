@@ -5,28 +5,40 @@ using System;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Operators;
 using TestHelper.UI.ScreenshotFilenameStrategies;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace TestHelper.UI.Samples.UguiDemo
 {
     [RequireComponent(typeof(Button))]
-    public class MonkeyTestsButton : MonoBehaviour
+    public class MonkeyTestButton : MonoBehaviour
     {
         [field: SerializeField]
-        private int LifetimeSeconds { get; set; } = 10;
+        public int LifetimeSeconds { get; set; } = 10;
 
         [field: SerializeField]
         private int DelayMillis { get; set; } = 200;
 
+        [field: SerializeField]
+        private int BufferLengthForDetectLooping { get; set; } = 10;
+
+        [field: SerializeField]
+        private bool VerboseLogger { get; set; }
+
+        [field: SerializeField]
+        private bool DebugVisualizer { get; set; }
+
         private Button _button;
         private Text _buttonText;
+        private string _originalButtonText;
 
         private void Awake()
         {
             _button = GetComponent<Button>();
             _button.onClick.AddListener(() => RunMonkeyTests().Forget());
             _buttonText = _button.GetComponentInChildren<Text>();
+            _originalButtonText = _buttonText.text;
         }
 
         private async UniTask RunMonkeyTests()
@@ -35,50 +47,35 @@ namespace TestHelper.UI.Samples.UguiDemo
             {
                 Lifetime = TimeSpan.FromSeconds(LifetimeSeconds),
                 DelayMillis = DelayMillis,
-                BufferLengthForDetectLooping = 10,
+                BufferLengthForDetectLooping = BufferLengthForDetectLooping,
+                Verbose = VerboseLogger,
+                Visualizer = DebugVisualizer ? new DefaultDebugVisualizer() : null,
                 Screenshots = new ScreenshotOptions()
                 {
                     FilenameStrategy = new CounterBasedStrategy("UguiDemo"),
                 },
                 Operators = new IOperator[]
                 {
+                    new UguiClickAndHoldOperator(),
                     new UguiClickOperator(),
                     new UguiDoubleClickOperator(),
-                    new UguiClickAndHoldOperator(),
                     new UguiDragAndDropOperator(),
-                    new UguiSwipeOperator(),
                     new UguiScrollWheelOperator(),
+                    new UguiSwipeOperator(),
                     new UguiTextInputOperator(),
                 }
             };
 
             try
             {
-                SetControlsInteractable(false);
+                _button.interactable = false;
+                _buttonText.text = "Running...";
                 await Monkey.Run(config);
             }
             finally
             {
-                SetControlsInteractable(true);
-            }
-        }
-
-        private void SetControlsInteractable(bool interactable)
-        {
-            // myself
-            _button.interactable = interactable;
-            _buttonText.text = _button.interactable ? "Run Monkey Tests" : "Running...";
-
-            // settings
-            foreach (var toggle in GameObject.Find("SettingsPane").GetComponentsInChildren<Toggle>())
-            {
-                toggle.interactable = interactable;
-            }
-
-            // controls in content pane
-            foreach (var content in FindObjectsOfType<TabContent>())
-            {
-                content.SetControlsInteractable(interactable);
+                _buttonText.text = _originalButtonText;
+                _button.interactable = true;
             }
         }
     }

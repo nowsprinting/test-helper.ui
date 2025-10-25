@@ -11,7 +11,7 @@ using UnityEngine.UI;
 namespace TestHelper.UI.Samples.UguiDemo
 {
     [TestFixture]
-    public class ClickOperatorsTest
+    public class GameObjectFinderTest
     {
         private const string ScenePath = "../../Scenes/uGUIDemo.unity";
         private readonly GameObjectFinder _finder = new GameObjectFinder();
@@ -21,43 +21,31 @@ namespace TestHelper.UI.Samples.UguiDemo
         {
             var matcher = new ComponentMatcher(componentType: typeof(Dropdown), name: "TabSwitcher");
             var dropdown = await _finder.FindByMatcherAsync(matcher);
-            dropdown.GameObject.GetComponent<Dropdown>().value = 1; // ClickDemo
+            dropdown.GameObject.GetComponent<Dropdown>().value = 0; // FinderDemo
         }
 
         [Test]
         [LoadScene(ScenePath)]
-        public async Task ClickClickButton()
+        public async Task ClickFindButton()
         {
-            var button = await _finder.FindByNameAsync("ClickButton");
+            var button = await _finder.FindByNameAsync("FindButton");
+            var clickOperator = new UguiClickOperator();
+            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
+
+            await clickOperator.OperateAsync(button.GameObject);
+            await Task.Delay(200 * 3 + 1000); // wait for GameObjectFinder timeout and show popup
+        }
+
+        [Test]
+        [LoadScene(ScenePath)]
+        public async Task ClickPaginatorButton()
+        {
+            var button = await _finder.FindByNameAsync("PaginatorButton");
             var clickOperator = new UguiClickOperator();
             Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
             await clickOperator.OperateAsync(button.GameObject);
             await Task.Delay(1000); // wait for show popup
-        }
-
-        [Test]
-        [LoadScene(ScenePath)]
-        public async Task ClickDoubleClickButton()
-        {
-            var button = await _finder.FindByNameAsync("DoubleClickButton");
-            var clickOperator = new UguiDoubleClickOperator();
-            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
-
-            await clickOperator.OperateAsync(button.GameObject);
-            await Task.Delay(1000); // wait for show popup
-        }
-
-        [Test]
-        [LoadScene(ScenePath)]
-        public async Task ClickClickAndHoldButton()
-        {
-            var button = await _finder.FindByNameAsync("ClickAndHoldButton");
-            var clickOperator = new UguiClickAndHoldOperator();
-            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
-
-            await clickOperator.OperateAsync(button.GameObject);
-            await Task.Delay(1000 + 1000); // wait for hold and show popup
         }
     }
 }
