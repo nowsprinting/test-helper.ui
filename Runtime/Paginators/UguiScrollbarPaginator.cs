@@ -14,19 +14,21 @@ namespace TestHelper.UI.Paginators
     /// </summary>
     public class UguiScrollbarPaginator : IPaginator
     {
-        /// <inheritdoc />
-        public Type ComponentType => typeof(Scrollbar);
-
         private readonly Scrollbar _scrollbar;
 
         /// <summary>
-        /// Constructor.
+        /// Constructor that takes a scroller instance.
         /// </summary>
         /// <param name="scrollbar">Scrollbar to be controlled</param>
         /// <exception cref="ArgumentNullException">When scrollbar is null</exception>
         public UguiScrollbarPaginator(Scrollbar scrollbar)
         {
-            _scrollbar = scrollbar ?? throw new ArgumentNullException(nameof(scrollbar));
+            if (!scrollbar)
+            {
+                throw new ArgumentNullException(nameof(scrollbar));
+            }
+
+            _scrollbar = scrollbar;
         }
 
         /// <inheritdoc />

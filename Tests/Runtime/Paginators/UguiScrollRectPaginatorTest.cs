@@ -28,16 +28,6 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public void ComponentType_ReturnsScrollbar()
-        {
-            var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
-            var sut = new UguiScrollRectPaginator(scrollRect);
-
-            Assert.That(sut.ComponentType, Is.EqualTo(typeof(ScrollRect)));
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
         public void Constructor_ValidScrollRect_ObjectCreatedSuccessfully()
         {
             var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();

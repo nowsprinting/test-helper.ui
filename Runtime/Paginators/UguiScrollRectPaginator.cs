@@ -14,25 +14,27 @@ namespace TestHelper.UI.Paginators
     /// </summary>
     public class UguiScrollRectPaginator : IPaginator
     {
-        /// <inheritdoc />
-        public Type ComponentType => typeof(ScrollRect);
-
         private readonly ScrollRect _scrollRect;
         private bool _isHorizontalAtEnd;
 
         /// <summary>
-        /// Constructor.
+        /// Constructor that takes a scroller instance.
         /// </summary>
         /// <param name="scrollRect">ScrollRect to be controlled</param>
         /// <exception cref="ArgumentNullException">When scrollRect is null</exception>
         public UguiScrollRectPaginator(ScrollRect scrollRect)
         {
-            _scrollRect = scrollRect ?? throw new ArgumentNullException(nameof(scrollRect));
+            if (!scrollRect)
+            {
+                throw new ArgumentNullException(nameof(scrollRect));
+            }
 
-            if (_scrollRect.content == null)
+            if (!scrollRect.content)
             {
                 throw new ArgumentNullException(nameof(scrollRect.content), "ScrollRect.content is null");
             }
+
+            _scrollRect = scrollRect;
         }
 
         /// <inheritdoc />
