@@ -45,16 +45,6 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public void ComponentType_ReturnsScrollbar()
-        {
-            var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
-            var sut = new UguiScrollbarPaginator(scrollbar);
-
-            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Scrollbar)));
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
         public void Constructor_ValidScrollbar_ObjectCreatedSuccessfully()
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();

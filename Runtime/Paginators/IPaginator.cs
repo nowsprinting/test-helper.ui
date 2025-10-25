@@ -1,7 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
@@ -11,13 +11,18 @@ namespace TestHelper.UI.Paginators
     /// Interface for pagination controller for finding <c>GameObject</c> on pageable or scrollable UI components (e.g., <c>ScrollRect</c>, Carousel, Paged dialog).
     /// Provides intuitive pagination operations as page navigation functionality, enabling auxiliary operations in the <see cref="GameObjectFinder"/>.
     /// </summary>
+    /// <remarks>
+    /// The implementation class must meet the following requirements:
+    /// <list type="bullet">
+    ///     <item>A paginator must have a constructor with one parameter.</item>
+    ///     <item>The first parameter of the constructor is a pageable or scrollable component to be controlled.</item>
+    ///     <item>The type of the first parameter must be a subclass of <c>MonoBehaviour</c>.</item>
+    /// </list>
+    /// <seealso cref="TestHelper.UI.Paginators.IPaginatorTest"/>
+    /// </remarks>
+    [SuppressMessage("ReSharper", "InvalidXmlDocComment")]
     public interface IPaginator
     {
-        /// <summary>
-        /// Pageable or scrollable UI component type.
-        /// </summary>
-        Type ComponentType { get; }
-
         /// <summary>
         /// Move the page position to the beginning.
         /// For scroll components, the display position (top, bottom, left, or right) depends on the implementation.
