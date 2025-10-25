@@ -14,9 +14,9 @@ namespace TestHelper.UI.Paginators
     /// <remarks>
     /// The implementation class must meet the following requirements:
     /// <list type="bullet">
-    ///     <item>A paginator must have a constructor with one parameter.</item>
-    ///     <item>The first parameter of the constructor is a pageable or scrollable component to be controlled.</item>
-    ///     <item>The type of the first parameter must be a subclass of <c>MonoBehaviour</c>.</item>
+    ///     <item>A paginator must have a constructor with one or more parameters</item>
+    ///     <item>The first parameter of the constructor is a pageable or scrollable component to be controlled</item>
+    ///     <item>The type of the first parameter must be a subclass of <c>MonoBehaviour</c></item>
     /// </list>
     /// <seealso cref="TestHelper.UI.Paginators.IPaginatorTest"/>
     /// </remarks>

@@ -477,7 +477,7 @@ A paginator must implement the following methods:
 
 In addition, the constructor must meet the following requirements:
 
-- A paginator must have a constructor with one parameter
+- A paginator must have a constructor with one or more parameters
 - The first parameter of the constructor is a pageable or scrollable component to be controlled
 - The type of the first parameter must be a subclass of `MonoBehaviour`
 
