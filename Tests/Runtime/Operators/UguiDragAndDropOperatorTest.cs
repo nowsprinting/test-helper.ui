@@ -16,6 +16,7 @@ namespace TestHelper.UI.Operators
     [TestFixture]
     public class UguiDragAndDropOperatorTest
     {
+        private const string TestScene = "../../Scenes/Canvas.unity";
         private const int RandomTestRepeatCount = 10;
 
         private readonly IOperator _sut = new UguiDragAndDropOperator();
@@ -29,9 +30,7 @@ namespace TestHelper.UI.Operators
 
         private void SetOnCanvas(MonoBehaviour handler)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var canvas = GameObject.FindObjectOfType<Canvas>();
-#pragma warning restore CS0618 // Type or member is obsolete
+            var canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
             Assume.That(canvas, Is.Not.Null, "Canvas not found in the scene.");
 
             handler.transform.SetParent(canvas.transform);
@@ -181,7 +180,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
+        [LoadScene(TestScene)]
         public async Task LotteryComponent_OnlyNotReachable_ReturnsNull()
         {
             var notReachableHandler = CreateSpyDropHandler();
@@ -199,7 +198,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
+        [LoadScene(TestScene)]
         [Repeat(5)]
         public async Task LotteryComponent_IncludeValidComponent_ReturnsComponent()
         {
@@ -221,7 +220,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
+        [LoadScene(TestScene)]
         [Repeat(5)]
         public async Task OperateAsync_ExistDropAnnotation_DropOnTarget()
         {
@@ -245,7 +244,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
+        [LoadScene(TestScene)]
         public async Task OperateAsync_ExistDropHandlerObject_DropOnTarget()
         {
             var dragHandler = CreateSpyDragHandler();
@@ -264,7 +263,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
+        [LoadScene(TestScene)]
         [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_NotExistDropTarget_DropOnRandomScreenPoint()
         {
@@ -286,7 +285,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
+        [LoadScene(TestScene)]
         public async Task OperateAsync_SpecifyDropTargetObject_DropOnTarget()
         {
             var dragHandler = CreateSpyDragHandler();
@@ -301,7 +300,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        [LoadScene("../../Scenes/Canvas.unity")]
+        [LoadScene(TestScene)]
         public async Task OperateAsync_SpecifyDropTargetPoint_DropOnTarget()
         {
             var dragHandler = CreateSpyDragHandler();
