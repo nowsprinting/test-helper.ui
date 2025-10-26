@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Random;
@@ -20,7 +21,7 @@ using TMPro;
 namespace TestHelper.UI.Operators
 {
     /// <summary>
-    /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.
+    /// Text input operator for Unity UI (uGUI) <c>InputField</c> and <c>TMP_InputField</c> component.
     /// </summary>
     /// <remarks>
     /// If no text is specified (e.g., in the case of monkey tests), a random string will be entered.
@@ -113,19 +114,44 @@ namespace TestHelper.UI.Operators
             operationLogger.Properties.Add("text", $"\"{text}\"");
             await operationLogger.Log();
 
-            // Select before input text
-            ExecuteEvents.ExecuteHierarchy(gameObject, null, ExecuteEvents.selectHandler);
-            // Note: OnDeselect event is called by the system when the focus moves to another element, so it is not called in this method.
+            // Note: The OnSelect event is not sent to prevent the TouchScreenKeyboard from being displayed.
+
+            await UniTask.SwitchToMainThread(cancellationToken);
 
             // Input text
             if (gameObject.TryGetEnabledComponent<InputField>(out var inputField))
             {
                 inputField.text = text;
+#if UNITY_2021_1_OR_NEWER
+                inputField.onSubmit?.Invoke(inputField.text);
+#endif
+                inputField.onEndEdit?.Invoke(inputField.text);
             }
 #if ENABLE_TMP
             if (gameObject.TryGetEnabledComponent<TMP_InputField>(out var tmpInputField))
             {
-                tmpInputField.text = text;
+                if (tmpInputField.onValidateInput != null)
+                {
+                    var completeText = new StringBuilder();
+                    for (var i = 0; i < text.Length; i++)
+                    {
+                        var validChar = tmpInputField.onValidateInput.Invoke(completeText.ToString(), i, text[i]);
+                        if (validChar != '\0')
+                        {
+                            completeText.Append(validChar);
+                            tmpInputField.text = completeText.ToString();
+                        }
+                    }
+                }
+                else
+                {
+                    tmpInputField.text = text;
+                }
+#if !UNITY_STANDALONE
+                tmpInputField.onTouchScreenKeyboardStatusChanged?.Invoke(TouchScreenKeyboard.Status.Done);
+#endif
+                tmpInputField.onSubmit?.Invoke(tmpInputField.text);
+                tmpInputField.onEndEdit?.Invoke(tmpInputField.text);
             }
 #endif
         }

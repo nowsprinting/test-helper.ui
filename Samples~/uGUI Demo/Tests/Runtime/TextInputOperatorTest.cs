@@ -26,14 +26,26 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         [Test]
         [LoadScene(ScenePath)]
-        public async Task ClickTextInputButton()
+        public async Task ClickTextInputToLegacyButton()
         {
-            var button = await _finder.FindByNameAsync("TextInputButton");
+            var button = await _finder.FindByNameAsync("TextInputToLegacyButton");
             var clickOperator = new UguiClickOperator();
             Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
             await clickOperator.OperateAsync(button.GameObject);
-            await Task.Delay(200 + 1000); // wait for input-text and show popup
+            await Task.Delay(200); // wait for input text
+        }
+
+        [Test]
+        [LoadScene(ScenePath)]
+        public async Task ClickTextInputToTmpButton()
+        {
+            var button = await _finder.FindByNameAsync("TextInputToTmpButton");
+            var clickOperator = new UguiClickOperator();
+            Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
+
+            await clickOperator.OperateAsync(button.GameObject);
+            await Task.Delay(200); // wait for input text
         }
     }
 }
