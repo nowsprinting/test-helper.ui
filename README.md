@@ -159,12 +159,13 @@ public class MyIntegrationTest
     public async Task FindButtonInScrollView()
     {
         var finder = new GameObjectFinder();
-        var matcher = new NameMatcher("Button_10");
 
-        var scrollView = GameObject.Find("Scroll View");
-        var scrollRect = scrollView.GetComponent<ScrollRect>();
+        var scrollViewMatcher = new NameMatcher("Scroll View");
+        var scrollViewResult = await finder.FindByMatcherAsync(scrollViewMatcher);
+        var scrollRect = scrollViewResult.GameObject.GetComponent<ScrollRect>();
         var paginator = new UguiScrollRectPaginator(scrollRect);
 
+        var matcher = new NameMatcher("Button_10");
         var result = await finder.FindByMatcherAsync(matcher, paginator: paginator);
         var button = result.GameObject;
     }
@@ -468,12 +469,17 @@ For example, the built-in `ButtonMatcher` class's `IsMatch` method returns `true
 If your game title uses a custom pageable or scrollable UI components (e.g., Scroller, Carousel, Paged dialog), you can implement the `IPaginator` interface.
 The custom paginator can be specified as an argument to the `GameObjectFinder.FindByMatcherAsync` method.
 
-A paginator must implement the following methods and properties:
+A paginator must implement the following methods:
 
-- `ComponentType` property to return the type of UI component that the paginator controls
 - `ResetAsync` method to navigate to the top page
 - `NextPageAsync` method to navigate to the next page
 - `HasNextPage` property to return whether there is a next page
+
+In addition, the constructor must meet the following requirements:
+
+- A paginator must have a constructor with one or more parameters
+- The first parameter of the constructor is a pageable or scrollable component to be controlled
+- The type of the first parameter must be a subclass of `MonoBehaviour`
 
 
 
