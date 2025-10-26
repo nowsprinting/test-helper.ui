@@ -131,10 +131,10 @@ namespace TestHelper.UI.Operators
                 if (tmpInputField.onValidateInput != null)
                 {
                     var completeText = new StringBuilder();
-                    for (var i = 0; i < text.ToCharArray().Length; i++)
+                    for (var i = 0; i < text.Length; i++)
                     {
-                        var validChar = tmpInputField.onValidateInput?.Invoke(completeText.ToString(), i, text[i]);
-                        if (validChar != null)
+                        var validChar = tmpInputField.onValidateInput.Invoke(completeText.ToString(), i, text[i]);
+                        if (validChar != '\0')
                         {
                             completeText.Append(validChar);
                             tmpInputField.text = completeText.ToString();
