@@ -151,7 +151,8 @@ namespace TestHelper.UI.Operators
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<TMP_InputField>();
-            inputField.onValidateInput += (string _, int _, char addedChar) => addedChar != 'N' ? addedChar : '\0';
+            inputField.onValidateInput += (string text, int index, char addedChar) =>
+                addedChar != 'N' ? addedChar : '\0';
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
             _sut.OperateAsync(gameObject);
