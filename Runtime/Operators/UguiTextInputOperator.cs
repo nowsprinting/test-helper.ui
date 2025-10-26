@@ -122,7 +122,9 @@ namespace TestHelper.UI.Operators
             if (gameObject.TryGetEnabledComponent<InputField>(out var inputField))
             {
                 inputField.text = text;
+#if UNITY_2021_1_OR_NEWER
                 inputField.onSubmit?.Invoke(inputField.text);
+#endif
                 inputField.onEndEdit?.Invoke(inputField.text);
             }
 #if ENABLE_TMP

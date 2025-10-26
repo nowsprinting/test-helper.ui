@@ -18,7 +18,9 @@ namespace TestHelper.UI.Samples.UguiDemo
                 _eventSourceName = inputField.GetType().Name;
 
                 inputField.onEndEdit.AddListener(OnEndEdit);
+#if UNITY_2021_1_OR_NEWER
                 inputField.onSubmit.AddListener(OnSubmit);
+#endif
                 inputField.onValidateInput += OnValidateInput;
                 inputField.onValueChanged.AddListener(OnValueChanged);
             }
@@ -47,7 +49,9 @@ namespace TestHelper.UI.Samples.UguiDemo
                 _eventSourceName = inputField.GetType().Name;
 
                 inputField.onEndEdit.RemoveListener(OnEndEdit);
+#if UNITY_2021_1_OR_NEWER
                 inputField.onSubmit.RemoveListener(OnSubmit);
+#endif
                 inputField.onValidateInput -= OnValidateInput;
                 inputField.onValueChanged.RemoveListener(OnValueChanged);
             }
