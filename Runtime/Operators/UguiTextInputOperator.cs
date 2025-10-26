@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Random;
@@ -113,19 +114,42 @@ namespace TestHelper.UI.Operators
             operationLogger.Properties.Add("text", $"\"{text}\"");
             await operationLogger.Log();
 
-            // Select before input text
-            ExecuteEvents.ExecuteHierarchy(gameObject, null, ExecuteEvents.selectHandler);
-            // Note: OnDeselect event is called by the system when the focus moves to another element, so it is not called in this method.
+            // Note: The OnSelect event is not sent to prevent the TouchScreenKeyboard from being displayed.
+
+            await UniTask.SwitchToMainThread(cancellationToken);
 
             // Input text
             if (gameObject.TryGetEnabledComponent<InputField>(out var inputField))
             {
                 inputField.text = text;
+                inputField.onSubmit?.Invoke(inputField.text);
+                inputField.onEndEdit?.Invoke(inputField.text);
             }
 #if ENABLE_TMP
             if (gameObject.TryGetEnabledComponent<TMP_InputField>(out var tmpInputField))
             {
-                tmpInputField.text = text;
+                if (tmpInputField.onValidateInput != null)
+                {
+                    var completeText = new StringBuilder();
+                    for (var i = 0; i < text.ToCharArray().Length; i++)
+                    {
+                        var validChar = tmpInputField.onValidateInput?.Invoke(completeText.ToString(), i, text[i]);
+                        if (validChar != null)
+                        {
+                            completeText.Append(validChar);
+                            tmpInputField.text = completeText.ToString();
+                        }
+                    }
+                }
+                else
+                {
+                    tmpInputField.text = text;
+                }
+#if !UNITY_STANDALONE
+                tmpInputField.onTouchScreenKeyboardStatusChanged?.Invoke(TouchScreenKeyboard.Status.Done);
+#endif
+                tmpInputField.onSubmit?.Invoke(tmpInputField.text);
+                tmpInputField.onEndEdit?.Invoke(tmpInputField.text);
             }
 #endif
         }

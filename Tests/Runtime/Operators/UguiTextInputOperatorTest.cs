@@ -99,7 +99,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        public void OperateAsync_InputText_SetsRandomText()
+        public void OperateAsync_InputField_SetsRandomText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<InputField>();
@@ -111,7 +111,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        public void OperateAsync_InputTextWithText_SetsSpecifiedText()
+        public void OperateAsync_InputFieldWithText_SetsSpecifiedText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<InputField>();
@@ -123,7 +123,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        public void OperateAsync_TmpInputText_SetsRandomText()
+        public void OperateAsync_TmpInputField_SetsRandomText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<TMP_InputField>();
@@ -135,7 +135,7 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        public void OperateAsync_TmpInputTextWithText_SetsSpecifiedText()
+        public void OperateAsync_TmpInputFieldWithText_SetsSpecifiedText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<TMP_InputField>();
@@ -144,6 +144,19 @@ namespace TestHelper.UI.Operators
             _sut.OperateAsync(gameObject, "SPECIFIED");
 
             Assert.That(inputField.text, Is.EqualTo("SPECIFIED"));
+        }
+
+        [Test]
+        public void OperateAsync_TmpInputFieldWithValidator_SetsValidatedText()
+        {
+            var gameObject = new GameObject();
+            var inputField = gameObject.AddComponent<TMP_InputField>();
+            inputField.onValidateInput += (string _, int _, char addedChar) => addedChar != 'N' ? addedChar : '\0';
+
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            _sut.OperateAsync(gameObject);
+
+            Assert.That(inputField.text, Is.EqualTo("RADOM"));
         }
     }
 }
