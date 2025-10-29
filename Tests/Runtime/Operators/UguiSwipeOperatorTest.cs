@@ -318,20 +318,22 @@ namespace TestHelper.UI.Operators
             var rectTransform = content.GetComponent<RectTransform>();
             var beforePosition = rectTransform.position;
 
-            var cancellationTokenSource = new CancellationTokenSource();
-            var cancellationToken = cancellationTokenSource.Token;
+            using (var cancellationTokenSource = new CancellationTokenSource())
+            {
+                var cancellationToken = cancellationTokenSource.Token;
 
-            var sut = new UguiSwipeOperator(swipeSpeed: SwipeSpeed);
-            var task = sut.OperateAsync(_scrollView, Vector2.up, cancellationToken: cancellationToken);
-            await UniTask.NextFrame(cancellationToken);
+                var sut = new UguiSwipeOperator(swipeSpeed: SwipeSpeed);
+                var task = sut.OperateAsync(_scrollView, Vector2.up, cancellationToken: cancellationToken);
+                await UniTask.NextFrame(cancellationToken);
 
-            var frameSpeed = SwipeSpeed * Time.deltaTime;
-            var expectedPositionY = beforePosition.y - frameSpeed;
+                var frameSpeed = SwipeSpeed * Time.deltaTime;
+                var expectedPositionY = beforePosition.y - frameSpeed;
 
-            cancellationTokenSource.Cancel();
-            await task; // Cancelled
+                cancellationTokenSource.Cancel();
+                await task; // Cancelled
 
-            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+                Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+            }
         }
 
         private static IEnumerable<TestCaseData> DirectionAndDistanceCases()
