@@ -34,6 +34,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
             var monkeyTestButton = button.GameObject.GetComponent<MonkeyTestButton>();
+            monkeyTestButton.BufferLengthForDetectLooping = 20;
             var lifetimeSeconds = monkeyTestButton.LifetimeSeconds;
 
             await clickOperator.OperateAsync(button.GameObject);
