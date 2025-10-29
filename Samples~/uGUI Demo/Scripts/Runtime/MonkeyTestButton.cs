@@ -21,7 +21,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         private int DelayMillis { get; set; } = 200;
 
         [field: SerializeField]
-        private int BufferLengthForDetectLooping { get; set; } = 10;
+        public int BufferLengthForDetectLooping { get; set; } = 10;
 
         [field: SerializeField]
         private bool VerboseLogger { get; set; }
@@ -74,8 +74,15 @@ namespace TestHelper.UI.Samples.UguiDemo
             }
             finally
             {
-                _buttonText.text = _originalButtonText;
-                _button.interactable = true;
+                if (_buttonText)
+                {
+                    _buttonText.text = _originalButtonText;
+                }
+
+                if (_button)
+                {
+                    _button.interactable = true;
+                }
             }
         }
     }
