@@ -55,9 +55,10 @@ jobs:
 
     steps:
       - name: Create project for tests
-        uses: nowsprinting/create-unity-project-action@eeafc6df4ff7584ca8744b866b61a87a94aa3c2d # v3
+        uses: nowsprinting/create-unity-project-action@42e3d97c2a8005e9b6cb0b10dfe2084a750a8dea # v3
         with:
           project-path: UnityProject~
+          active-input-handler: 2 # Both
 
       - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
@@ -87,6 +88,7 @@ jobs:
           npm install -g openupm-cli
           openupm add -f com.unity.test-framework@stable
           openupm add -f com.unity.testtools.codecoverage
+          openupm add -f com.unity.inputsystem@1.12.0 # latest for Unity 2019 LTS
           openupm add -f com.cysharp.unitask
           openupm add -f com.nowsprinting.test-helper
           openupm add -f com.nowsprinting.test-helper.random
