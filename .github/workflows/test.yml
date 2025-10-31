@@ -55,10 +55,10 @@ jobs:
 
     steps:
       - name: Create project for tests
-        uses: nowsprinting/create-unity-project-action@42e3d97c2a8005e9b6cb0b10dfe2084a750a8dea # v3
+        uses: nowsprinting/create-unity-project-action@e6a2ccac5eaa666d219b4bee94781bfb3b768c86 # v3
         with:
-          project-path: UnityProject~
-          active-input-handler: 2 # Both
+          project-path: .
+          active-input-handler: 2 # both
 
       - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
