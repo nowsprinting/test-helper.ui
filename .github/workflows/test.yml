@@ -47,18 +47,24 @@ jobs:
           - 6000.2.6f1
         testMode:
           - All # run tests in editor
+        inputHandler:
+          - '2' # both
         include:
           - unityVersion: 6000.2.6f1
             octocov: true
           - unityVersion: 6000.2.6f1
+            testMode: PlayMode
+            inputHandler: '0' # legacy only
+          - unityVersion: 6000.2.6f1
             testMode: Standalone  # run tests on player
+            inputHandler: '2'
 
     steps:
       - name: Create project for test
         uses: nowsprinting/create-unity-project-action@e6a2ccac5eaa666d219b4bee94781bfb3b768c86 # v3
         with:
           project-path: .
-          active-input-handler: 2 # both
+          active-input-handler: ${{ matrix.inputHandler }}
 
       - name: Cache Library
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
@@ -88,11 +94,16 @@ jobs:
         run: |
           npm install -g openupm-cli
           openupm add -f com.unity.test-framework@stable
-          openupm add -f com.unity.inputsystem@1.12.0 # latest for Unity 2019 LTS
           openupm add -f com.cysharp.unitask
           openupm add -f com.nowsprinting.test-helper
           openupm add -f com.nowsprinting.test-helper.random
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
+
+      - name: Install inputsystem package
+        run: |
+          openupm add -f com.unity.inputsystem@1.12.0 # latest for Unity 2019 LTS
+        working-directory: ${{ env.CREATED_PROJECT_PATH }}
+        if: ${{ matrix.inputHandler != '0' }}
 
       - name: Install codecoverage package
         run: |
@@ -118,7 +129,7 @@ jobs:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
-          checkName: test result (${{ matrix.unityVersion }}, ${{ matrix.testMode }})
+          checkName: test result (${{ matrix.unityVersion }}, ${{ matrix.testMode }}, ${{ matrix.inputHandler }})
           projectPath: ${{ env.CREATED_PROJECT_PATH }}
           customParameters: -testCategory "!IgnoreCI" -testHelperScreenshotDirectory /github/workspace/artifacts/Screenshots
           # Note: `/github/workspace/artifacts` is the artifacts path inside the game-ci container
@@ -146,7 +157,7 @@ jobs:
       - name: Upload test results
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: TestResults-Unity${{ matrix.unityVersion }}-${{ matrix.testMode }}
+          name: TestResults-Unity${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.inputHandler }}
           path: |
             ${{ steps.test.outputs.artifactsPath }}
             ${{ steps.test.outputs.coveragePath }}
