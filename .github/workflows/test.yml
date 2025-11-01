@@ -54,13 +54,14 @@ jobs:
             testMode: Standalone  # run tests on player
 
     steps:
-      - name: Create project for tests
+      - name: Create project for test
         uses: nowsprinting/create-unity-project-action@e6a2ccac5eaa666d219b4bee94781bfb3b768c86 # v3
         with:
           project-path: .
           active-input-handler: 2 # both
 
-      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+      - name: Cache Library
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
           path: ${{ env.CREATED_PROJECT_PATH }}/Library
           key: Library-linux-${{ matrix.unityVersion }}-${{ github.ref }}
@@ -87,14 +88,19 @@ jobs:
         run: |
           npm install -g openupm-cli
           openupm add -f com.unity.test-framework@stable
-          openupm add -f com.unity.testtools.codecoverage
           openupm add -f com.unity.inputsystem@1.12.0 # latest for Unity 2019 LTS
           openupm add -f com.cysharp.unitask
           openupm add -f com.nowsprinting.test-helper
           openupm add -f com.nowsprinting.test-helper.random
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
 
-      - name: Import Samples~
+      - name: Install codecoverage package
+        run: |
+          openupm add -f com.unity.testtools.codecoverage
+        working-directory: ${{ env.CREATED_PROJECT_PATH }}
+        if: ${{ matrix.octocov }}
+
+      - name: Import Samples
         run: |
           mv ${{ env.PACKAGE_PATH }}/Samples~ ${{ env.CREATED_PROJECT_PATH }}/Assets/Samples
 
@@ -145,17 +151,3 @@ jobs:
             ${{ steps.test.outputs.artifactsPath }}
             ${{ steps.test.outputs.coveragePath }}
         if: always()
-
-  notify:
-    needs: test
-    if: github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      actions: read
-
-    steps:
-      - uses: Gamesight/slack-workflow-status@68bf00d0dbdbcb206c278399aa1ef6c14f74347a # v1.3.0
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
