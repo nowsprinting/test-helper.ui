@@ -80,7 +80,9 @@ namespace TestHelper.UI.Operators.Utils
             for (var i = 0; i < clickCount; i++)
             {
                 // Down
+                _eventData.SetStateToPointerDowning();
                 ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerDownHandler);
+                _eventData.SetStateToPointerDowned();
                 ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.initializePotentialDrag);
 
                 if (holdMillis > 0)

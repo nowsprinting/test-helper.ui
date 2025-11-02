@@ -86,9 +86,13 @@ namespace TestHelper.UI.Operators.Utils
             }
 
             // Begin drag
+            _eventData.SetStateToPointerDowning();
             ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerDownHandler);
+            _eventData.SetStateToPointerDowned();
+            _eventData.SetStateToBeginDrag();
             ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.initializePotentialDrag);
             ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.beginDragHandler);
+            _eventData.SetStateToDragging();
 
             _isDragging = true;
         }
@@ -123,17 +127,30 @@ namespace TestHelper.UI.Operators.Utils
                 if (distance < frameSpeed)
                 {
                     _eventData.position = destination;
+                    _eventData.delta = destination - currentPosition;
                     arrived = true;
                 }
+                else
+                {
+                    _eventData.delta = direction * frameSpeed;
+                    _eventData.position = currentPosition + _eventData.delta;
+                }
 
-                _eventData.position = currentPosition + direction * frameSpeed;
-
-#if ENABLE_UGUI2
                 if (TryGetGameObjectAtCurrentPosition(out var pointerGameObject))
                 {
+                    if (_eventData.pointerEnter != pointerGameObject)
+                    {
+                        // switch pointer enter object
+                        ExecuteEvents.ExecuteHierarchy(
+                            _eventData.pointerEnter, _eventData, ExecuteEvents.pointerExitHandler);
+                        _eventData.pointerEnter = pointerGameObject;
+                        ExecuteEvents.ExecuteHierarchy(
+                            pointerGameObject, _eventData, ExecuteEvents.pointerEnterHandler);
+                    }
+#if ENABLE_UGUI2
                     ExecuteEvents.ExecuteHierarchy(pointerGameObject, _eventData, ExecuteEvents.pointerMoveHandler);
-                }
 #endif
+                }
 
                 if (_gameObject == null)
                 {
@@ -191,8 +208,9 @@ namespace TestHelper.UI.Operators.Utils
             }
 
             // End drag
+            _eventData.SetStateToEndDrag();
             ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.endDragHandler);
-            ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerExitHandler);
+            ExecuteEvents.ExecuteHierarchy(_eventData.pointerEnter, _eventData, ExecuteEvents.pointerExitHandler);
 
             _isDragging = false;
         }
