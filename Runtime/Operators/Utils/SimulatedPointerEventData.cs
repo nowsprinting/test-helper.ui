@@ -124,16 +124,25 @@ namespace TestHelper.UI.Operators.Utils
 #endif
         }
 
+        /// <summary>
+        /// Transition state to the begin-drag.
+        /// </summary>
         public void SetStateToBeginDrag()
         {
             pointerDrag = pointerEnter;
         }
 
+        /// <summary>
+        /// Transition state to the after begin-drag.
+        /// </summary>
         public void SetStateToDragging()
         {
             dragging = true;
         }
 
+        /// <summary>
+        /// Transition state to the end-drag.
+        /// </summary>
         public void SetStateToEndDrag()
         {
             eligibleForClick = false;

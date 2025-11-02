@@ -130,20 +130,22 @@ namespace TestHelper.UI.Operators.Utils
                     _eventData.delta = destination - currentPosition;
                     arrived = true;
                 }
-
-                _eventData.delta = direction * frameSpeed;
-                _eventData.position = currentPosition + _eventData.delta;
+                else
+                {
+                    _eventData.delta = direction * frameSpeed;
+                    _eventData.position = currentPosition + _eventData.delta;
+                }
 
                 if (TryGetGameObjectAtCurrentPosition(out var pointerGameObject))
                 {
                     if (_eventData.pointerEnter != pointerGameObject)
                     {
                         // switch pointer enter object
-                        ExecuteEvents.ExecuteHierarchy(_eventData.pointerEnter, _eventData,
-                            ExecuteEvents.pointerExitHandler);
+                        ExecuteEvents.ExecuteHierarchy(
+                            _eventData.pointerEnter, _eventData, ExecuteEvents.pointerExitHandler);
                         _eventData.pointerEnter = pointerGameObject;
-                        ExecuteEvents.ExecuteHierarchy(pointerGameObject, _eventData,
-                            ExecuteEvents.pointerEnterHandler);
+                        ExecuteEvents.ExecuteHierarchy(
+                            pointerGameObject, _eventData, ExecuteEvents.pointerEnterHandler);
                     }
 #if ENABLE_UGUI2
                     ExecuteEvents.ExecuteHierarchy(pointerGameObject, _eventData, ExecuteEvents.pointerMoveHandler);
