@@ -59,8 +59,8 @@ namespace TestHelper.UI.Operators.Utils
             position = raycastResult.screenPosition;
             pressPosition = raycastResult.screenPosition;
 
-            // Set the initial state of the pointer-down event based on target GameObject
-            pointerPress = gameObject;
+            // Set the initial state of the pointer-enter event based on target GameObject
+            pointerEnter = gameObject;
 
             if (_deviceType == PointingDeviceType.TouchScreen)
             {
@@ -85,22 +85,43 @@ namespace TestHelper.UI.Operators.Utils
         }
 
         /// <summary>
-        /// Transition state to the click state.
+        /// Transition state to the pointer-down.
+        /// </summary>
+        public void SetStateToPointerDowning()
+        {
+            eligibleForClick = true;
+        }
+
+        /// <summary>
+        /// Transition state to the after pointer-down.
+        /// </summary>
+        public void SetStateToPointerDowned()
+        {
+            pointerPress = pointerEnter;
+#if UNITY_2020_3_OR_NEWER
+            pointerClick = pointerEnter;
+#endif
+        }
+
+        /// <summary>
+        /// Transition state to the click.
         /// </summary>
         public void SetStateToClicking()
         {
-#if UNITY_2020_3_OR_NEWER
-            pointerClick = pointerPress;
-#endif
             clickCount++;
         }
 
         /// <summary>
-        /// Transition state to the click state.
+        /// Transition state to the after click.
         /// </summary>
         public void SetStateToClicked()
         {
             clickTime = Time.unscaledTime;
+            eligibleForClick = false;
+            pointerPress = null;
+#if UNITY_2020_3_OR_NEWER
+            pointerClick = null;
+#endif
         }
     }
 }
