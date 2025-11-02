@@ -123,5 +123,27 @@ namespace TestHelper.UI.Operators.Utils
             pointerClick = null;
 #endif
         }
+
+        public void SetStateToBeginDrag()
+        {
+            pointerDrag = pointerEnter;
+        }
+
+        public void SetStateToDragging()
+        {
+            dragging = true;
+        }
+
+        public void SetStateToEndDrag()
+        {
+            eligibleForClick = false;
+            pointerPress = null;
+#if UNITY_2020_3_OR_NEWER
+            pointerClick = null;
+#endif
+            pointerDrag = null;
+            delta = Vector2.zero;
+            // Note: `dragging` is still true here
+        }
     }
 }
