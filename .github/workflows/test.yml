@@ -80,7 +80,7 @@ jobs:
           lfs: false
           path: ${{ env.PACKAGE_PATH }}
 
-      - name: Cache the Library
+      - name: Restore cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
           path: ${{ env.CREATED_PROJECT_PATH }}/Library
@@ -105,6 +105,13 @@ jobs:
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
         if: ${{ matrix.octocov }}
 
+      - name: Set coverage assembly filters
+        run: |
+          assemblies=$(find ${{ env.PACKAGE_PATH }} -name "*.asmdef" | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//)
+          # shellcheck disable=SC2001,SC2048,SC2086
+          echo "assembly_filters=$(echo ${assemblies[*]} | sed -e s/\ /,/g),+<assets>,-*.Tests" >> "$GITHUB_ENV"
+        if: ${{ matrix.octocov }}
+
       - name: Install inputsystem package
         run: |
           openupm add -f com.unity.inputsystem@1.12.0 # latest for Unity 2019 LTS
@@ -114,12 +121,6 @@ jobs:
       - name: Import Samples
         run: |
           mv ${{ env.PACKAGE_PATH }}/Samples~ ${{ env.CREATED_PROJECT_PATH }}/Assets/Samples
-
-      - name: Set coverage assembly filters
-        run: |
-          assemblies=$(find ${{ env.PACKAGE_PATH }} -name "*.asmdef" | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//)
-          # shellcheck disable=SC2001,SC2048,SC2086
-          echo "assembly_filters=$(echo ${assemblies[*]} | sed -e s/\ /,/g),+<assets>,-*.Tests" >> "$GITHUB_ENV"
 
       - name: Set license secret key
         run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_ENV"
