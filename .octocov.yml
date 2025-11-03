@@ -9,9 +9,11 @@ codeToTestRatio:
     - '**/*.cs'
     - '!**/Tests/**'
     - '!UnityProject~/Library/**'
+    - '!Library/**'
   test:
     - '**/Tests/**/*.cs'
     - '!UnityProject~/Library/**'
+    - '!Library/**'
 
 testExecutionTime:
   if: true
