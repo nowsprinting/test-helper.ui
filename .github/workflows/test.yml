@@ -66,16 +66,6 @@ jobs:
           project-path: .
           active-input-handler: ${{ matrix.inputHandler }}
 
-      - name: Cache Library
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
-        with:
-          path: ${{ env.CREATED_PROJECT_PATH }}/Library
-          key: Library-linux-${{ matrix.unityVersion }}-${{ github.ref }}
-          restore-keys: |
-            Library-linux-${{ matrix.unityVersion }}
-            Library-linux
-            Library
-
       - name: Get package checkout path
         run: |
           name=com.$(echo "${GITHUB_REPOSITORY}" | sed 's/\//\./g')
@@ -89,6 +79,16 @@ jobs:
           submodules: false
           lfs: false
           path: ${{ env.PACKAGE_PATH }}
+
+      - name: Cache the Library
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ${{ env.CREATED_PROJECT_PATH }}/Library
+          key: Library-${{ runner.os }}-${{ matrix.unityVersion }}-${{ hashFiles(format('{0}/package.json', env.PACKAGE_PATH)) }}
+          restore-keys: |
+            Library-${{ runner.os }}-${{ matrix.unityVersion }}-
+            Library-${{ runner.os }}-
+            Library-
 
       - name: Install dependent UPM packages
         run: |
