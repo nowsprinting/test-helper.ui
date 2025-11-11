@@ -99,6 +99,12 @@ jobs:
           openupm add -f com.nowsprinting.test-helper.random
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
 
+      - name: Install inputsystem package
+        run: |
+          openupm add -f com.unity.inputsystem@1.12.0 # latest for Unity 2019 LTS
+        working-directory: ${{ env.CREATED_PROJECT_PATH }}
+        if: ${{ matrix.inputHandler != '0' }}
+
       - name: Install codecoverage package
         run: |
           openupm add -f com.unity.testtools.codecoverage
@@ -112,12 +118,6 @@ jobs:
           echo "assembly_filters=$(echo ${assemblies[*]} | sed -e s/\ /,/g),+<assets>,-*.Tests" >> "$GITHUB_ENV"
         if: ${{ matrix.octocov }}
 
-      - name: Install inputsystem package
-        run: |
-          openupm add -f com.unity.inputsystem@1.12.0 # latest for Unity 2019 LTS
-        working-directory: ${{ env.CREATED_PROJECT_PATH }}
-        if: ${{ matrix.inputHandler != '0' }}
-
       - name: Import Samples
         run: |
           mv ${{ env.PACKAGE_PATH }}/Samples~ ${{ env.CREATED_PROJECT_PATH }}/Assets/Samples
@@ -130,7 +130,7 @@ jobs:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
-          checkName: test result (${{ matrix.unityVersion }}, ${{ matrix.testMode }}, ${{ matrix.inputHandler }})
+          checkName: test (${{ matrix.unityVersion }}, ${{ matrix.testMode }}, ${{ matrix.inputHandler }})
           projectPath: ${{ env.CREATED_PROJECT_PATH }}
           customParameters: -testCategory "!IgnoreCI" -testHelperScreenshotDirectory /github/workspace/artifacts/Screenshots
           # Note: `/github/workspace/artifacts` is the artifacts path inside the game-ci container
