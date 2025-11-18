@@ -12,7 +12,6 @@ using TestHelper.UI.Paginators;
 using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -46,8 +45,11 @@ namespace TestHelper.UI
             Func<Component, bool> isInteractable = null,
             IVisualizer visualizer = null)
         {
-            Assert.IsTrue(timeoutSeconds > MinTimeoutSeconds,
-                $"TimeoutSeconds must be greater than {MinTimeoutSeconds}.");
+            if (timeoutSeconds < MinTimeoutSeconds)
+            {
+                throw new ArgumentException(
+                    $"Must be greater than or equal to {MinTimeoutSeconds}.", nameof(timeoutSeconds));
+            }
 
             _timeoutSeconds = timeoutSeconds;
             _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy();
@@ -225,14 +227,16 @@ namespace TestHelper.UI
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="paginator">Pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).</param>
+        /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appears. This parameter is respected over the same-name constructor argument. If omitted, use the constructor argument value.</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
         public async UniTask<GameObjectFinderResult> FindByMatcherAsync(IGameObjectMatcher matcher,
-            bool reachable = true, bool interactable = false, IPaginator paginator = null,
+            bool reachable = true, bool interactable = false, IPaginator paginator = null, float timeoutSeconds = 0,
             CancellationToken cancellationToken = default)
         {
-            var timeoutTime = Time.realtimeSinceStartup + (float)_timeoutSeconds;
+            var timeoutTime = Time.realtimeSinceStartup +
+                              (timeoutSeconds > 0 ? timeoutSeconds : (float)_timeoutSeconds);
             var delaySeconds = MinTimeoutSeconds;
             var reason = Reason.None;
 
@@ -285,14 +289,17 @@ namespace TestHelper.UI
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="paginator">Pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).</param>
+        /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appears. This parameter is respected over the same-name constructor argument. If omitted, use the constructor argument value.</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
         public async UniTask<GameObjectFinderResult> FindByNameAsync(string name, bool reachable = true,
-            bool interactable = false, IPaginator paginator = null, CancellationToken cancellationToken = default)
+            bool interactable = false, IPaginator paginator = null, float timeoutSeconds = 0,
+            CancellationToken cancellationToken = default)
         {
             var matcher = new NameMatcher(name);
-            return await FindByMatcherAsync(matcher, reachable, interactable, paginator, cancellationToken);
+            return await FindByMatcherAsync(matcher, reachable, interactable, paginator, timeoutSeconds,
+                cancellationToken);
         }
 
         /// <summary>
@@ -302,15 +309,18 @@ namespace TestHelper.UI
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="paginator">Pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).</param>
+        /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appears. This parameter is respected over the same-name constructor argument. If omitted, use the constructor argument value.</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
         public async UniTask<GameObjectFinderResult> FindByPathAsync(string path, bool reachable = true,
-            bool interactable = false, IPaginator paginator = null, CancellationToken cancellationToken = default)
+            bool interactable = false, IPaginator paginator = null, float timeoutSeconds = 0,
+            CancellationToken cancellationToken = default)
         {
             var matcher = new PathMatcher(path);
-            return await FindByMatcherAsync(matcher, reachable, interactable, paginator, cancellationToken);
+            return await FindByMatcherAsync(matcher, reachable, interactable, paginator, timeoutSeconds,
+                cancellationToken);
         }
     }
 }
