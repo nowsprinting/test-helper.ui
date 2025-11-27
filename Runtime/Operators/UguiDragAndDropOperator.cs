@@ -190,8 +190,7 @@ namespace TestHelper.UI.Operators
         public UniTask OperateAsync(GameObject gameObject, GameObject destination,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
-            var destinationPoint = GetScreenPoint.Invoke(destination);
-            return OperateAsync(gameObject, destinationPoint, raycastResult, cancellationToken);
+            return OperateAsync(gameObject, destination, 0, raycastResult, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -199,7 +198,30 @@ namespace TestHelper.UI.Operators
         /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start dragging.
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+        public UniTask OperateAsync(GameObject gameObject, GameObject destination, int dragSpeed,
+            RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
+        {
+            var destinationPoint = GetScreenPoint.Invoke(destination);
+            return OperateAsync(gameObject, destinationPoint, dragSpeed, raycastResult, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start dragging.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
+        public UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+            RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
+        {
+            return OperateAsync(gameObject, destination, 0, raycastResult, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start dragging.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination, int dragSpeed,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
             if (raycastResult.gameObject == null)
@@ -207,9 +229,10 @@ namespace TestHelper.UI.Operators
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
+            var effectiveDragSpeed = dragSpeed > 0 ? dragSpeed : _dragSpeed;
             var canvas = gameObject.GetComponentInParent<Canvas>();
             var scaleFactor = canvas != null ? canvas.scaleFactor : 1f;
-            var scaledSpeed = (int)(_dragSpeed * scaleFactor);
+            var scaledSpeed = (int)(effectiveDragSpeed * scaleFactor);
 
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);

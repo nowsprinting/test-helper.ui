@@ -250,5 +250,23 @@ namespace TestHelper.UI.Operators
                 LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
             }
         }
+
+        [Test]
+        [CreateScene]
+        public async Task OperateAsync_WithHoldMillis_RespectMethodArgument()
+        {
+            const int ConstructorHoldMillis = 1000;
+            const int MethodHoldMillis = 100;
+
+            var gameObject = new GameObject("ClickAndHoldTarget", typeof(SpyOnPointerDownHandler),
+                typeof(SpyOnPointerUpHandler));
+            var sut = new UguiClickAndHoldOperator(holdMillis: ConstructorHoldMillis);
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await sut.OperateAsync(gameObject, MethodHoldMillis);
+            stopwatch.Stop();
+
+            Assert.That(stopwatch.ElapsedMilliseconds, Is.LessThan(ConstructorHoldMillis));
+        }
     }
 }
