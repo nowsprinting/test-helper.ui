@@ -468,11 +468,6 @@ namespace TestHelper.UI.Operators
             const int MethodScrollSpeed = 10000;
             const int Distance = 300;
 
-            var viewport = _scrollView.transform.Find("Viewport");
-            var content = viewport.Find("Content");
-            var rectTransform = content.GetComponent<RectTransform>();
-            var beforePosition = rectTransform.position;
-
             var sut = new UguiScrollWheelOperator(scrollSpeed: ConstructorScrollSpeed);
 
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
