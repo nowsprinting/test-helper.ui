@@ -41,21 +41,21 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
-          - 2019.4.40f1
-          - 2022.3.62f1
-          - 6000.0.58f1
-          - 6000.2.6f1
+          - 2019.4.41f2
+          - 2022.3.70f1
+          - 6000.0.64f1
+          - 6000.3.2f1
         testMode:
           - All # run tests in editor
         inputHandler:
           - '2' # both
         include:
-          - unityVersion: 6000.2.6f1
+          - unityVersion: 6000.3.2f1
             octocov: true
-          - unityVersion: 6000.2.6f1
+          - unityVersion: 6000.3.2f1
             testMode: PlayMode
             inputHandler: '0' # legacy only
-          - unityVersion: 6000.2.6f1
+          - unityVersion: 6000.3.2f1
             testMode: Standalone  # run tests on player
             inputHandler: '2'
 
