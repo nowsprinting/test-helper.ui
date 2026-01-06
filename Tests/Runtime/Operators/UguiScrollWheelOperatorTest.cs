@@ -459,5 +459,27 @@ namespace TestHelper.UI.Operators
 
             Assert.That(path, Does.Exist);
         }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithScrollSpeedMethodArgument_RespectMethodArgument()
+        {
+            const int ConstructorScrollSpeed = 100;
+            const int MethodScrollSpeed = 10000;
+            const int Distance = 300;
+
+            var sut = new UguiScrollWheelOperator(scrollSpeed: ConstructorScrollSpeed);
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await sut.OperateAsync(_scrollView, Vector2.up, Distance, MethodScrollSpeed);
+            stopwatch.Stop();
+
+            Centering(_scrollView);
+            var slowStopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await sut.OperateAsync(_scrollView, Vector2.up, Distance);
+            slowStopwatch.Stop();
+
+            Assert.That(stopwatch.ElapsedMilliseconds, Is.LessThan(slowStopwatch.ElapsedMilliseconds));
+        }
     }
 }

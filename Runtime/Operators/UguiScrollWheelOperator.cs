@@ -167,7 +167,18 @@ namespace TestHelper.UI.Operators
         /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance,
+        public UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance,
+            RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
+        {
+            return OperateAsync(gameObject, direction, distance, 0, raycastResult, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance, int scrollSpeed,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
             // Validate parameters
@@ -181,6 +192,8 @@ namespace TestHelper.UI.Operators
                 throw new ArgumentException("Distance must be positive", nameof(distance));
             }
 
+            var effectiveScrollSpeed = scrollSpeed > 0 ? scrollSpeed : _scrollSpeed;
+
             // Log direction and distance
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("direction", direction);
@@ -192,7 +205,7 @@ namespace TestHelper.UI.Operators
             var destination = flipped.normalized * distance;
 
             // Call the common implementation
-            await OperateAsyncCore(gameObject, destination, raycastResult, cancellationToken);
+            await OperateAsyncCore(gameObject, destination, effectiveScrollSpeed, raycastResult, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -201,24 +214,26 @@ namespace TestHelper.UI.Operators
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
         [Obsolete("Use OperateAsync with direction and distance parameters instead.")]
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+        public UniTask OperateAsync(GameObject gameObject, Vector2 destination,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
-            // Log destination
-            var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
-            operationLogger.Properties.Add("destination", destination);
-            await operationLogger.Log();
-
-            // Call the common implementation
-            await OperateAsyncCore(gameObject, destination, raycastResult, cancellationToken);
+            return OperateAsyncCore(gameObject, destination, _scrollSpeed, raycastResult, cancellationToken, true);
         }
 
-        private async UniTask OperateAsyncCore(GameObject gameObject, Vector2 destination,
-            RaycastResult raycastResult, CancellationToken cancellationToken)
+        private async UniTask OperateAsyncCore(GameObject gameObject, Vector2 destination, int scrollSpeed,
+            RaycastResult raycastResult, CancellationToken cancellationToken, bool logDestination = false)
         {
             if (raycastResult.gameObject == null)
             {
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
+            }
+
+            if (logDestination)
+            {
+                // Log destination (for obsolete methods)
+                var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
+                operationLogger.Properties.Add("destination", destination);
+                await operationLogger.Log();
             }
 
             // Send pointer enter event
@@ -234,7 +249,7 @@ namespace TestHelper.UI.Operators
 
             while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
             {
-                var frameSpeed = _scrollSpeed * Time.deltaTime;
+                var frameSpeed = scrollSpeed * Time.deltaTime;
                 var scrollDelta = direction * Mathf.Min(frameSpeed, remainingDistance);
                 pointerEventData.scrollDelta = scrollDelta;
 

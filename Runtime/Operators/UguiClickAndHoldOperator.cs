@@ -65,10 +65,23 @@ namespace TestHelper.UI.Operators
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
+            await OperateAsync(gameObject, 0, raycastResult, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be clicked.
+        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
+        /// </remarks>
+        public async UniTask OperateAsync(GameObject gameObject, int holdMillis, RaycastResult raycastResult = default,
+            CancellationToken cancellationToken = default)
+        {
             if (raycastResult.gameObject == null)
             {
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
+
+            var effectiveHoldMillis = holdMillis > 0 ? holdMillis : _holdMillis;
 
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
@@ -78,7 +91,7 @@ namespace TestHelper.UI.Operators
             // Do operation
             using (var pointerClickSimulator = new PointerClickEventSimulator(gameObject, raycastResult, Logger))
             {
-                await pointerClickSimulator.PointerClickAsync(_holdMillis, cancellationToken: cancellationToken);
+                await pointerClickSimulator.PointerClickAsync(effectiveHoldMillis, cancellationToken: cancellationToken);
             }
         }
     }
