@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Diagnostics.CodeAnalysis;
@@ -11,6 +11,12 @@ namespace TestHelper.UI.Operators.Utils
     [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP017:Prefer using")]
     public class SimulatedPointerEventDataTest
     {
+        [SetUp]
+        public void SetUp()
+        {
+            FingerPool.Instance.Reset();
+        }
+
         [Test]
         [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
         public void Constructor_WithoutPointingDeviceTypeInEditor_AsMouse()
@@ -45,17 +51,24 @@ namespace TestHelper.UI.Operators.Utils
         }
 
         [Test]
-        public void Dispose_WithTouchScreen_DecrementTouchCount()
+        public void Constructor_WithTouchScreen_ReuseReleasedPointerId()
         {
-            var firstTouch = new SimulatedPointerEventData(null, default,
+            var finger0 = new SimulatedPointerEventData(null, default,
                 SimulatedPointerEventData.PointingDeviceType.TouchScreen);
-            Assume.That(firstTouch.pointerId, Is.EqualTo(0));
-            firstTouch.Dispose();
+            Assume.That(finger0.pointerId, Is.EqualTo(0));
 
-            var secondTouch = new SimulatedPointerEventData(null, default,
+            var finger1 = new SimulatedPointerEventData(null, default,
                 SimulatedPointerEventData.PointingDeviceType.TouchScreen);
-            Assert.That(secondTouch.pointerId, Is.EqualTo(0));
-            secondTouch.Dispose();
+            Assume.That(finger1.pointerId, Is.EqualTo(1));
+
+            finger0.Dispose();
+
+            var finger2 = new SimulatedPointerEventData(null, default,
+                SimulatedPointerEventData.PointingDeviceType.TouchScreen);
+            Assert.That(finger2.pointerId, Is.EqualTo(0));
+
+            finger1.Dispose();
+            finger2.Dispose();
         }
     }
 }

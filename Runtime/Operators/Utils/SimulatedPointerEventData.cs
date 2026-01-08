@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -20,8 +20,6 @@ namespace TestHelper.UI.Operators.Utils
         }
 
         private readonly PointingDeviceType _deviceType; // Mouse or TouchScreen
-
-        private static int s_touchCount; // Touchscreen touches go from 0
 
         /// <summary>
         /// Constructor for pointer-down state.
@@ -64,7 +62,7 @@ namespace TestHelper.UI.Operators.Utils
 
             if (_deviceType == PointingDeviceType.TouchScreen)
             {
-                pointerId = s_touchCount++; // Touchscreen touches go from 0
+                pointerId = FingerPool.Instance.Acquire();
             }
             else
             {
@@ -80,7 +78,7 @@ namespace TestHelper.UI.Operators.Utils
         {
             if (_deviceType == PointingDeviceType.TouchScreen)
             {
-                s_touchCount--;
+                FingerPool.Instance.Release(pointerId);
             }
         }
 
