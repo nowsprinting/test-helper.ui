@@ -67,5 +67,32 @@ namespace TestHelper.UI.Operators.Utils
 
             Assert.That(actual, Is.EqualTo(1));
         }
+
+        [Test]
+        public void Acquire_AfterReleaseLastId_ReusesSameId()
+        {
+            var id0 = FingerPool.Instance.Acquire();
+            var id1 = FingerPool.Instance.Acquire();
+            FingerPool.Instance.Release(id1);
+
+            var actual = FingerPool.Instance.Acquire();
+
+            Assert.That(actual, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Acquire_AfterReleaseMultipleIds_ReturnsSmallestId()
+        {
+            FingerPool.Instance.Acquire(); // 0
+            FingerPool.Instance.Acquire(); // 1
+            FingerPool.Instance.Acquire(); // 2
+            FingerPool.Instance.Acquire(); // 3
+            FingerPool.Instance.Release(2);
+            FingerPool.Instance.Release(1);
+
+            var actual = FingerPool.Instance.Acquire();
+
+            Assert.That(actual, Is.EqualTo(1));
+        }
     }
 }
