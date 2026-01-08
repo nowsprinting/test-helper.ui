@@ -47,10 +47,21 @@ namespace TestHelper.UI.Operators.Utils
         [Test]
         public void Acquire_AfterReleaseMiddleId_ReusesReleasedId()
         {
-            FingerPool.Instance.Acquire();
+            var id0 = FingerPool.Instance.Acquire();
             var id1 = FingerPool.Instance.Acquire();
-            FingerPool.Instance.Acquire();
+            var id2 = FingerPool.Instance.Acquire();
             FingerPool.Instance.Release(id1);
+
+            var actual = FingerPool.Instance.Acquire();
+
+            Assert.That(actual, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Release_NotAcquiredId_DoesNotAffectPool()
+        {
+            var id0 = FingerPool.Instance.Acquire();
+            FingerPool.Instance.Release(999); // no error should occur
 
             var actual = FingerPool.Instance.Acquire();
 
