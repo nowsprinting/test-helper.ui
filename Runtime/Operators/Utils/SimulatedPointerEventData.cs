@@ -1,9 +1,12 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace TestHelper.UI.Operators.Utils
 {
@@ -21,8 +24,6 @@ namespace TestHelper.UI.Operators.Utils
 
         private readonly PointingDeviceType _deviceType; // Mouse or TouchScreen
 
-        private static int s_touchCount; // Touchscreen touches go from 0
-
         /// <summary>
         /// Constructor for pointer-down state.
         /// </summary>
@@ -38,10 +39,10 @@ namespace TestHelper.UI.Operators.Utils
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (deviceType == PointingDeviceType.Auto)
             {
-#if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
-                _deviceType = PointingDeviceType.TouchScreen;
+#if ENABLE_INPUT_SYSTEM
+                _deviceType = Touchscreen.current != null ? PointingDeviceType.TouchScreen : PointingDeviceType.Mouse;
 #else
-                _deviceType = PointingDeviceType.Mouse;
+                _deviceType = Input.touchSupported ? PointingDeviceType.TouchScreen : PointingDeviceType.Mouse;
 #endif
             }
             else
@@ -64,7 +65,7 @@ namespace TestHelper.UI.Operators.Utils
 
             if (_deviceType == PointingDeviceType.TouchScreen)
             {
-                pointerId = s_touchCount++; // Touchscreen touches go from 0
+                pointerId = FingerPool.Instance.Acquire();
             }
             else
             {
@@ -80,7 +81,7 @@ namespace TestHelper.UI.Operators.Utils
         {
             if (_deviceType == PointingDeviceType.TouchScreen)
             {
-                s_touchCount--;
+                FingerPool.Instance.Release(pointerId);
             }
         }
 
