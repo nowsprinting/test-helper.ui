@@ -52,12 +52,11 @@ jobs:
         include:
           - unityVersion: 6000.2.6f1
             octocov: true
-          - unityVersion: 6000.2.6f1
+          - unityVersion: 2022.3.62f1
             testMode: PlayMode
             inputHandler: '0' # legacy only
           - unityVersion: 6000.2.6f1
             testMode: Standalone  # run tests on player
-            inputHandler: '2'
 
     steps:
       - name: Create project for test
