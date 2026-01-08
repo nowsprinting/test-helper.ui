@@ -4,6 +4,9 @@
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace TestHelper.UI.Operators.Utils
 {
@@ -36,10 +39,10 @@ namespace TestHelper.UI.Operators.Utils
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (deviceType == PointingDeviceType.Auto)
             {
-#if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
-                _deviceType = PointingDeviceType.TouchScreen;
+#if ENABLE_INPUT_SYSTEM
+                _deviceType = Touchscreen.current != null ? PointingDeviceType.TouchScreen : PointingDeviceType.Mouse;
 #else
-                _deviceType = PointingDeviceType.Mouse;
+                _deviceType = Input.touchSupported ? PointingDeviceType.TouchScreen : PointingDeviceType.Mouse;
 #endif
             }
             else

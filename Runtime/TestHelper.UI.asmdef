@@ -6,7 +6,8 @@
         "TestHelper.RuntimeInternals",
         "TestHelper.Random",
         "UniTask",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
