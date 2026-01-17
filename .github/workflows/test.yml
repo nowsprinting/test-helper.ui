@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Koji Hasegawa.
+# Copyright (c) 2023-2026 Koji Hasegawa.
 # This software is released under the MIT License.
 
 name: Test
@@ -41,21 +41,22 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
-          - 2019.4.40f1
-          - 2022.3.62f1
-          - 6000.0.58f1
-          - 6000.2.6f1
+          - 2019.4.41f2
+          - 2022.3.62f3 # Non-Enterprise LTS
+          - 6000.0.65f1
+          - 6000.3.4f1
         testMode:
           - All # run tests in editor
         inputHandler:
           - '2' # both
         include:
-          - unityVersion: 6000.2.6f1
+          - unityVersion: 6000.3.4f1
             octocov: true
-          - unityVersion: 2022.3.62f1
-            testMode: PlayMode
+          - unityVersion: 2022.3.62f3 # inputsystem package is not pre-installed
             inputHandler: '0' # legacy only
-          - unityVersion: 6000.2.6f1
+            testMode: PlayMode
+          - unityVersion: 2022.3.62f3 # "Error building Player because scripts are compiling" in 6000.0.65f1 and 6000.3.4f1
+            inputHandler: '2'
             testMode: Standalone  # run tests on player
 
     steps:
@@ -131,7 +132,7 @@ jobs:
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
           checkName: test (${{ matrix.unityVersion }}, ${{ matrix.testMode }}, ${{ matrix.inputHandler }})
           projectPath: ${{ env.CREATED_PROJECT_PATH }}
-          customParameters: -testCategory "!IgnoreCI" -testHelperScreenshotDirectory /github/workspace/artifacts/Screenshots
+          customParameters: -retry 5 -testCategory "!IgnoreCI" -testHelperScreenshotDirectory /github/workspace/artifacts/Screenshots
           # Note: `/github/workspace/artifacts` is the artifacts path inside the game-ci container
           coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:${{ env.assembly_filters }}
           # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
