@@ -2,8 +2,10 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.RuntimeInternals;
@@ -240,6 +242,22 @@ namespace TestHelper.UI
                 var matcher = new ToggleMatcher(text: text);
                 var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
                 Assert.That(result.GameObject.transform.GetPath(), Is.EqualTo(expectedPath));
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_WithTimeoutSeconds_RespectMethodArgument()
+            {
+                var wall = await _sut.FindByNameAsync("Wall");
+
+                const string BehindTheWall = "BehindTheWall";
+                var task = _sut.FindByNameAsync(BehindTheWall, timeoutSeconds: 0.5f);
+
+                await UniTask.Delay(100);         // _sut timeout is 100ms
+                wall.GameObject.SetActive(false); // Remove blocker
+
+                var result = await task;
+                Assert.That(result.GameObject.name, Is.EqualTo(BehindTheWall));
             }
         }
 
@@ -630,6 +648,14 @@ namespace TestHelper.UI
                 await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
                 Assert.That(indicator, Is.Destroyed);
             }
+        }
+
+        [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public void Constructor_TimeoutSecondsUnderThreshold_ThrowsArgumentException()
+        {
+            Assert.That(() => { new GameObjectFinder(0.009d); }, Throws.TypeOf<ArgumentException>()
+                .And.Message.EqualTo("Must be greater than or equal to 0.01.\nParameter name: timeoutSeconds"));
         }
     }
 }

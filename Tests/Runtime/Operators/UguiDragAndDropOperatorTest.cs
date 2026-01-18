@@ -314,6 +314,34 @@ namespace TestHelper.UI.Operators
             Assert.That(dropHandler.WasDrop, Is.True);
         }
 
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithDragSpeed_RespectMethodArgument()
+        {
+            const int ConstructorDragSpeed = 100;
+            const int MethodDragSpeed = 10000;
+
+            var dragHandler = CreateSpyDragHandler();
+            var dropHandler = CreateSpyDropHandler();
+
+            await UniTask.NextFrame();
+
+            var sut = new UguiDragAndDropOperator(dragSpeed: ConstructorDragSpeed);
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject, MethodDragSpeed);
+            stopwatch.Stop();
+
+            var slowSut = new UguiDragAndDropOperator(dragSpeed: ConstructorDragSpeed);
+            var slowDragHandler = CreateSpyDragHandler();
+
+            var slowStopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await slowSut.OperateAsync(slowDragHandler.gameObject, dropHandler.gameObject);
+            slowStopwatch.Stop();
+
+            Assert.That(stopwatch.ElapsedMilliseconds, Is.LessThan(slowStopwatch.ElapsedMilliseconds));
+        }
+
         private class FakeDragHandler : MonoBehaviour, IDragHandler
         {
             public void OnDrag(PointerEventData eventData) { }
