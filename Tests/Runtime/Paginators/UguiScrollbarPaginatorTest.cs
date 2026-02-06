@@ -65,8 +65,9 @@ namespace TestHelper.UI.Paginators
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 0.5f;
-            var sut = new UguiScrollbarPaginator(scrollbar);
+            await Task.Yield();
 
+            var sut = new UguiScrollbarPaginator(scrollbar);
             await sut.ResetAsync();
 
             Assert.That(scrollbar.value, Is.EqualTo(0f));
@@ -78,6 +79,8 @@ namespace TestHelper.UI.Paginators
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 0f;
+            await Task.Yield();
+
             var sut = new UguiScrollbarPaginator(scrollbar);
             var beforeValue = scrollbar.value;
 
@@ -93,8 +96,9 @@ namespace TestHelper.UI.Paginators
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 1f;
-            var sut = new UguiScrollbarPaginator(scrollbar);
+            await Task.Yield();
 
+            var sut = new UguiScrollbarPaginator(scrollbar);
             var actual = await sut.NextPageAsync();
 
             Assert.That(actual, Is.False);
@@ -107,8 +111,9 @@ namespace TestHelper.UI.Paginators
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 1.0f - float.Epsilon;
-            var sut = new UguiScrollbarPaginator(scrollbar);
+            await Task.Yield();
 
+            var sut = new UguiScrollbarPaginator(scrollbar);
             var actual = await sut.NextPageAsync();
 
             Assert.That(actual, Is.False);
@@ -121,8 +126,9 @@ namespace TestHelper.UI.Paginators
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 0f;
             scrollbar.size = 0.3f; // 30% of total content
-            var sut = new UguiScrollbarPaginator(scrollbar);
+            await Task.Yield();
 
+            var sut = new UguiScrollbarPaginator(scrollbar);
             await sut.NextPageAsync();
 
             // Value increase should be based on scrollbar.size
@@ -131,12 +137,13 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public void HasNextPage_AtStart_ReturnsTrue()
+        public async Task HasNextPage_AtStart_ReturnsTrue()
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 0f;
-            var sut = new UguiScrollbarPaginator(scrollbar);
+            await Task.Yield();
 
+            var sut = new UguiScrollbarPaginator(scrollbar);
             var actual = sut.HasNextPage();
 
             Assert.That(actual, Is.True);
@@ -144,12 +151,13 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public void HasNextPage_AtMiddle_ReturnsTrue()
+        public async Task HasNextPage_AtMiddle_ReturnsTrue()
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 0.5f;
-            var sut = new UguiScrollbarPaginator(scrollbar);
+            await Task.Yield();
 
+            var sut = new UguiScrollbarPaginator(scrollbar);
             var actual = sut.HasNextPage();
 
             Assert.That(actual, Is.True);
@@ -157,12 +165,13 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public void HasNextPage_AtEnd_ReturnsFalse()
+        public async Task HasNextPage_AtEnd_ReturnsFalse()
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 1.0f;
-            var sut = new UguiScrollbarPaginator(scrollbar);
+            await Task.Yield();
 
+            var sut = new UguiScrollbarPaginator(scrollbar);
             var actual = sut.HasNextPage();
 
             Assert.That(actual, Is.False);
@@ -170,12 +179,13 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public void HasNextPage_FloatingPointPrecisionAtEnd_ReturnsFalse()
+        public async Task HasNextPage_FloatingPointPrecisionAtEnd_ReturnsFalse()
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 1.0f - float.Epsilon;
-            var sut = new UguiScrollbarPaginator(scrollbar);
+            await Task.Yield();
 
+            var sut = new UguiScrollbarPaginator(scrollbar);
             var actual = sut.HasNextPage();
 
             Assert.That(actual, Is.False);
