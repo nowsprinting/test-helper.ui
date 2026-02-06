@@ -15,7 +15,7 @@ defaults:
 
 jobs:
   create-release-pr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     timeout-minutes: 5
     permissions:
       contents: write
