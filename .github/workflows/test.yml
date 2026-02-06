@@ -43,8 +43,8 @@ jobs:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.41f2
           - 2022.3.62f3 # Non-Enterprise LTS
-          - 6000.0.65f1
-          - &latest_unity_version 6000.3.4f1
+          - 6000.0.67f1
+          - &latest_unity_version 6000.3.7f1
         testMode:
           - All # run tests in editor
         inputHandler:
