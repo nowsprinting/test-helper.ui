@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Koji Hasegawa.
+# Copyright (c) 2023-2026 Koji Hasegawa.
 # This software is released under the MIT License.
 
 name: Lint workflow files
@@ -14,7 +14,7 @@ on:
     paths:
       - .github/workflows/**
 
-permissions: {}
+permissions: { }
 
 defaults:
   run:
@@ -26,24 +26,16 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: read
+      pull-requests: write
       actions: read
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-
-      - name: Lint workflow files
-        shell: bash
-        run: |
-          bash <(curl -LsS --retry 2 https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          ./actionlint -color
-
-      - uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
-          status: ${{ job.status }}
-          fields: repo,message,job,pullRequest
-          mention: here
-          if_mention: failure
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: failure() && github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
+          submodules: false
+          lfs: false
+
+      - uses: reviewdog/action-actionlint@e58ee9d111489c31395fbe4857b0be6e7635dbda # v1
+        with:
+          reporter: github-pr-review
+          fail_level: error
