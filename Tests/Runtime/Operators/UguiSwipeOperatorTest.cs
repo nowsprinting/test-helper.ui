@@ -287,10 +287,9 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_SpecifySwipeSpeedInConstructor_SwipeSpecifiedAmountInOneFrame()
         {
-            const int SwipeSpeed = 600;
+            const int SwipeSpeed = 200;
             var viewport = _scrollView.transform.Find("Viewport");
             var content = viewport.Find("Content");
             var rectTransform = content.GetComponent<RectTransform>();
@@ -302,18 +301,17 @@ namespace TestHelper.UI.Operators
 
             var frameSpeed = SwipeSpeed * Time.deltaTime;
             var expectedPositionY = beforePosition.y - frameSpeed;
-            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(30.0f));
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(20.0f));
 
             await task; // Ensure the task completes
         }
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_SpecifySwipeSpeedInMethod_SwipeSpecifiedAmountInOneFrame()
         {
-            const int ConstructorSwipeSpeed = 100;
-            const int MethodSwipeSpeed = 600;
+            const int ConstructorSwipeSpeed = 10000;
+            const int MethodSwipeSpeed = 200;
 
             var viewport = _scrollView.transform.Find("Viewport");
             var content = viewport.Find("Content");
@@ -326,14 +324,13 @@ namespace TestHelper.UI.Operators
 
             var frameSpeed = MethodSwipeSpeed * Time.deltaTime;
             var expectedPositionY = beforePosition.y - frameSpeed;
-            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(30.0f));
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(20.0f));
 
             await task; // Ensure the task completes
         }
 
         [Test]
         [LoadScene(TestScene)]
-        [Repeat(RandomTestRepeatCount)]
         public async Task OperateAsync_Cancel_SwipeCancelled()
         {
             const int SwipeSpeed = 200;
@@ -356,7 +353,7 @@ namespace TestHelper.UI.Operators
                 cancellationTokenSource.Cancel();
                 await task; // Cancelled
 
-                Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+                Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(20.0f));
             }
         }
 

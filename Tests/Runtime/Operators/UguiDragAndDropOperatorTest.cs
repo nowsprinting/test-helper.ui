@@ -318,7 +318,7 @@ namespace TestHelper.UI.Operators
         [LoadScene(TestScene)]
         public async Task OperateAsync_SpecifyDragSpeedInConstructor_DragSpecifiedAmountInOneFrame()
         {
-            const int DragSpeed = 600;
+            const int DragSpeed = 200;
 
             var dragHandler = CreateSpyDragHandler();
             var dropHandler = CreateSpyDropHandler();
@@ -342,8 +342,8 @@ namespace TestHelper.UI.Operators
         [LoadScene(TestScene)]
         public async Task OperateAsync_SpecifyDragSpeedInMethod_SwipeSpecifiedAmountInOneFrame()
         {
-            const int ConstructorDragSpeed = 100;
-            const int MethodDragSpeed = 600;
+            const int ConstructorDragSpeed = 10000;
+            const int MethodDragSpeed = 200;
 
             var dragHandler = CreateSpyDragHandler();
             var dropHandler = CreateSpyDropHandler();

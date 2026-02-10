@@ -245,7 +245,7 @@ namespace TestHelper.UI.Operators
         [LoadScene(TestScene)]
         public async Task OperateAsync_SpecifyScrollSpeedInMethod_ScrollSpecifiedAmountInOneFrame()
         {
-            const int ConstructorScrollSpeed = 100;
+            const int ConstructorScrollSpeed = 10000;
             const int MethodScrollSpeed = 300;
 
             var viewport = _scrollView.transform.Find("Viewport");
