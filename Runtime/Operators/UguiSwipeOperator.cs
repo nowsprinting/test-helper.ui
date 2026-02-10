@@ -23,9 +23,6 @@ namespace TestHelper.UI.Operators
     /// </remarks>
     public class UguiSwipeOperator : ISwipeOperator, IRandomizable, IScreenPointCustomizable
     {
-        private readonly int _swipeSpeed;
-        private readonly float _swipeDistance;
-
         /// <inheritdoc/>
         public ILogger Logger { private get; set; }
 
@@ -43,6 +40,9 @@ namespace TestHelper.UI.Operators
         }
 
         private IRandom _random;
+
+        private readonly int _swipeSpeed;
+        private readonly float _swipeDistance;
 
         /// <summary>
         /// Constructor.
@@ -114,7 +114,7 @@ namespace TestHelper.UI.Operators
             var direction = GenerateRandomSwipeDirection(gameObject);
 
             // Call the direction overload
-            await OperateAsync(gameObject, direction, raycastResult, cancellationToken);
+            await OperateAsync(gameObject, direction, _swipeSpeed, raycastResult, cancellationToken);
         }
 
         private Vector2 GenerateRandomSwipeDirection(GameObject gameObject)
@@ -166,13 +166,15 @@ namespace TestHelper.UI.Operators
         /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction,
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction, int swipeSpeed = 0,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
             if (direction == Vector2.zero)
             {
                 throw new ArgumentException("Direction must not be zero", nameof(direction));
             }
+
+            swipeSpeed = swipeSpeed > 0 ? swipeSpeed : _swipeSpeed;
 
             if (raycastResult.gameObject == null)
             {
@@ -191,7 +193,7 @@ namespace TestHelper.UI.Operators
             using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
             {
                 simulator.BeginDrag();
-                await simulator.DragAsync(destination, _swipeSpeed, cancellationToken);
+                await simulator.DragAsync(destination, swipeSpeed, cancellationToken);
                 simulator.EndDrag(out _, out _);
             }
         }

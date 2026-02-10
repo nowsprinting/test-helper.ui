@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -288,9 +288,9 @@ namespace TestHelper.UI.Operators
         [Test]
         [LoadScene(TestScene)]
         [Repeat(RandomTestRepeatCount)]
-        public async Task OperateAsync_SpecifySwipeSpeed_SwipeSpecifiedAmountInOneFrame()
+        public async Task OperateAsync_SpecifySwipeSpeedInConstructor_SwipeSpecifiedAmountInOneFrame()
         {
-            const int SwipeSpeed = 200;
+            const int SwipeSpeed = 600;
             var viewport = _scrollView.transform.Find("Viewport");
             var content = viewport.Find("Content");
             var rectTransform = content.GetComponent<RectTransform>();
@@ -301,6 +301,30 @@ namespace TestHelper.UI.Operators
             await UniTask.NextFrame();
 
             var frameSpeed = SwipeSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(30.0f));
+
+            await task; // Ensure the task completes
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Repeat(RandomTestRepeatCount)]
+        public async Task OperateAsync_SpecifySwipeSpeedInMethod_SwipeSpecifiedAmountInOneFrame()
+        {
+            const int ConstructorSwipeSpeed = 100;
+            const int MethodSwipeSpeed = 600;
+
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var rectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+
+            var sut = new UguiSwipeOperator(swipeSpeed: ConstructorSwipeSpeed);
+            var task = sut.OperateAsync(_scrollView, Vector2.up, MethodSwipeSpeed);
+            await UniTask.NextFrame();
+
+            var frameSpeed = MethodSwipeSpeed * Time.deltaTime;
             var expectedPositionY = beforePosition.y - frameSpeed;
             Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(30.0f));
 
