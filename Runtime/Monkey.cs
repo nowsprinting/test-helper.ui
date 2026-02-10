@@ -48,7 +48,9 @@ namespace TestHelper.UI
             var lastOperationTime = Time.realtimeSinceStartup;
 
             var beforeGizmos = false;
+#pragma warning disable CS0618 // Type or member is obsolete
             if (config.Gizmos)
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 beforeGizmos = GameViewControlHelper.GetGizmos();
                 GameViewControlHelper.SetGizmos(true);
@@ -114,7 +116,9 @@ namespace TestHelper.UI
             }
             finally
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (config.Gizmos)
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     GameViewControlHelper.SetGizmos(beforeGizmos);
                 }
