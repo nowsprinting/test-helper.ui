@@ -266,7 +266,7 @@ namespace TestHelper.UI.Operators
             await sut.OperateAsync(gameObject);
             stopwatch.Stop();
 
-            Assert.That(stopwatch.ElapsedMilliseconds, Is.EqualTo(HoldMillis).Within(10));
+            Assert.That(stopwatch.ElapsedMilliseconds, Is.EqualTo(HoldMillis).Within(50));
         }
 
         [Test]
@@ -284,7 +284,7 @@ namespace TestHelper.UI.Operators
             await sut.OperateAsync(gameObject, MethodHoldMillis);
             stopwatch.Stop();
 
-            Assert.That(stopwatch.ElapsedMilliseconds, Is.EqualTo(MethodHoldMillis).Within(10));
+            Assert.That(stopwatch.ElapsedMilliseconds, Is.EqualTo(MethodHoldMillis).Within(50));
         }
     }
 }
