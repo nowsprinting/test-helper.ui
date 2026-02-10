@@ -316,30 +316,51 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task OperateAsync_WithDragSpeed_RespectMethodArgument()
+        public async Task OperateAsync_SpecifyDragSpeedInConstructor_DragSpecifiedAmountInOneFrame()
         {
-            const int ConstructorDragSpeed = 100;
-            const int MethodDragSpeed = 10000;
+            const int DragSpeed = 600;
 
             var dragHandler = CreateSpyDragHandler();
             var dropHandler = CreateSpyDropHandler();
+            await UniTask.NextFrame(); // wait ready for raycaster
 
+            var rectTransform = dragHandler.gameObject.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+
+            var sut = new UguiDragAndDropOperator(dragSpeed: DragSpeed);
+            var task = sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject);
             await UniTask.NextFrame();
 
+            var frameSpeed = DragSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+
+            await task; // Ensure the task completes
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_SpecifyDragSpeedInMethod_SwipeSpecifiedAmountInOneFrame()
+        {
+            const int ConstructorDragSpeed = 100;
+            const int MethodDragSpeed = 600;
+
+            var dragHandler = CreateSpyDragHandler();
+            var dropHandler = CreateSpyDropHandler();
+            await UniTask.NextFrame(); // wait ready for raycaster
+
+            var rectTransform = dragHandler.gameObject.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+
             var sut = new UguiDragAndDropOperator(dragSpeed: ConstructorDragSpeed);
+            var task = sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject);
+            await UniTask.NextFrame();
 
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            await sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject, MethodDragSpeed);
-            stopwatch.Stop();
+            var frameSpeed = MethodDragSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
 
-            var slowSut = new UguiDragAndDropOperator(dragSpeed: ConstructorDragSpeed);
-            var slowDragHandler = CreateSpyDragHandler();
-
-            var slowStopwatch = System.Diagnostics.Stopwatch.StartNew();
-            await slowSut.OperateAsync(slowDragHandler.gameObject, dropHandler.gameObject);
-            slowStopwatch.Stop();
-
-            Assert.That(stopwatch.ElapsedMilliseconds, Is.LessThan(slowStopwatch.ElapsedMilliseconds));
+            await task; // Ensure the task completes
         }
 
         private class FakeDragHandler : MonoBehaviour, IDragHandler

@@ -105,7 +105,7 @@ namespace TestHelper.UI.Operators
             var distance = Random.Next(maxDistance / 2, maxDistance);
 
             // Call the direction/distance overload
-            await OperateAsync(gameObject, direction, distance, raycastResult, cancellationToken);
+            await OperateAsync(gameObject, direction, distance, _scrollSpeed, raycastResult, cancellationToken);
         }
 
         private Vector2 GenerateRandomScrollDirection(GameObject gameObject)
@@ -167,18 +167,7 @@ namespace TestHelper.UI.Operators
         /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
-        public UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance,
-            RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
-        {
-            return OperateAsync(gameObject, direction, distance, 0, raycastResult, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        /// <remarks>
-        /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
-        /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
-        /// </remarks>
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance, int scrollSpeed,
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance, int scrollSpeed = 0,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
             // Validate parameters
@@ -192,8 +181,6 @@ namespace TestHelper.UI.Operators
                 throw new ArgumentException("Distance must be positive", nameof(distance));
             }
 
-            var effectiveScrollSpeed = scrollSpeed > 0 ? scrollSpeed : _scrollSpeed;
-
             // Log direction and distance
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("direction", direction);
@@ -205,7 +192,7 @@ namespace TestHelper.UI.Operators
             var destination = flipped.normalized * distance;
 
             // Call the common implementation
-            await OperateAsyncCore(gameObject, destination, effectiveScrollSpeed, raycastResult, cancellationToken);
+            await OperateAsyncCore(gameObject, destination, scrollSpeed, raycastResult, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -214,10 +201,10 @@ namespace TestHelper.UI.Operators
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
         [Obsolete("Use OperateAsync with direction and distance parameters instead.")]
-        public UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+        public UniTask OperateAsync(GameObject gameObject, Vector2 destination, int scrollSpeed = 0,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
-            return OperateAsyncCore(gameObject, destination, _scrollSpeed, raycastResult, cancellationToken, true);
+            return OperateAsyncCore(gameObject, destination, scrollSpeed, raycastResult, cancellationToken, true);
         }
 
         private async UniTask OperateAsyncCore(GameObject gameObject, Vector2 destination, int scrollSpeed,
@@ -227,6 +214,7 @@ namespace TestHelper.UI.Operators
             {
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
+            scrollSpeed = scrollSpeed > 0 ? scrollSpeed : _scrollSpeed;
 
             if (logDestination)
             {
