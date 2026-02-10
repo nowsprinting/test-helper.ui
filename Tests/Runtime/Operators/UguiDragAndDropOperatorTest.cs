@@ -314,6 +314,55 @@ namespace TestHelper.UI.Operators
             Assert.That(dropHandler.WasDrop, Is.True);
         }
 
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_SpecifyDragSpeedInConstructor_DragSpecifiedAmountInOneFrame()
+        {
+            const int DragSpeed = 200;
+
+            var dragHandler = CreateSpyDragHandler();
+            var dropHandler = CreateSpyDropHandler();
+            await UniTask.NextFrame(); // wait ready for raycaster
+
+            var rectTransform = dragHandler.gameObject.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+
+            var sut = new UguiDragAndDropOperator(dragSpeed: DragSpeed);
+            var task = sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject);
+            await UniTask.NextFrame();
+
+            var frameSpeed = DragSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+
+            await task; // Ensure the task completes
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_SpecifyDragSpeedInMethod_DragSpecifiedAmountInOneFrame()
+        {
+            const int ConstructorDragSpeed = 10000;
+            const int MethodDragSpeed = 200;
+
+            var dragHandler = CreateSpyDragHandler();
+            var dropHandler = CreateSpyDropHandler();
+            await UniTask.NextFrame(); // wait ready for raycaster
+
+            var rectTransform = dragHandler.gameObject.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+
+            var sut = new UguiDragAndDropOperator(dragSpeed: ConstructorDragSpeed);
+            var task = sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject, dragSpeed: MethodDragSpeed);
+            await UniTask.NextFrame();
+
+            var frameSpeed = MethodDragSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+
+            await task; // Ensure the task completes
+        }
+
         private class FakeDragHandler : MonoBehaviour, IDragHandler
         {
             public void OnDrag(PointerEventData eventData) { }

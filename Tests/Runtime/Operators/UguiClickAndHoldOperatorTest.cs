@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -249,6 +250,41 @@ namespace TestHelper.UI.Operators
 
                 LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
             }
+        }
+
+        [Test]
+        [CreateScene]
+        public async Task OperateAsync_SpecifyHoldMillisInConstructor_RespectConstructorArgument()
+        {
+            const int HoldMillis = 100;
+
+            var gameObject = new GameObject("ClickAndHoldTarget", typeof(SpyOnPointerDownHandler),
+                typeof(SpyOnPointerUpHandler));
+            var sut = new UguiClickAndHoldOperator(holdMillis: HoldMillis);
+
+            var stopwatch = Stopwatch.StartNew();
+            await sut.OperateAsync(gameObject);
+            stopwatch.Stop();
+
+            Assert.That(stopwatch.ElapsedMilliseconds, Is.EqualTo(HoldMillis).Within(50));
+        }
+
+        [Test]
+        [CreateScene]
+        public async Task OperateAsync_SpecifyHoldMillisInMethod_RespectMethodArgument()
+        {
+            const int ConstructorHoldMillis = 1000;
+            const int MethodHoldMillis = 100;
+
+            var gameObject = new GameObject("ClickAndHoldTarget", typeof(SpyOnPointerDownHandler),
+                typeof(SpyOnPointerUpHandler));
+            var sut = new UguiClickAndHoldOperator(holdMillis: ConstructorHoldMillis);
+
+            var stopwatch = Stopwatch.StartNew();
+            await sut.OperateAsync(gameObject, MethodHoldMillis);
+            stopwatch.Stop();
+
+            Assert.That(stopwatch.ElapsedMilliseconds, Is.EqualTo(MethodHoldMillis).Within(50));
         }
     }
 }

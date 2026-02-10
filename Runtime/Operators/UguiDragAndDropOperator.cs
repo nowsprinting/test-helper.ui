@@ -134,18 +134,19 @@ namespace TestHelper.UI.Operators
             var dropAnnotation = LotteryComponent(dropAnnotations);
             if (dropAnnotation != null)
             {
-                return OperateAsync(gameObject, dropAnnotation.gameObject, raycastResult, cancellationToken);
+                return OperateAsync(gameObject, dropAnnotation.gameObject, _dragSpeed, raycastResult,
+                    cancellationToken);
             }
 
             var dropHandlers = InteractableComponentsFinder.FindEventHandlers<IDropHandler>().ToArray<Component>();
             var dropHandler = LotteryComponent(dropHandlers);
             if (dropHandler != null)
             {
-                return OperateAsync(gameObject, dropHandler.gameObject, raycastResult, cancellationToken);
+                return OperateAsync(gameObject, dropHandler.gameObject, _dragSpeed, raycastResult, cancellationToken);
             }
 
             var destination = Random.NextScreenPosition();
-            return OperateAsync(gameObject, destination, raycastResult, cancellationToken);
+            return OperateAsync(gameObject, destination, _dragSpeed, raycastResult, cancellationToken);
         }
 
         private static IEnumerable<DropAnnotation> FindDropAnnotations()
@@ -187,11 +188,11 @@ namespace TestHelper.UI.Operators
         /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start dragging.
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
-        public UniTask OperateAsync(GameObject gameObject, GameObject destination,
+        public UniTask OperateAsync(GameObject gameObject, GameObject destination, int dragSpeed = 0,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
             var destinationPoint = GetScreenPoint.Invoke(destination);
-            return OperateAsync(gameObject, destinationPoint, raycastResult, cancellationToken);
+            return OperateAsync(gameObject, destinationPoint, dragSpeed, raycastResult, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -199,9 +200,11 @@ namespace TestHelper.UI.Operators
         /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start dragging.
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination, int dragSpeed = 0,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
+            dragSpeed = dragSpeed > 0 ? dragSpeed : _dragSpeed;
+
             if (raycastResult.gameObject == null)
             {
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
@@ -217,7 +220,7 @@ namespace TestHelper.UI.Operators
             using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
             {
                 simulator.BeginDrag();
-                await simulator.DragAsync(destination, _dragSpeed, cancellationToken);
+                await simulator.DragAsync(destination, dragSpeed, cancellationToken);
 
                 // Wait for delay before drop
                 await UniTask.Delay(TimeSpan.FromSeconds(_delayBeforeDrop), ignoreTimeScale: true,

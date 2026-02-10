@@ -105,7 +105,7 @@ namespace TestHelper.UI.Operators
             var distance = Random.Next(maxDistance / 2, maxDistance);
 
             // Call the direction/distance overload
-            await OperateAsync(gameObject, direction, distance, raycastResult, cancellationToken);
+            await OperateAsync(gameObject, direction, distance, _scrollSpeed, raycastResult, cancellationToken);
         }
 
         private Vector2 GenerateRandomScrollDirection(GameObject gameObject)
@@ -167,7 +167,7 @@ namespace TestHelper.UI.Operators
         /// If <c>raycastResult</c> is omitted, the pivot position of the <c>gameObject</c> will be used to start scrolling.
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance,
+        public async UniTask OperateAsync(GameObject gameObject, Vector2 direction, int distance, int scrollSpeed = 0,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
             // Validate parameters
@@ -192,7 +192,7 @@ namespace TestHelper.UI.Operators
             var destination = flipped.normalized * distance;
 
             // Call the common implementation
-            await OperateAsyncCore(gameObject, destination, raycastResult, cancellationToken);
+            await OperateAsyncCore(gameObject, destination, scrollSpeed, raycastResult, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -201,24 +201,27 @@ namespace TestHelper.UI.Operators
         /// Screen position is calculated using the <c>getScreenPoint</c> function specified in the constructor.
         /// </remarks>
         [Obsolete("Use OperateAsync with direction and distance parameters instead.")]
-        public async UniTask OperateAsync(GameObject gameObject, Vector2 destination,
+        public UniTask OperateAsync(GameObject gameObject, Vector2 destination, int scrollSpeed = 0,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
-            // Log destination
-            var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
-            operationLogger.Properties.Add("destination", destination);
-            await operationLogger.Log();
-
-            // Call the common implementation
-            await OperateAsyncCore(gameObject, destination, raycastResult, cancellationToken);
+            return OperateAsyncCore(gameObject, destination, scrollSpeed, raycastResult, cancellationToken, true);
         }
 
-        private async UniTask OperateAsyncCore(GameObject gameObject, Vector2 destination,
-            RaycastResult raycastResult, CancellationToken cancellationToken)
+        private async UniTask OperateAsyncCore(GameObject gameObject, Vector2 destination, int scrollSpeed,
+            RaycastResult raycastResult, CancellationToken cancellationToken, bool logDestination = false)
         {
             if (raycastResult.gameObject == null)
             {
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
+            }
+            scrollSpeed = scrollSpeed > 0 ? scrollSpeed : _scrollSpeed;
+
+            if (logDestination)
+            {
+                // Log destination (for obsolete methods)
+                var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
+                operationLogger.Properties.Add("destination", destination);
+                await operationLogger.Log();
             }
 
             // Send pointer enter event
@@ -234,7 +237,7 @@ namespace TestHelper.UI.Operators
 
             while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
             {
-                var frameSpeed = _scrollSpeed * Time.deltaTime;
+                var frameSpeed = scrollSpeed * Time.deltaTime;
                 var scrollDelta = direction * Mathf.Min(frameSpeed, remainingDistance);
                 pointerEventData.scrollDelta = scrollDelta;
 

@@ -194,7 +194,7 @@ namespace TestHelper.UI.Operators
             try
             {
                 var sut = new UguiScrollWheelOperator();
-                await sut.OperateAsync(null, Vector2.zero, 300);
+                await sut.OperateAsync(null, Vector2.zero, distance: 300);
                 Assert.Fail("Expected exception was not thrown.");
             }
             catch (ArgumentException e)
@@ -210,7 +210,7 @@ namespace TestHelper.UI.Operators
             try
             {
                 var sut = new UguiScrollWheelOperator();
-                await sut.OperateAsync(null, Vector2.up, distance);
+                await sut.OperateAsync(null, Vector2.up, distance: distance);
                 Assert.Fail("Expected exception was not thrown.");
             }
             catch (ArgumentException e)
@@ -221,19 +221,43 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task OperateAsync_WithScrollSpeed_ScrollSpecifiedAmountInOneFrame()
+        public async Task OperateAsync_SpecifyScrollSpeedInConstructor_ScrollSpecifiedAmountInOneFrame()
         {
             const int ScrollSpeed = 300;
+
             var viewport = _scrollView.transform.Find("Viewport");
             var content = viewport.Find("Content");
             var rectTransform = content.GetComponent<RectTransform>();
             var beforePosition = rectTransform.position;
 
             var sut = new UguiScrollWheelOperator(ScrollSpeed);
-            var task = sut.OperateAsync(_scrollView, Vector2.up, 300);
+            var task = sut.OperateAsync(_scrollView, Vector2.up, distance: 300);
             await UniTask.NextFrame();
 
             var frameSpeed = ScrollSpeed * Time.deltaTime;
+            var expectedPositionY = beforePosition.y - frameSpeed;
+            Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
+
+            await task; // Ensure the task completes
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_SpecifyScrollSpeedInMethod_ScrollSpecifiedAmountInOneFrame()
+        {
+            const int ConstructorScrollSpeed = 10000;
+            const int MethodScrollSpeed = 300;
+
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var rectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = rectTransform.position;
+
+            var sut = new UguiScrollWheelOperator(ConstructorScrollSpeed);
+            var task = sut.OperateAsync(_scrollView, Vector2.up, distance: 300, scrollSpeed: MethodScrollSpeed);
+            await UniTask.NextFrame();
+
+            var frameSpeed = MethodScrollSpeed * Time.deltaTime;
             var expectedPositionY = beforePosition.y - frameSpeed;
             Assert.That(rectTransform.position.y, Is.EqualTo(expectedPositionY).Within(10.0f));
 
@@ -255,7 +279,8 @@ namespace TestHelper.UI.Operators
                 var cancellationToken = cancellationTokenSource.Token;
 
                 var sut = new UguiScrollWheelOperator(ScrollSpeed);
-                var task = sut.OperateAsync(_scrollView, Vector2.up, 300, cancellationToken: cancellationToken);
+                var task = sut.OperateAsync(_scrollView, Vector2.up, distance: 300,
+                    cancellationToken: cancellationToken);
                 await UniTask.NextFrame(cancellationToken);
 
                 var frameSpeed = ScrollSpeed * Time.deltaTime;
@@ -288,7 +313,7 @@ namespace TestHelper.UI.Operators
             var expectedPosition = beforePosition + new Vector3(expectedDelta.x, expectedDelta.y);
 
             var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView, direction, distance);
+            await sut.OperateAsync(_scrollView, direction, distance: distance);
 
             Assert.That(rectTransform.position, Is.EqualTo(expectedPosition).Using(Vector3EqualityComparer.Instance));
         }
@@ -300,7 +325,7 @@ namespace TestHelper.UI.Operators
             var spyEventHandler = _scrollView.AddComponent<SpyOnScrollHandler>();
 
             var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView, Vector2.up, 100);
+            await sut.OperateAsync(_scrollView, Vector2.up, distance: 100);
 
             Assert.That(spyEventHandler.WasScrolled, Is.True);
         }
@@ -312,7 +337,7 @@ namespace TestHelper.UI.Operators
             var spyEventHandler = _scrollView.AddComponent<SpyOnPointerEnterExitHandler>();
 
             var sut = new UguiScrollWheelOperator();
-            await sut.OperateAsync(_scrollView, Vector2.up, 100);
+            await sut.OperateAsync(_scrollView, Vector2.up, distance: 100);
 
             Assert.That(spyEventHandler.WasPointerEntered, Is.True);
             Assert.That(spyEventHandler.WasPointerExited, Is.True);
