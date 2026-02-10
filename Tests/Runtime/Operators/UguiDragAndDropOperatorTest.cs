@@ -340,7 +340,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task OperateAsync_SpecifyDragSpeedInMethod_SwipeSpecifiedAmountInOneFrame()
+        public async Task OperateAsync_SpecifyDragSpeedInMethod_DragSpecifiedAmountInOneFrame()
         {
             const int ConstructorDragSpeed = 10000;
             const int MethodDragSpeed = 200;
@@ -353,7 +353,7 @@ namespace TestHelper.UI.Operators
             var beforePosition = rectTransform.position;
 
             var sut = new UguiDragAndDropOperator(dragSpeed: ConstructorDragSpeed);
-            var task = sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject);
+            var task = sut.OperateAsync(dragHandler.gameObject, dropHandler.gameObject, dragSpeed: MethodDragSpeed);
             await UniTask.NextFrame();
 
             var frameSpeed = MethodDragSpeed * Time.deltaTime;

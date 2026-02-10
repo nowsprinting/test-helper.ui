@@ -31,7 +31,7 @@ namespace TestHelper.UI.Operators
         /// Scroll with destination screen point and scroll speed.
         /// </summary>
         /// <param name="gameObject">Operation target <c>GameObject</c></param>
-        /// <param name="destination">Scroll destination screen point. Scroll speed is assumed to be specified in the constructor.</param>
+        /// <param name="destination">Scroll destination screen point.</param>
         /// <param name="scrollSpeed">Scroll speed in units per second. If omitted, use the constructor value.</param>
         /// <param name="raycastResult">Includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>
         /// <param name="cancellationToken">Cancellation token for operation (e.g., click and hold)</param>

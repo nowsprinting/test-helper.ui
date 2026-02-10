@@ -236,7 +236,7 @@ namespace TestHelper.UI
             CancellationToken cancellationToken = default)
         {
             var timeoutTime = Time.realtimeSinceStartup +
-                              (timeoutSeconds > MinTimeoutSeconds ? timeoutSeconds : _timeoutSeconds);
+                              (timeoutSeconds >= MinTimeoutSeconds ? timeoutSeconds : _timeoutSeconds);
             var delaySeconds = MinTimeoutSeconds;
             var reason = Reason.None;
 
