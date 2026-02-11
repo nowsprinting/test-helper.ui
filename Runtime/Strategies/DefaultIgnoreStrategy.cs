@@ -1,7 +1,8 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Collections.Generic;
+using System.Linq;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.GameObjectMatchers;
@@ -40,7 +41,7 @@ namespace TestHelper.UI.Strategies
         {
             verboseLogger = verboseLogger ?? _verboseLogger; // If null, use the specified in the constructor.
 
-            var isIgnored = HasEnabledIgnoreAnnotationInParent(gameObject) ||
+            var isIgnored = gameObject.TryGetEnabledComponentInParent<IgnoreAnnotation>(out _) ||
                             IsMatchedOrChildOfIgnoreMatchersMatched(gameObject);
             if (isIgnored && verboseLogger != null)
             {
@@ -50,15 +51,24 @@ namespace TestHelper.UI.Strategies
             return isIgnored;
         }
 
-        private bool HasEnabledIgnoreAnnotationInParent(GameObject gameObject)
-        {
-            // TODO: Implement parent-chain traversal
-            return false;
-        }
-
         private bool IsMatchedOrChildOfIgnoreMatchersMatched(GameObject gameObject)
         {
-            // TODO: Implement matcher checking with parent-chain traversal
+            if (_ignoreMatchers == null || _ignoreMatchers.Count == 0)
+            {
+                return false;
+            }
+
+            var currentTransform = gameObject.transform;
+            while (currentTransform != null)
+            {
+                if (_ignoreMatchers.Any(matcher => matcher.IsMatch(currentTransform.gameObject)))
+                {
+                    return true;
+                }
+
+                currentTransform = currentTransform.parent;
+            }
+
             return false;
         }
     }
