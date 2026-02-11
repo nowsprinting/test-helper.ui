@@ -330,7 +330,7 @@ classDiagram
     }
 
     class DefaultReachableStrategy {
-        +DefaultReachableStrategy(Func&lt;GameObject, Vector2&gt;, ILogger)
+        +DefaultReachableStrategy(Func&lt;GameObject, Vector2&gt;, ILogger, List&lt;IGameObjectMatcher&gt;)
         +IsReachable(GameObject, out RaycastResult, ILogger) bool
     }
 
@@ -373,6 +373,13 @@ Please note that this will be included in the release build due to the way it wo
 #### Control ReachableStrategy
 
 You can control the `DefaultReachableStrategy` behavior by attaching the annotation components to the `GameObject`.
+
+##### NonBlockingAnnotation
+
+Excludes the `GameObject` (and its children) from blocking reachability checks in `DefaultReachableStrategy`.
+When this component is attached, the object will not interfere with raycasts to other objects, but will still be considered reachable if it is the target object itself.
+
+This is useful for overlay panels, dialogs, or other UI elements that should not block interaction with underlying content.
 
 ##### ScreenOffsetAnnotation
 
@@ -452,6 +459,11 @@ You should replace this when you want to ignore specific objects (e.g., by name 
 `DefaultReachableStrategy.IsReachable` method returns true if it can raycast from `Camera.main` to the pivot position of `GameObject`.
 
 You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).
+
+The `DefaultReachableStrategy` constructor accepts optional parameters:
+- `getScreenPoint`: Function to get the screen point from `GameObject`
+- `verboseLogger`: Logger for detailed output
+- `nonBlockingMatchers`: List of `IGameObjectMatcher` instances to programmatically exclude GameObjects (and their children) from blocking reachability checks, similar to `NonBlockingAnnotation` but configured via code
 
 
 

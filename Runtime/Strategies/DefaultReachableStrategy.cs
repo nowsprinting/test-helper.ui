@@ -1,10 +1,12 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
+using TestHelper.UI.GameObjectMatchers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,6 +19,8 @@ namespace TestHelper.UI.Strategies
     {
         private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly ILogger _verboseLogger;
+        private readonly List<IGameObjectMatcher> _nonBlockingMatchers;
+
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
         private PointerEventData _cachedPointerEventData;
@@ -27,15 +31,28 @@ namespace TestHelper.UI.Strategies
         /// </summary>
         /// <param name="getScreenPoint">Function returns the screen point of <c>GameObject</c></param>
         /// <param name="verboseLogger">Logger set if you need verbose output</param>
-        public DefaultReachableStrategy(Func<GameObject, Vector2> getScreenPoint = null, ILogger verboseLogger = null)
+        /// <param name="nonBlockingMatchers">List of matchers to exclude GameObjects from blocking reachability checks</param>
+        public DefaultReachableStrategy(
+            Func<GameObject, Vector2> getScreenPoint = null,
+            ILogger verboseLogger = null,
+            List<IGameObjectMatcher> nonBlockingMatchers = null)
         {
             _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _verboseLogger = verboseLogger;
+            _nonBlockingMatchers = nonBlockingMatchers;
         }
 
         ///<inheritdoc/>
         /// <remarks>
         /// Default implementation uses <c>DefaultScreenPointStrategy</c>, checks whether a raycast from <c>Camera.main</c> to the pivot position passes through.
+        /// <para>
+        /// GameObjects with <c>NonBlockingAnnotation</c> component (or whose parent has it) are excluded from raycast results,
+        /// except for the target GameObject itself and its child objects.
+        /// </para>
+        /// <para>
+        /// GameObjects that match any of the <c>IGameObjectMatcher</c> instances provided in the constructor
+        /// (or whose parent matches) are also excluded from raycast results, except for the target GameObject itself and its child objects.
+        /// </para>
         /// </remarks>
         public bool IsReachable(GameObject gameObject, out RaycastResult raycastResult, ILogger verboseLogger = null)
         {
@@ -53,6 +70,12 @@ namespace TestHelper.UI.Strategies
 
             _results.Clear();
             EventSystem.current.RaycastAll(pointerEventData, _results);
+
+            _results.RemoveAll(r =>
+                !IsSameOrChildObject(gameObject, r.gameObject.transform) &&
+                (r.gameObject.GetComponentInParent<NonBlockingAnnotation>() != null ||
+                 IsMatchedOrChildOfNonBlockingMatchersMatched(r.gameObject)));
+
             if (_results.Count == 0)
             {
                 if (verboseLogger != null)
@@ -107,6 +130,30 @@ namespace TestHelper.UI.Strategies
                 }
 
                 hitObjectTransform = hitObjectTransform.transform.parent;
+            }
+
+            return false;
+        }
+
+        private bool IsMatchedOrChildOfNonBlockingMatchersMatched(GameObject gameObject)
+        {
+            if (_nonBlockingMatchers == null || _nonBlockingMatchers.Count == 0)
+            {
+                return false;
+            }
+
+            var current = gameObject.transform;
+            while (current != null)
+            {
+                foreach (var matcher in _nonBlockingMatchers)
+                {
+                    if (matcher.IsMatch(current.gameObject))
+                    {
+                        return true;
+                    }
+                }
+
+                current = current.parent;
             }
 
             return false;
