@@ -74,7 +74,7 @@ namespace TestHelper.UI.Strategies
 
             _results.RemoveAll(r =>
                 !IsSameOrChildObject(gameObject, r.gameObject.transform) &&
-                (r.gameObject.GetComponentInParent<NonBlockingAnnotation>() != null ||
+                (r.gameObject.TryGetEnabledComponentInParent<NonBlockingAnnotation>(out _) ||
                  IsMatchedOrChildOfNonBlockingMatchersMatched(r.gameObject)));
 
             if (_results.Count == 0)

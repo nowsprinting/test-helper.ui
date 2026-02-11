@@ -77,6 +77,17 @@ namespace TestHelper.UI.Strategies
 
             [Test]
             [LoadScene(TestScenePath)]
+            public async Task IsReachable_BehindBlockerWithDisabledNonBlockingAnnotation_NotReachable()
+            {
+                var nonBlockingAnnotation = GameObject.Find("Wall").AddComponent<NonBlockingAnnotation>();
+                nonBlockingAnnotation.enabled = false;
+
+                var result = await _finder.FindByNameAsync("BehindTheWall", reachable: false);
+                Assert.That(new DefaultReachableStrategy().IsReachable(result.GameObject, out _), Is.False);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
             public async Task IsReachable_BehindBlockerWithNonBlockingMatchers_Reachable()
             {
                 var matchers = new List<IGameObjectMatcher>() { new NameMatcher("Wall") };

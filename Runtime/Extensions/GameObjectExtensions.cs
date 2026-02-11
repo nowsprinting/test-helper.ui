@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -83,6 +83,30 @@ namespace TestHelper.UI.Extensions
         {
             component = gameObject.GetComponent<T>();
             return component != null && (!(component is Behaviour) || (component as Behaviour).isActiveAndEnabled);
+        }
+
+        /// <summary>
+        /// Try to get a component in parent exclude disabled component.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="component">A component of the matching type, if found.</param>
+        /// <typeparam name="T">The type of component to search for</typeparam>
+        /// <returns>True if found component in self or parent, active, and enabled</returns>
+        public static bool TryGetEnabledComponentInParent<T>(this GameObject gameObject, out T component)
+        {
+            var current = gameObject.transform;
+            while (current != null)
+            {
+                if (current.gameObject.TryGetEnabledComponent(out component))
+                {
+                    return true;
+                }
+
+                current = current.parent;
+            }
+
+            component = default;
+            return false;
         }
 
         /// <summary>

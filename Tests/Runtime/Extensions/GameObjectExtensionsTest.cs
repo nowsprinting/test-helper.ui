@@ -1,7 +1,8 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using NUnit.Framework;
+using TestHelper.Attributes;
 using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,7 @@ namespace TestHelper.UI.Extensions
     public class GameObjectExtensionsTest
     {
         [Test]
+        [CreateScene]
         public void GetInteractableComponents_GotInteractableComponents()
         {
             var gameObject = new GameObject();
@@ -30,6 +32,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void GetInteractableComponents_NoInteractableComponents_ReturnsEmpty()
         {
             var button = new GameObject().AddComponent<Button>();
@@ -40,6 +43,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponent_Null_ReturnsFalse()
         {
             var gameObject = new GameObject();
@@ -48,6 +52,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponent_NotBehaviour_ReturnsTrue()
         {
             var gameObject = new GameObject();
@@ -56,6 +61,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponent_ActiveAndEnabled_ReturnsTrue()
         {
             var gameObject = new GameObject("Button", typeof(Button));
@@ -64,6 +70,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponent_NotActive_ReturnsFalse()
         {
             var gameObject = new GameObject("Button", typeof(Button));
@@ -74,6 +81,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponent_NotActiveParent_ReturnsFalse()
         {
             var parent = new GameObject();
@@ -86,6 +94,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponent_NotEnabled_ReturnsFalse()
         {
             var gameObject = new GameObject();
@@ -93,6 +102,94 @@ namespace TestHelper.UI.Extensions
             button.enabled = false;
 
             var actual = gameObject.TryGetEnabledComponent<Button>(out var _);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void TryGetEnabledComponentInParent_Null_ReturnsFalse()
+        {
+            var gameObject = new GameObject();
+
+            var actual = gameObject.TryGetEnabledComponentInParent<Button>(out var _);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void TryGetEnabledComponentInParent_NotBehaviour_ReturnsTrue()
+        {
+            var gameObject = new GameObject();
+
+            var actual = gameObject.TryGetEnabledComponentInParent<Transform>(out var _);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void TryGetEnabledComponentInParent_ActiveAndEnabled_ReturnsTrue()
+        {
+            var gameObject = new GameObject("Button", typeof(Button));
+
+            var actual = gameObject.TryGetEnabledComponentInParent<Button>(out var _);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void TryGetEnabledComponentInParent_FoundInParent_ReturnsTrue()
+        {
+            var parent = new GameObject("Parent", typeof(Button));
+            var gameObject = new GameObject("Child");
+            gameObject.transform.SetParent(parent.transform);
+
+            var actual = gameObject.TryGetEnabledComponentInParent<Button>(out var _);
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        public void TryGetEnabledComponentInParent_NotActive_ReturnsFalse()
+        {
+            var gameObject = new GameObject("Button", typeof(Button));
+            gameObject.SetActive(false);
+
+            var actual = gameObject.TryGetEnabledComponentInParent<Button>(out var _);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void TryGetEnabledComponentInParent_NotActiveParent_ReturnsFalse()
+        {
+            var parent = new GameObject("Parent", typeof(Button));
+            var gameObject = new GameObject("Child");
+            gameObject.transform.SetParent(parent.transform);
+            parent.SetActive(false);
+
+            var actual = gameObject.TryGetEnabledComponentInParent<Button>(out var _);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void TryGetEnabledComponentInParent_NotEnabled_ReturnsFalse()
+        {
+            var gameObject = new GameObject();
+            var button = gameObject.AddComponent<Button>();
+            button.enabled = false;
+
+            var actual = gameObject.TryGetEnabledComponentInParent<Button>(out var _);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void TryGetEnabledComponentInParent_NotEnabledInParent_ReturnsFalse()
+        {
+            var parent = new GameObject("Parent");
+            var button = parent.AddComponent<Button>();
+            button.enabled = false;
+            var gameObject = new GameObject("Child");
+            gameObject.transform.SetParent(parent.transform);
+
+            var actual = gameObject.TryGetEnabledComponentInParent<Button>(out var _);
             Assert.That(actual, Is.False);
         }
     }
