@@ -1,8 +1,11 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Collections.Generic;
+using System.Linq;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
+using TestHelper.UI.GameObjectMatchers;
 using UnityEngine;
 
 namespace TestHelper.UI.Strategies
@@ -13,19 +16,23 @@ namespace TestHelper.UI.Strategies
     public class DefaultIgnoreStrategy : IIgnoreStrategy
     {
         private readonly ILogger _verboseLogger;
+        private readonly List<IGameObjectMatcher> _ignoreMatchers;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="verboseLogger">Logger set if you need verbose output</param>
-        public DefaultIgnoreStrategy(ILogger verboseLogger = null)
+        /// <param name="ignoreMatchers">List of matchers to identify GameObjects (and their children) that should be ignored</param>
+        public DefaultIgnoreStrategy(ILogger verboseLogger = null, List<IGameObjectMatcher> ignoreMatchers = null)
         {
             _verboseLogger = verboseLogger;
+            _ignoreMatchers = ignoreMatchers;
         }
 
         /// <summary>
         /// Returns whether the <c>GameObject</c> is ignored or not.
-        /// Default implementation is to check whether the <c>GameObject</c> has <c>IgnoreAnnotation</c> component.
+        /// Default implementation checks whether the <c>GameObject</c> or any of its ancestors has an enabled <c>IgnoreAnnotation</c> component,
+        /// or matches any of the configured ignore matchers (including their children).
         /// </summary>
         /// <param name="gameObject">Target <c>GameObject</c></param>
         /// <param name="verboseLogger">Logger set if you need verbose output</param>
@@ -34,13 +41,35 @@ namespace TestHelper.UI.Strategies
         {
             verboseLogger = verboseLogger ?? _verboseLogger; // If null, use the specified in the constructor.
 
-            var hasIgnoreAnnotation = gameObject.TryGetEnabledComponent<IgnoreAnnotation>(out _);
-            if (hasIgnoreAnnotation && verboseLogger != null)
+            var isIgnored = gameObject.TryGetEnabledComponentInParent<IgnoreAnnotation>(out _) ||
+                            IsMatchedOrChildOfIgnoreMatchersMatched(gameObject);
+            if (isIgnored && verboseLogger != null)
             {
                 verboseLogger.Log($"Ignored {gameObject.name}({gameObject.GetInstanceID()}).");
             }
 
-            return hasIgnoreAnnotation;
+            return isIgnored;
+        }
+
+        private bool IsMatchedOrChildOfIgnoreMatchersMatched(GameObject gameObject)
+        {
+            if (_ignoreMatchers == null || _ignoreMatchers.Count == 0)
+            {
+                return false;
+            }
+
+            var currentTransform = gameObject.transform;
+            while (currentTransform != null)
+            {
+                if (_ignoreMatchers.Any(matcher => matcher.IsMatch(currentTransform.gameObject)))
+                {
+                    return true;
+                }
+
+                currentTransform = currentTransform.parent;
+            }
+
+            return false;
         }
     }
 }

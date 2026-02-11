@@ -291,7 +291,7 @@ Configurations in `MonkeyConfig`:
     - **SuperSize**: The factor to increase resolution with. Default is 1.
     - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
 - **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
-- **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
+- **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` or any of its ancestors has an enabled `IgnoreAnnotation` attached, or matches any of the configured ignore matchers (including their children).
 - **GetScreenPoint**: Function to get the screen point from `GameObject` used in the operators. The default implementation returns the pivot position of the `GameObject` in screen space.
 - **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
 - **Operators**: A collection of `IOperator` that the monkey invokes. The default is `UguiClickOperator` and `UguiTextInputOperator`. There is support for standard uGUI components.
@@ -411,6 +411,7 @@ You can control the random behavior of the operator during the monkey testing by
 ##### IgnoreAnnotation
 
 Monkey will not operate objects with `IgnoreAnnotation` attached.
+When attached to a parent GameObject, all child objects will also be ignored.
 
 ##### InputFieldAnnotation
 
@@ -448,9 +449,13 @@ You should replace this when you want to control special components that compris
 #### IIgnoreStrategy interface
 
 `IsIgnored` method returns whether the `GameObject` is ignored or not from `Monkey`.
-`DefaultIgnoreStrategy.IsIgnored` method returns true if the `GameObject` has the `IgnoreAnnotation` component attached.
+`DefaultIgnoreStrategy.IsIgnored` method returns true if the `GameObject` or any of its ancestors has an enabled `IgnoreAnnotation` component attached, or matches any of the configured ignore matchers (including their children).
 
-You should replace this when you want to ignore specific objects (e.g., by name and/or path) in your game title.
+The `DefaultIgnoreStrategy` constructor accepts optional parameters:
+- `verboseLogger`: Logger for detailed output
+- `ignoreMatchers`: List of `IGameObjectMatcher` instances to programmatically specify GameObjects (and their children) that should be ignored, similar to `IgnoreAnnotation` but configured via code
+
+If you want to ignore it for other conditions, you must replace it.
 
 
 #### IReachableStrategy interface
