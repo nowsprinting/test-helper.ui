@@ -93,5 +93,111 @@ namespace TestHelper.UI.Visualizers
 
             await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
         }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public void ShowNotReachableIndicator_IndicatorIsShown()
+        {
+            var screenPoint = new Vector2(100, 100);
+
+            _sut.ShowNotReachableIndicator(screenPoint);
+
+            var indicator = GameObject.Find("Indicator");
+            Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
+            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public void ShowNotReachableIndicator_WithBlocker_BlockerIndicatorIsShown()
+        {
+            var blocker = _referenceObjects[0];
+            var screenPoint = new Vector2(100, 100);
+
+            _sut.ShowNotReachableIndicator(screenPoint, blocker);
+
+            var indicator = GameObject.Find("Blocker Indicator");
+            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public async Task ShowNotReachableIndicator_AfterLifetime_IndicatorIsDeactivated()
+        {
+            var screenPoint = new Vector2(100, 100);
+
+            _sut.ShowNotReachableIndicator(screenPoint);
+
+            var indicator = GameObject.Find("Indicator");
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
+            Assert.That(indicator.activeInHierarchy, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public async Task ShowNotReachableIndicator_CalledAfterReturn_IndicatorIsReused()
+        {
+            var screenPoint = new Vector2(100, 100);
+
+            _sut.ShowNotReachableIndicator(screenPoint);
+
+            var firstIndicator = GameObject.Find("Indicator");
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
+            _sut.ShowNotReachableIndicator(screenPoint);
+            var secondIndicator = GameObject.Find("Indicator");
+            Assert.That(secondIndicator, Is.SameAs(firstIndicator));
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public void ShowNotInteractableIndicator_IndicatorIsShown()
+        {
+            var target = _referenceObjects[0];
+
+            _sut.ShowNotInteractableIndicator(target);
+
+            var indicator = GameObject.Find("Indicator");
+            Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("hand_slash"));
+            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public async Task ShowNotInteractableIndicator_AfterLifetime_IndicatorIsDeactivated()
+        {
+            var target = _referenceObjects[0];
+
+            _sut.ShowNotInteractableIndicator(target);
+
+            var indicator = GameObject.Find("Indicator");
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
+            Assert.That(indicator.activeInHierarchy, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public void ShowIgnoredIndicator_IndicatorIsShown()
+        {
+            var target = _referenceObjects[0];
+
+            _sut.ShowIgnoredIndicator(target);
+
+            var indicator = GameObject.Find("Indicator");
+            Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("lock"));
+            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public async Task ShowIgnoredIndicator_AfterLifetime_IndicatorIsDeactivated()
+        {
+            var target = _referenceObjects[0];
+
+            _sut.ShowIgnoredIndicator(target);
+
+            var indicator = GameObject.Find("Indicator");
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
+            Assert.That(indicator.activeInHierarchy, Is.False);
+        }
     }
 }

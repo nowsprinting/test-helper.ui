@@ -578,10 +578,6 @@ namespace TestHelper.UI
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
                 Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
-                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
-
-                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
-                Assert.That(indicator, Is.Destroyed);
             }
 
             [Test]
@@ -600,10 +596,6 @@ namespace TestHelper.UI
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
                 Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
-                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
-
-                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
-                Assert.That(indicator, Is.Destroyed);
             }
 
             [Test]
@@ -621,10 +613,6 @@ namespace TestHelper.UI
 
                 var indicator = GameObject.Find("Blocker Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
-                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
-
-                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
-                Assert.That(indicator, Is.Destroyed);
             }
 
             [Test]
@@ -643,10 +631,6 @@ namespace TestHelper.UI
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
                 Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("hand_slash"));
-                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
-
-                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
-                Assert.That(indicator, Is.Destroyed);
             }
         }
 

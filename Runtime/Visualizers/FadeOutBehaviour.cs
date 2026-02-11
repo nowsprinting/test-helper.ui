@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,6 +25,11 @@ namespace TestHelper.UI.Visualizers
         /// &lt;1 = decelerating.
         /// </summary>
         public float Acceleration { private get; set; } = 1.0f;
+
+        /// <summary>
+        /// Callback invoked when fade-out is completed.
+        /// </summary>
+        public Action OnFadeOutCompleted { private get; set; }
 
         private Image _image;
         private float _elapsed;

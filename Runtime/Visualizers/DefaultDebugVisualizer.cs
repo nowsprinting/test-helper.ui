@@ -77,6 +77,8 @@ namespace TestHelper.UI.Visualizers
             DefaultScreenPointStrategy.GetScreenPoint;
 
         private readonly Dictionary<string, Sprite> _pics = new Dictionary<string, Sprite>();
+        private readonly Stack<GameObject> _indicatorPool = new Stack<GameObject>();
+        private readonly Stack<GameObject> _blockerIndicatorPool = new Stack<GameObject>();
         private Canvas _overlayCanvas;
 
         public void Dispose()
@@ -94,12 +96,12 @@ namespace TestHelper.UI.Visualizers
             {
                 if (blocker && blocker.TryGetComponent<RectTransform>(out var rectTransform))
                 {
-                    var blockerIndicator = CreateBlockerIndicator(rectTransform);
+                    var blockerIndicator = GetOrCreateBlockerIndicator(rectTransform);
                     blockerIndicator.transform.position = GetScreenPoint(blocker);
                 }
                 // TODO: 3D objects
 
-                var indicator = CreateIndicator(NotReachablePictPath, NotReachablePictColor);
+                var indicator = GetOrCreateIndicator(NotReachablePictPath, NotReachablePictColor);
                 indicator.transform.position = screenPoint;
             }
             catch (Exception e)
@@ -113,7 +115,7 @@ namespace TestHelper.UI.Visualizers
         {
             try
             {
-                var indicator = CreateIndicator(NotInteractablePictPath, NotInteractablePictColor);
+                var indicator = GetOrCreateIndicator(NotInteractablePictPath, NotInteractablePictColor);
                 indicator.transform.position = GetScreenPoint(gameObject);
             }
             catch (Exception e)
@@ -127,7 +129,7 @@ namespace TestHelper.UI.Visualizers
         {
             try
             {
-                var indicator = CreateIndicator(IgnoredPictPath, IgnoredPictColor);
+                var indicator = GetOrCreateIndicator(IgnoredPictPath, IgnoredPictColor);
                 indicator.transform.position = GetScreenPoint(gameObject);
             }
             catch (Exception e)
@@ -136,7 +138,7 @@ namespace TestHelper.UI.Visualizers
             }
         }
 
-        private GameObject CreateBlockerIndicator(RectTransform blockerRectTransform)
+        private GameObject GetOrCreateBlockerIndicator(RectTransform blockerRectTransform)
         {
             var indicator = new GameObject($"Blocker Indicator", typeof(Image),
                 typeof(FadeOutBehaviour));
@@ -156,7 +158,7 @@ namespace TestHelper.UI.Visualizers
             return indicator;
         }
 
-        private GameObject CreateIndicator(string pictPath, Color pictColor)
+        private GameObject GetOrCreateIndicator(string pictPath, Color pictColor)
         {
             var indicator = new GameObject($"Indicator", typeof(Image), typeof(ContentSizeFitter),
                 typeof(FadeOutBehaviour));
