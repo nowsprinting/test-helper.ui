@@ -1,11 +1,14 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.UI.TestDoubles;
 using TestHelper.RuntimeInternals;
+using TestHelper.UI.Annotations;
+using TestHelper.UI.GameObjectMatchers;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.TestTools;
 #if !UNITY_2023_1_OR_NEWER
@@ -60,6 +63,50 @@ namespace TestHelper.UI.Strategies
             {
                 var result = await _finder.FindByNameAsync(target, reachable: false);
                 Assert.That(new DefaultReachableStrategy().IsReachable(result.GameObject, out _), Is.False);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task IsReachable_BehindBlockerWithNonBlockingAnnotation_Reachable()
+            {
+                GameObject.Find("Wall").AddComponent<NonBlockingAnnotation>();
+
+                var result = await _finder.FindByNameAsync("BehindTheWall", reachable: false);
+                Assert.That(new DefaultReachableStrategy().IsReachable(result.GameObject, out _), Is.True);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task IsReachable_BehindBlockerWithNonBlockingMatchers_Reachable()
+            {
+                var matchers = new List<IGameObjectMatcher>() { new NameMatcher("Wall") };
+                var sut = new DefaultReachableStrategy(nonBlockingMatchers: matchers);
+
+                var result = await _finder.FindByNameAsync("BehindTheWall", reachable: false);
+                Assert.That(sut.IsReachable(result.GameObject, out _), Is.True);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task IsReachable_WithNonBlockingAnnotation_Reachable()
+            {
+                const string Blocker = "Wall";
+                GameObject.Find(Blocker).AddComponent<NonBlockingAnnotation>();
+
+                var result = await _finder.FindByNameAsync(Blocker, reachable: false);
+                Assert.That(new DefaultReachableStrategy().IsReachable(result.GameObject, out _), Is.True);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task IsReachable_WithNonBlockingMatcher_Reachable()
+            {
+                const string Blocker = "Wall";
+                var matchers = new List<IGameObjectMatcher>() { new NameMatcher(Blocker) };
+                var sut = new DefaultReachableStrategy(nonBlockingMatchers: matchers);
+
+                var result = await _finder.FindByNameAsync(Blocker, reachable: false);
+                Assert.That(sut.IsReachable(result.GameObject, out _), Is.True);
             }
         }
 
@@ -165,7 +212,7 @@ namespace TestHelper.UI.Strategies
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Does.Match(
-                    @"Not reachable to BehindTheWall\(\d+\), position=\(\d+,\d+\)\. Raycast hit other objects: \[Wall\(\d+\), BehindTheWall\(\d+\)\]"));
+                    @"Not reachable to BehindTheWall\(\d+\), position=\(\d+,\d+\)\. Raycast hit other objects: \[ChildOfWall\(\d+\), Wall\(\d+\), BehindTheWall\(\d+\)\]"));
                 // Note: No camera when ScreenSpaceOverlay canvas.
             }
 
