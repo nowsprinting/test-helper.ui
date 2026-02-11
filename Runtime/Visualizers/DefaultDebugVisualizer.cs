@@ -17,7 +17,7 @@ namespace TestHelper.UI.Visualizers
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public sealed class DefaultDebugVisualizer : IVisualizer, IDisposable
     {
-        private const string ResourcesBasePath = "Packages/com.nowsprinting.test-helper.ui";
+        private const string ResourcesBasePath = "com.nowsprinting.test-helper.ui";
 
         /// <summary>
         /// Image file path with the "not reachable" state in the Resources folder.
