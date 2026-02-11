@@ -618,8 +618,7 @@ Using the Debug Visualizer can help you investigate why a `GameObject` cannot be
 To use it, simply pass an instance to the `GameObjectFinder` constructor, like this:
 
 ```csharp
-var visualizer = new DefaultDebugVisualizer();
-var finder = new GameObjectFinder(visualizer: _visualizer);
+var finder = new GameObjectFinder(visualizer: new DefaultDebugVisualizer());
 ```
 
 

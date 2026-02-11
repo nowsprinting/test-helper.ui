@@ -29,5 +29,11 @@ namespace TestHelper.UI.Visualizers
         /// </summary>
         /// <param name="gameObject"></param>
         void ShowIgnoredIndicator(GameObject gameObject);
+
+        /// <summary>
+        /// Show the visual effect of pointer operation on the specified <c>GameObject</c>.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        void ShowPointerOperationEffect(GameObject gameObject);
     }
 }

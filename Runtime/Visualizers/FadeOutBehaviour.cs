@@ -11,12 +11,12 @@ namespace TestHelper.UI.Visualizers
     /// Fade-out behavior for indicators.
     /// </summary>
     [RequireComponent(typeof(Image))]
-    public class FadeOutBehaviour : MonoBehaviour
+    internal class FadeOutBehaviour : MonoBehaviour
     {
         /// <summary>
         /// Indicator lifetime in seconds.
         /// </summary>
-        public float Lifetime { private get; set; } = 1.0f;
+        public float Lifetime { private get; set; }
 
         /// <summary>
         /// Exponent for acceleration.
@@ -24,7 +24,7 @@ namespace TestHelper.UI.Visualizers
         /// &gt;1 = accelerating (slow -> fast),
         /// &lt;1 = decelerating.
         /// </summary>
-        public float Acceleration { private get; set; } = 1.0f;
+        public float Acceleration { private get; set; }
 
         /// <summary>
         /// Callback invoked when fade-out is completed.

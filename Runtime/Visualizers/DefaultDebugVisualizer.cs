@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Cysharp.Threading.Tasks;
 using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,39 +21,64 @@ namespace TestHelper.UI.Visualizers
         private const string ResourcesBasePath = "com.nowsprinting.test-helper.ui";
 
         /// <summary>
-        /// Image file path with the "not reachable" state in the Resources folder.
+        /// Image file path of the "not reachable" state in the Resources folder.
         /// </summary>
         public string NotReachablePictPath { private get; set; } = $"{ResourcesBasePath}/eye_slash";
 
         /// <summary>
-        /// Image color for the "not reachable" state.
+        /// Image color of the "not reachable" state.
         /// </summary>
         public Color NotReachablePictColor { private get; set; } = new Color(1f, 0f, 0f);
 
         /// <summary>
-        /// Indicate color for the blocker.
+        /// Indicate color of the blocker.
         /// </summary>
         public Color NotReachableBlockerColor { private get; set; } = new Color(1f, 1f, 1f);
 
         /// <summary>
-        /// Image file path with the "not interactable" state in the Resources folder.
+        /// Image file path of the "not interactable" state in the Resources folder.
         /// </summary>
         public string NotInteractablePictPath { private get; set; } = $"{ResourcesBasePath}/hand_slash";
 
         /// <summary>
-        /// Image color for the "not interactable" state.
+        /// Image color of the "not interactable" state.
         /// </summary>
         public Color NotInteractablePictColor { private get; set; } = new Color(1f, 0f, 0f);
 
         /// <summary>
-        /// Image file path with the "ignored" state in the Resources folder.
+        /// Image file path of the "ignored" state in the Resources folder.
         /// </summary>
         public string IgnoredPictPath { private get; set; } = $"{ResourcesBasePath}/lock";
 
         /// <summary>
-        /// Image color for the "ignored" state.
+        /// Image color of the "ignored" state.
         /// </summary>
         public Color IgnoredPictColor { private get; set; } = new Color(1f, 0.68f, 0f);
+
+        /// <summary>
+        /// Image file path of the pointer operation in the Resources folder.
+        /// </summary>
+        public string RipplePictPath { private get; set; } = $"{ResourcesBasePath}/ripple";
+
+        /// <summary>
+        /// Image color of the pointer operation.
+        /// </summary>
+        public Color RipplePictColor { private get; set; } = new Color(0.2f, 0.82f, 1f);
+
+        /// <summary>
+        /// Ripple scale amount per second.
+        /// </summary>
+        public float RippleScalePerSecond { private get; set; } = 4.0f;
+
+        /// <summary>
+        /// Number of ripples.
+        /// </summary>
+        public int RippleCount { private get; set; } = 3;
+
+        /// <summary>
+        /// Interval of ripples in milliseconds.
+        /// </summary>
+        public int RippleIntervalMillis { private get; set; } = 400;
 
         /// <summary>
         /// Screen resolution (short side) for which the pictograms size is intended.
@@ -60,10 +86,10 @@ namespace TestHelper.UI.Visualizers
         public int ReferenceScreenResolutionShortSide { private get; set; } = 480;
 
         /// <summary>
-        /// Overlay <c>Canvas</c> sorting order.
+        /// Overlay <see cref="Canvas"/> sorting order.
         /// This can only be specified before the first pictogram is shown.
         /// </summary>
-        public int CanvasSortingOrder { private get; set; } = 1000;
+        public short CanvasSortingOrder { private get; set; } = 1000;
 
         /// <summary>
         /// Indicator lifetime in seconds.
@@ -73,14 +99,14 @@ namespace TestHelper.UI.Visualizers
         /// <summary>
         /// Function of get screen point.
         /// </summary>
-        public Func<GameObject, Vector2> GetScreenPoint { private get; set; } =
-            DefaultScreenPointStrategy.GetScreenPoint;
+        public Func<GameObject, Vector2> GetScreenPoint { get; set; } = DefaultScreenPointStrategy.GetScreenPoint;
 
         private readonly Dictionary<string, Sprite> _pics = new Dictionary<string, Sprite>();
         private readonly Stack<GameObject> _blockerIndicatorPool = new Stack<GameObject>();
         private readonly Stack<GameObject> _indicatorPool = new Stack<GameObject>();
         private Canvas _overlayCanvas;
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             if (_overlayCanvas)
@@ -138,6 +164,32 @@ namespace TestHelper.UI.Visualizers
             }
         }
 
+        /// <inheritdoc/>
+        public void ShowPointerOperationEffect(GameObject gameObject)
+        {
+            try
+            {
+                for (var i = 0; i < RippleCount; i++)
+                {
+                    ShowRippleEffectAfterDelay(i).Forget();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to show ripple effect: {e}");
+            }
+
+            return;
+
+            async UniTask ShowRippleEffectAfterDelay(int i)
+            {
+                await UniTask.Delay(RippleIntervalMillis * i, ignoreTimeScale: false);
+
+                var ripple = GetOrCreateIndicator(RipplePictPath, RipplePictColor, true);
+                ripple.transform.position = GetScreenPoint(gameObject);
+            }
+        }
+
         private GameObject GetOrCreateBlockerIndicator(RectTransform blockerRectTransform)
         {
             GameObject indicator;
@@ -173,7 +225,7 @@ namespace TestHelper.UI.Visualizers
             return indicator;
         }
 
-        private GameObject GetOrCreateIndicator(string pictPath, Color pictColor)
+        private GameObject GetOrCreateIndicator(string pictPath, Color pictColor, bool withSpread = false)
         {
             GameObject indicator;
             if (_indicatorPool.Count > 0)
@@ -184,7 +236,7 @@ namespace TestHelper.UI.Visualizers
             else
             {
                 indicator = new GameObject($"Indicator", typeof(Image), typeof(ContentSizeFitter),
-                    typeof(FadeOutBehaviour));
+                    typeof(FadeOutBehaviour), typeof(SpreadBehaviour));
                 indicator.transform.SetParent(GetOrCreateOverlayCanvas().transform);
 
                 var contentSizeFitter = indicator.GetComponent<ContentSizeFitter>();
@@ -203,6 +255,10 @@ namespace TestHelper.UI.Visualizers
 
             indicator.transform.localScale = CalcScale();
             // Note: Why not use CanvasScaler? Screen points may move depending on the aspect ratio.
+
+            var spreadBehaviour = indicator.GetComponent<SpreadBehaviour>();
+            spreadBehaviour.ScalePerSecond = RippleScalePerSecond;
+            spreadBehaviour.enabled = withSpread;
 
             var image = indicator.GetComponent<Image>();
             image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions

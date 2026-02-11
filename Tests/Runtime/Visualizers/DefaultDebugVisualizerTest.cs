@@ -235,5 +235,37 @@ namespace TestHelper.UI.Visualizers
             await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
             Assert.That(indicator.activeInHierarchy, Is.False);
         }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        [GameViewResolution(GameViewResolution.VGA)]
+        [TimeScale(5.0f)]
+        public async Task ShowPointerOperationEffect_IndicatorIsShown()
+        {
+            using var sut = new DefaultDebugVisualizer(); // use default settings
+            sut.ShowPointerOperationEffect(_referenceObjects[0]);
+            await UniTask.NextFrame(); // wait for indicator to be shown
+
+            var indicator = GameObject.Find("Indicator");
+            Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("ripple"));
+            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(2.0f), ignoreTimeScale: false); // wait for end of life
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        [GameViewResolution(GameViewResolution.VGA)]
+        [TimeScale(5.0f)]
+        public async Task ShowPointerOperationEffect_AfterLifetime_IndicatorIsDeactivated()
+        {
+            using var sut = new DefaultDebugVisualizer(); // use default settings
+            sut.ShowPointerOperationEffect(_referenceObjects[0]);
+            await UniTask.NextFrame(); // wait for indicator to be shown
+
+            var indicator = GameObject.Find("Indicator");
+            await UniTask.Delay(TimeSpan.FromSeconds(2.0f), ignoreTimeScale: false); // wait for end of life
+            Assert.That(indicator.activeInHierarchy, Is.False);
+        }
     }
 }
