@@ -34,10 +34,20 @@ namespace TestHelper.UI.Visualizers
         private Image _image;
         private float _elapsed;
 
-        private void Start()
+        private void Awake()
         {
             _image = GetComponent<Image>();
-            Destroy(gameObject, Lifetime);
+        }
+
+        private void OnEnable()
+        {
+            _elapsed = 0f;
+            if (_image)
+            {
+                var color = _image.color;
+                color.a = 1f;
+                _image.color = color;
+            }
         }
 
         private void Update()
@@ -48,6 +58,20 @@ namespace TestHelper.UI.Visualizers
             var color = _image.color;
             color.a = 1f - accelerated;
             _image.color = color;
+
+            if (_elapsed < Lifetime)
+            {
+                return;
+            }
+
+            if (OnFadeOutCompleted != null)
+            {
+                OnFadeOutCompleted.Invoke();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

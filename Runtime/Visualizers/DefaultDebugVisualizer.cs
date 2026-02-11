@@ -83,6 +83,24 @@ namespace TestHelper.UI.Visualizers
 
         public void Dispose()
         {
+            while (_indicatorPool.Count > 0)
+            {
+                var indicator = _indicatorPool.Pop();
+                if (indicator)
+                {
+                    Object.Destroy(indicator);
+                }
+            }
+
+            while (_blockerIndicatorPool.Count > 0)
+            {
+                var indicator = _blockerIndicatorPool.Pop();
+                if (indicator)
+                {
+                    Object.Destroy(indicator);
+                }
+            }
+
             if (_overlayCanvas)
             {
                 Object.Destroy(_overlayCanvas);
@@ -140,44 +158,81 @@ namespace TestHelper.UI.Visualizers
 
         private GameObject GetOrCreateBlockerIndicator(RectTransform blockerRectTransform)
         {
-            var indicator = new GameObject($"Blocker Indicator", typeof(Image),
-                typeof(FadeOutBehaviour));
-            indicator.transform.SetParent(GetOrCreateOverlayCanvas().transform);
+            GameObject indicator;
+            if (_blockerIndicatorPool.Count > 0)
+            {
+                indicator = _blockerIndicatorPool.Pop();
+                indicator.SetActive(true);
+            }
+            else
+            {
+                indicator = new GameObject($"Blocker Indicator", typeof(Image),
+                    typeof(FadeOutBehaviour));
+                indicator.transform.SetParent(GetOrCreateOverlayCanvas().transform);
+
+                var image = indicator.GetComponent<Image>();
+                image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
+
+                var fadeout = indicator.GetComponent<FadeOutBehaviour>();
+                fadeout.Acceleration = 0.2f; // Decelerated fade-out
+                fadeout.OnFadeOutCompleted = () =>
+                {
+                    indicator.SetActive(false);
+                    _blockerIndicatorPool.Push(indicator);
+                };
+            }
 
             var rectTransform = indicator.GetComponent<RectTransform>();
             rectTransform.sizeDelta = blockerRectTransform.rect.size * blockerRectTransform.lossyScale;
 
-            var image = indicator.GetComponent<Image>();
-            image.color = NotReachableBlockerColor;
-            image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
+            var image2 = indicator.GetComponent<Image>();
+            image2.color = NotReachableBlockerColor;
 
-            var fadeout = indicator.GetComponent<FadeOutBehaviour>();
-            fadeout.Lifetime = IndicatorLifetime;
-            fadeout.Acceleration = 0.2f; // Decelerated fade-out
+            var fadeout2 = indicator.GetComponent<FadeOutBehaviour>();
+            fadeout2.Lifetime = IndicatorLifetime;
 
             return indicator;
         }
 
         private GameObject GetOrCreateIndicator(string pictPath, Color pictColor)
         {
-            var indicator = new GameObject($"Indicator", typeof(Image), typeof(ContentSizeFitter),
-                typeof(FadeOutBehaviour));
-            indicator.transform.SetParent(GetOrCreateOverlayCanvas().transform);
+            GameObject indicator;
+            if (_indicatorPool.Count > 0)
+            {
+                indicator = _indicatorPool.Pop();
+                indicator.SetActive(true);
+            }
+            else
+            {
+                indicator = new GameObject($"Indicator", typeof(Image), typeof(ContentSizeFitter),
+                    typeof(FadeOutBehaviour));
+                indicator.transform.SetParent(GetOrCreateOverlayCanvas().transform);
+
+                var image = indicator.GetComponent<Image>();
+                image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
+
+                var contentSizeFitter = indicator.GetComponent<ContentSizeFitter>();
+                contentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                var fadeout = indicator.GetComponent<FadeOutBehaviour>();
+                fadeout.Acceleration = 2.0f; // Accelerated fade-out
+                fadeout.OnFadeOutCompleted = () =>
+                {
+                    indicator.SetActive(false);
+                    _indicatorPool.Push(indicator);
+                };
+            }
+
             indicator.transform.localScale = CalcScale();
             // Note: Why not use CanvasScaler? Screen points may move depending on the aspect ratio.
 
-            var image = indicator.GetComponent<Image>();
-            image.sprite = GetOrCreateSprite(pictPath);
-            image.color = pictColor;
-            image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
+            var image2 = indicator.GetComponent<Image>();
+            image2.sprite = GetOrCreateSprite(pictPath);
+            image2.color = pictColor;
 
-            var contentSizeFitter = indicator.GetComponent<ContentSizeFitter>();
-            contentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            var fadeout = indicator.GetComponent<FadeOutBehaviour>();
-            fadeout.Lifetime = IndicatorLifetime;
-            fadeout.Acceleration = 2.0f; // Accelerated fade-out
+            var fadeout2 = indicator.GetComponent<FadeOutBehaviour>();
+            fadeout2.Lifetime = IndicatorLifetime;
 
             return indicator;
         }
