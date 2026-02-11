@@ -11,7 +11,7 @@ namespace TestHelper.UI.Annotations
     /// </summary>
     [AddComponentMenu("UI Test Helper/Non Blocking Annotation")]
     [HelpURL("https://nowsprinting.github.io/test-helper.ui/api/TestHelper.UI.Annotations.NonBlockingAnnotation.html")]
-    public class NonBlockingAnnotation : MonoBehaviour
+    public sealed class NonBlockingAnnotation : MonoBehaviour
     {
     }
 }
