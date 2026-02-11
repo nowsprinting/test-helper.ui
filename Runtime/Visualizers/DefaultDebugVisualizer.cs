@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -77,30 +77,12 @@ namespace TestHelper.UI.Visualizers
             DefaultScreenPointStrategy.GetScreenPoint;
 
         private readonly Dictionary<string, Sprite> _pics = new Dictionary<string, Sprite>();
-        private readonly Stack<GameObject> _indicatorPool = new Stack<GameObject>();
         private readonly Stack<GameObject> _blockerIndicatorPool = new Stack<GameObject>();
+        private readonly Stack<GameObject> _indicatorPool = new Stack<GameObject>();
         private Canvas _overlayCanvas;
 
         public void Dispose()
         {
-            while (_indicatorPool.Count > 0)
-            {
-                var indicator = _indicatorPool.Pop();
-                if (indicator)
-                {
-                    Object.Destroy(indicator);
-                }
-            }
-
-            while (_blockerIndicatorPool.Count > 0)
-            {
-                var indicator = _blockerIndicatorPool.Pop();
-                if (indicator)
-                {
-                    Object.Destroy(indicator);
-                }
-            }
-
             if (_overlayCanvas)
             {
                 Object.Destroy(_overlayCanvas);
@@ -112,10 +94,10 @@ namespace TestHelper.UI.Visualizers
         {
             try
             {
-                if (blocker && blocker.TryGetComponent<RectTransform>(out var rectTransform))
+                if (blocker && blocker.TryGetComponent<RectTransform>(out var blockerRectTransform))
                 {
-                    var blockerIndicator = GetOrCreateBlockerIndicator(rectTransform);
-                    blockerIndicator.transform.position = GetScreenPoint(blocker);
+                    var blockerIndicator = GetOrCreateBlockerIndicator(blockerRectTransform);
+                    blockerIndicator.transform.position = screenPoint;
                 }
                 // TODO: 3D objects
 
@@ -172,8 +154,10 @@ namespace TestHelper.UI.Visualizers
 
                 var image = indicator.GetComponent<Image>();
                 image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
+                image.color = NotReachableBlockerColor;
 
                 var fadeout = indicator.GetComponent<FadeOutBehaviour>();
+                fadeout.Lifetime = IndicatorLifetime;
                 fadeout.Acceleration = 0.2f; // Decelerated fade-out
                 fadeout.OnFadeOutCompleted = () =>
                 {
@@ -184,12 +168,7 @@ namespace TestHelper.UI.Visualizers
 
             var rectTransform = indicator.GetComponent<RectTransform>();
             rectTransform.sizeDelta = blockerRectTransform.rect.size * blockerRectTransform.lossyScale;
-
-            var image2 = indicator.GetComponent<Image>();
-            image2.color = NotReachableBlockerColor;
-
-            var fadeout2 = indicator.GetComponent<FadeOutBehaviour>();
-            fadeout2.Lifetime = IndicatorLifetime;
+            rectTransform.position = blockerRectTransform.position;
 
             return indicator;
         }
@@ -208,14 +187,12 @@ namespace TestHelper.UI.Visualizers
                     typeof(FadeOutBehaviour));
                 indicator.transform.SetParent(GetOrCreateOverlayCanvas().transform);
 
-                var image = indicator.GetComponent<Image>();
-                image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
-
                 var contentSizeFitter = indicator.GetComponent<ContentSizeFitter>();
                 contentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
                 contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
                 var fadeout = indicator.GetComponent<FadeOutBehaviour>();
+                fadeout.Lifetime = IndicatorLifetime;
                 fadeout.Acceleration = 2.0f; // Accelerated fade-out
                 fadeout.OnFadeOutCompleted = () =>
                 {
@@ -227,12 +204,10 @@ namespace TestHelper.UI.Visualizers
             indicator.transform.localScale = CalcScale();
             // Note: Why not use CanvasScaler? Screen points may move depending on the aspect ratio.
 
-            var image2 = indicator.GetComponent<Image>();
-            image2.sprite = GetOrCreateSprite(pictPath);
-            image2.color = pictColor;
-
-            var fadeout2 = indicator.GetComponent<FadeOutBehaviour>();
-            fadeout2.Lifetime = IndicatorLifetime;
+            var image = indicator.GetComponent<Image>();
+            image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
+            image.sprite = GetOrCreateSprite(pictPath);
+            image.color = pictColor;
 
             return indicator;
         }

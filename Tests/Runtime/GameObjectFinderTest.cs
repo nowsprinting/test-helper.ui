@@ -504,6 +504,12 @@ namespace TestHelper.UI
                 _visualizer.Dispose();
             }
 
+            [TearDown]
+            public async Task TearDown()
+            {
+                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+            }
+
             [Test]
             [LoadScene(TestScenePath)]
             public async Task FindWithVisualizer_Hit_IndicatorIsNotShown()

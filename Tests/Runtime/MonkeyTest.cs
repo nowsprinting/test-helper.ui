@@ -616,7 +616,7 @@ namespace TestHelper.UI
         [TestFixture]
         public class Visualizer
         {
-            private const float IndicatorLifetime = 0.5f;
+            private const float IndicatorLifetime = 0.2f;
             private DefaultDebugVisualizer _visualizer;
 
             [OneTimeSetUp]
@@ -631,6 +631,12 @@ namespace TestHelper.UI
                 _visualizer.Dispose();
             }
 
+            [TearDown]
+            public async Task TearDown()
+            {
+                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+            }
+
             [Test]
             [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
             public async Task LotteryOperator_IgnoredObjectOnly_IgnoredIndicatorIsShown()
@@ -638,8 +644,7 @@ namespace TestHelper.UI
                 var cube = GameObject.Find("Cube");
                 cube.transform.position = new Vector3(0, 0, 0);
                 cube.AddComponent<IgnoreAnnotation>(); // ignored
-
-                await UniTask.DelayFrame(5); // warm up for physics raycaster (maybe)
+                await UniTask.DelayFrame(5);           // warm up for physics raycaster (maybe)
 
                 var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
                 var random = new RandomWrapper();
@@ -647,15 +652,9 @@ namespace TestHelper.UI
                 var reachableStrategy = new DefaultReachableStrategy();
                 Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, visualizer: _visualizer);
 
-                await UniTask.NextFrame();
-
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
                 Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("lock"));
-                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
-
-                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
-                Assert.That(indicator, Is.Destroyed);
             }
 
             [Test]
@@ -668,7 +667,6 @@ namespace TestHelper.UI
                 var blocker = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 blocker.transform.position = new Vector3(0, 1, -7);
                 blocker.GetComponent<MeshRenderer>().materials[0].color = Color.gray;
-
                 await UniTask.DelayFrame(5); // warm up for physics raycaster (maybe)
 
                 var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
@@ -677,15 +675,9 @@ namespace TestHelper.UI
                 var reachableStrategy = new DefaultReachableStrategy();
                 Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, visualizer: _visualizer);
 
-                await UniTask.NextFrame();
-
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
                 Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
-                Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
-
-                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
-                Assert.That(indicator, Is.Destroyed);
             }
         }
 

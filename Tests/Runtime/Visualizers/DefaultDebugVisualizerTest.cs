@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -96,39 +96,55 @@ namespace TestHelper.UI.Visualizers
 
         [Test]
         [LoadScene(TestScenePath)]
-        public void ShowNotReachableIndicator_IndicatorIsShown()
+        public async Task ShowNotReachableIndicator_IndicatorIsShown()
         {
-            var screenPoint = new Vector2(100, 100);
-
+            var screenPoint = RectTransformUtility.WorldToScreenPoint(null, _referenceObjects[0].transform.position);
             _sut.ShowNotReachableIndicator(screenPoint);
 
             var indicator = GameObject.Find("Indicator");
-            Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
-            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+            var image = indicator.GetComponent<Image>();
+            Assert.That(image.sprite.name, Is.EqualTo("eye_slash"));
+            Assert.That(image.raycastTarget, Is.False);
+
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
         [LoadScene(TestScenePath)]
-        public void ShowNotReachableIndicator_WithBlocker_BlockerIndicatorIsShown()
+        public async Task ShowNotReachableIndicator_WithBlocker_BlockerIndicatorIsShown()
         {
             var blocker = _referenceObjects[0];
-            var screenPoint = new Vector2(100, 100);
-
+            var screenPoint = RectTransformUtility.WorldToScreenPoint(null, blocker.transform.position);
             _sut.ShowNotReachableIndicator(screenPoint, blocker);
 
             var indicator = GameObject.Find("Blocker Indicator");
-            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+            var image = indicator.GetComponent<Image>();
+            Assert.That(image.raycastTarget, Is.False);
+
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
         [LoadScene(TestScenePath)]
         public async Task ShowNotReachableIndicator_AfterLifetime_IndicatorIsDeactivated()
         {
-            var screenPoint = new Vector2(100, 100);
-
+            var screenPoint = RectTransformUtility.WorldToScreenPoint(null, _referenceObjects[0].transform.position);
             _sut.ShowNotReachableIndicator(screenPoint);
 
             var indicator = GameObject.Find("Indicator");
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
+            Assert.That(indicator.activeInHierarchy, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public async Task ShowNotReachableIndicator_AfterLifetime_BlockIndicatorIsDeactivated()
+        {
+            var blocker = _referenceObjects[0];
+            var screenPoint = RectTransformUtility.WorldToScreenPoint(null, blocker.transform.position);
+            _sut.ShowNotReachableIndicator(screenPoint, blocker);
+
+            var indicator = GameObject.Find("Blocker Indicator");
             await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
             Assert.That(indicator.activeInHierarchy, Is.False);
         }
@@ -137,28 +153,49 @@ namespace TestHelper.UI.Visualizers
         [LoadScene(TestScenePath)]
         public async Task ShowNotReachableIndicator_CalledAfterReturn_IndicatorIsReused()
         {
-            var screenPoint = new Vector2(100, 100);
-
+            var screenPoint = RectTransformUtility.WorldToScreenPoint(null, _referenceObjects[0].transform.position);
             _sut.ShowNotReachableIndicator(screenPoint);
 
             var firstIndicator = GameObject.Find("Indicator");
             await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
+
             _sut.ShowNotReachableIndicator(screenPoint);
             var secondIndicator = GameObject.Find("Indicator");
-            Assert.That(secondIndicator, Is.SameAs(firstIndicator));
+            Assert.That(secondIndicator, Is.SameAs(firstIndicator)); // latest indicator is reused
+
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
         [LoadScene(TestScenePath)]
-        public void ShowNotInteractableIndicator_IndicatorIsShown()
+        public async Task ShowNotReachableIndicator_CalledAfterReturn_BlockerIndicatorIsReused()
+        {
+            var blocker = _referenceObjects[0];
+            var screenPoint = RectTransformUtility.WorldToScreenPoint(null, blocker.transform.position);
+            _sut.ShowNotReachableIndicator(screenPoint, blocker);
+
+            var firstIndicator = GameObject.Find("Blocker Indicator");
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime + 0.1));
+
+            _sut.ShowNotReachableIndicator(screenPoint, blocker);
+            var secondIndicator = GameObject.Find("Blocker Indicator");
+            Assert.That(secondIndicator, Is.SameAs(firstIndicator)); // latest indicator is reused
+
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+        }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        public async Task ShowNotInteractableIndicator_IndicatorIsShown()
         {
             var target = _referenceObjects[0];
-
             _sut.ShowNotInteractableIndicator(target);
 
             var indicator = GameObject.Find("Indicator");
             Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("hand_slash"));
             Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -166,7 +203,6 @@ namespace TestHelper.UI.Visualizers
         public async Task ShowNotInteractableIndicator_AfterLifetime_IndicatorIsDeactivated()
         {
             var target = _referenceObjects[0];
-
             _sut.ShowNotInteractableIndicator(target);
 
             var indicator = GameObject.Find("Indicator");
@@ -176,15 +212,16 @@ namespace TestHelper.UI.Visualizers
 
         [Test]
         [LoadScene(TestScenePath)]
-        public void ShowIgnoredIndicator_IndicatorIsShown()
+        public async Task ShowIgnoredIndicator_IndicatorIsShown()
         {
             var target = _referenceObjects[0];
-
             _sut.ShowIgnoredIndicator(target);
 
             var indicator = GameObject.Find("Indicator");
             Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("lock"));
             Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+
+            await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -192,7 +229,6 @@ namespace TestHelper.UI.Visualizers
         public async Task ShowIgnoredIndicator_AfterLifetime_IndicatorIsDeactivated()
         {
             var target = _referenceObjects[0];
-
             _sut.ShowIgnoredIndicator(target);
 
             var indicator = GameObject.Find("Indicator");
