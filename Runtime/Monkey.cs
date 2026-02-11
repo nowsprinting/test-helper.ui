@@ -122,6 +122,11 @@ namespace TestHelper.UI
                 {
                     GameViewControlHelper.SetGizmos(beforeGizmos);
                 }
+
+                if (config.Visualizer is IDisposable disposableVisualizer)
+                {
+                    disposableVisualizer.Dispose();
+                }
             }
         }
 
@@ -131,6 +136,7 @@ namespace TestHelper.UI
             {
                 iOperator.Logger = config.Logger;
                 iOperator.ScreenshotOptions = config.Screenshots;
+                iOperator.Visualizer = config.Visualizer;
 
                 if (iOperator is IRandomizable randomizable)
                 {

@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -11,6 +11,7 @@ using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
 using TestHelper.UI.Random;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -35,6 +36,9 @@ namespace TestHelper.UI.Operators
         public ScreenshotOptions ScreenshotOptions { private get; set; }
 
         /// <inheritdoc/>
+        public IVisualizer Visualizer { get; set; }
+
+        /// <inheritdoc/>
         public IRandom Random
         {
             set
@@ -53,14 +57,16 @@ namespace TestHelper.UI.Operators
         /// <param name="randomString">Random string generator</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        /// <param name="visualizer">Visualizer set if you need</param>
         public UguiTextInputOperator(
             Func<GameObject, RandomStringParameters> randomStringParams = null, IRandomString randomString = null,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null, IVisualizer visualizer = null)
         {
             _randomStringParams = randomStringParams ?? (_ => RandomStringParameters.Default);
             _randomString = randomString ?? new RandomStringImpl(new RandomWrapper());
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
+            Visualizer = visualizer;
         }
 
         /// <inheritdoc />
@@ -109,6 +115,9 @@ namespace TestHelper.UI.Operators
         public async UniTask OperateAsync(GameObject gameObject, string text,
             CancellationToken cancellationToken = default)
         {
+            // Show visual effect
+            Visualizer?.ShowPointerOperationEffect(gameObject);
+
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("text", $"\"{text}\"");

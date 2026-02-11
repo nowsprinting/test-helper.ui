@@ -1,8 +1,9 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -27,6 +28,11 @@ namespace TestHelper.UI.Operators
         /// Take screenshot options set if you need.
         /// </summary>
         ScreenshotOptions ScreenshotOptions { set; }
+
+        /// <summary>
+        /// Visualizer for the operation; set it if you need.
+        /// </summary>
+        IVisualizer Visualizer { set; }
 
         /// <summary>
         /// Returns if can operate target <c>GameObject</c> this Operator.

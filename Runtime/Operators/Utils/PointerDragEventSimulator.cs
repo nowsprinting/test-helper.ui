@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Extensions;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -25,6 +26,8 @@ namespace TestHelper.UI.Operators.Utils
 
         private bool _isDragging;
         private readonly List<RaycastResult> _raycastResults;
+
+        private const int VisualEffectIntervalFrame = 5;
 
         /// <summary>
         /// Constructor.
@@ -108,8 +111,10 @@ namespace TestHelper.UI.Operators.Utils
         /// </summary>
         /// <param name="destination">Drop destination point.</param>
         /// <param name="speed">Drag speed in units per second (must be positive)</param>
+        /// <param name="visualizer">Visualizer that visualizes pointer events.</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public async UniTask DragAsync(Vector2 destination, int speed, CancellationToken cancellationToken = default)
+        public async UniTask DragAsync(Vector2 destination, int speed, IVisualizer visualizer,
+            CancellationToken cancellationToken = default)
         {
             if (!_isDragging)
             {
@@ -159,6 +164,12 @@ namespace TestHelper.UI.Operators.Utils
                 }
 
                 ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.dragHandler);
+
+                // Show visual effect
+                if (visualizer != null && Time.frameCount % VisualEffectIntervalFrame == 0)
+                {
+                    visualizer.ShowPointerOperationEffect(_eventData.position);
+                }
 
                 await UniTask.NextFrame(cancellationToken: cancellationToken);
             }

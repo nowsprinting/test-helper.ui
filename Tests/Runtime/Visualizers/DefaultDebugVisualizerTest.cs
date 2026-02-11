@@ -250,7 +250,7 @@ namespace TestHelper.UI.Visualizers
             Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("ripple"));
             Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(2.0f), ignoreTimeScale: false); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(2.0f)); // wait for end of life
         }
 
         [Test]
@@ -264,7 +264,7 @@ namespace TestHelper.UI.Visualizers
             await UniTask.NextFrame(); // wait for indicator to be shown
 
             var indicator = GameObject.Find("Indicator");
-            await UniTask.Delay(TimeSpan.FromSeconds(2.0f), ignoreTimeScale: false); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(2.0f)); // wait for end of life
             Assert.That(indicator.activeInHierarchy, Is.False);
         }
     }

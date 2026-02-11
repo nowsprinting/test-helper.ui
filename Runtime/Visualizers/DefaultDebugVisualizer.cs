@@ -167,6 +167,12 @@ namespace TestHelper.UI.Visualizers
         /// <inheritdoc/>
         public void ShowPointerOperationEffect(GameObject gameObject)
         {
+            ShowPointerOperationEffect(GetScreenPoint(gameObject));
+        }
+
+        /// <inheritdoc/>
+        public void ShowPointerOperationEffect(Vector2 screenPoint)
+        {
             try
             {
                 for (var i = 0; i < RippleCount; i++)
@@ -186,7 +192,7 @@ namespace TestHelper.UI.Visualizers
                 await UniTask.Delay(RippleIntervalMillis * i, ignoreTimeScale: false);
 
                 var ripple = GetOrCreateIndicator(RipplePictPath, RipplePictColor, true);
-                ripple.transform.position = GetScreenPoint(gameObject);
+                ripple.transform.position = screenPoint;
             }
         }
 

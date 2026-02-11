@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Extensions;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -27,9 +28,10 @@ namespace TestHelper.UI.Operators
         /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        /// <param name="visualizer">Visualizer set if you need</param>
         public UguiToggleOperator(Func<GameObject, Vector2> getScreenPoint = null,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
-            : base(getScreenPoint, logger, screenshotOptions)
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null, IVisualizer visualizer = null)
+            : base(getScreenPoint, logger, screenshotOptions, visualizer)
         {
         }
 

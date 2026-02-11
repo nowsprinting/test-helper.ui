@@ -736,7 +736,7 @@ Lottery entries are empty or all of not reachable.
 #### Debug Visualizer
 
 Using the Debug Visualizer can help you investigate why a `GameObject` cannot be operated on.
-`DefaultDebugVisualizer` shows visual indicators when "not reachable" or "ignored" occurs.
+`DefaultDebugVisualizer` shows visual indicators for operating, "not reachable", and "ignored".
 
 To use it, simply set an instance to the `MonkeyConfig.Visualizer`, like this:
 

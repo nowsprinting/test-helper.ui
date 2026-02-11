@@ -13,6 +13,7 @@ using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
 using TestHelper.UI.Random;
 using TestHelper.UI.Strategies;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
@@ -38,6 +39,9 @@ namespace TestHelper.UI.Operators
 
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
+
+        /// <inheritdoc/>
+        public IVisualizer Visualizer { get; set; }
 
         /// <inheritdoc/>
         public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
@@ -78,9 +82,10 @@ namespace TestHelper.UI.Operators
         /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. Used to determine drop position.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console).</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need.</param>
+        /// <param name="visualizer">Visualizer set if you need</param>
         public UguiDragAndDropOperator(int dragSpeed = 1200, double delayBeforeDrop = 0D, IRandom random = null,
             Func<GameObject, Vector2> getScreenPoint = null, IReachableStrategy reachableStrategy = null,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null, IVisualizer visualizer = null)
         {
             if (dragSpeed <= 0)
             {
@@ -99,6 +104,7 @@ namespace TestHelper.UI.Operators
             ReachableStrategy = reachableStrategy ?? new DefaultReachableStrategy(GetScreenPoint);
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
+            Visualizer = visualizer;
         }
 
         /// <inheritdoc />
@@ -210,6 +216,9 @@ namespace TestHelper.UI.Operators
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
+            // Show visual effect
+            Visualizer?.ShowPointerOperationEffect(gameObject);
+
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
@@ -220,7 +229,7 @@ namespace TestHelper.UI.Operators
             using (var simulator = new PointerDragEventSimulator(gameObject, raycastResult, Logger))
             {
                 simulator.BeginDrag();
-                await simulator.DragAsync(destination, dragSpeed, cancellationToken);
+                await simulator.DragAsync(destination, dragSpeed, Visualizer, cancellationToken);
 
                 // Wait for delay before drop
                 await UniTask.Delay(TimeSpan.FromSeconds(_delayBeforeDrop), ignoreTimeScale: true,
