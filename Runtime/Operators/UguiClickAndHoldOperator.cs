@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
 using TestHelper.UI.Strategies;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -25,6 +26,9 @@ namespace TestHelper.UI.Operators
         public ScreenshotOptions ScreenshotOptions { private get; set; }
 
         /// <inheritdoc/>
+        public IVisualizer Visualizer { get; set; }
+
+        /// <inheritdoc/>
         public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
 
         private readonly int _holdMillis;
@@ -36,8 +40,9 @@ namespace TestHelper.UI.Operators
         /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        /// <param name="visualizer">Visualizer set if you need</param>
         public UguiClickAndHoldOperator(int holdMillis = 1000, Func<GameObject, Vector2> getScreenPoint = null,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null, IVisualizer visualizer = null)
         {
             if (holdMillis <= 0)
             {
@@ -48,6 +53,7 @@ namespace TestHelper.UI.Operators
             GetScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
+            Visualizer = visualizer;
         }
 
         /// <inheritdoc />
@@ -91,6 +97,9 @@ namespace TestHelper.UI.Operators
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
 
+            // Show visual effect
+            Visualizer?.ShowPointerOperationEffect(gameObject);
+
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
@@ -101,6 +110,9 @@ namespace TestHelper.UI.Operators
             {
                 await pointerClickSimulator.PointerClickAsync(holdMillis, cancellationToken: cancellationToken);
             }
+
+            // Show visual effect (pointer up)
+            Visualizer?.ShowPointerOperationEffect(gameObject);
         }
     }
 }

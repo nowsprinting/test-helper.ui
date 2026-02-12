@@ -1,6 +1,7 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,12 +11,12 @@ namespace TestHelper.UI.Visualizers
     /// Fade-out behavior for indicators.
     /// </summary>
     [RequireComponent(typeof(Image))]
-    public class FadeOutBehaviour : MonoBehaviour
+    internal class FadeOutBehaviour : MonoBehaviour
     {
         /// <summary>
         /// Indicator lifetime in seconds.
         /// </summary>
-        public float Lifetime { private get; set; } = 1.0f;
+        public float Lifetime { private get; set; }
 
         /// <summary>
         /// Exponent for acceleration.
@@ -23,15 +24,30 @@ namespace TestHelper.UI.Visualizers
         /// &gt;1 = accelerating (slow -> fast),
         /// &lt;1 = decelerating.
         /// </summary>
-        public float Acceleration { private get; set; } = 1.0f;
+        public float Acceleration { private get; set; }
+
+        /// <summary>
+        /// Callback invoked when fade-out is completed.
+        /// </summary>
+        public Action OnFadeOutCompleted { private get; set; }
 
         private Image _image;
         private float _elapsed;
 
-        private void Start()
+        private void Awake()
         {
             _image = GetComponent<Image>();
-            Destroy(gameObject, Lifetime);
+        }
+
+        private void OnEnable()
+        {
+            _elapsed = 0f;
+            if (_image)
+            {
+                var color = _image.color;
+                color.a = 1f;
+                _image.color = color;
+            }
         }
 
         private void Update()
@@ -42,6 +58,20 @@ namespace TestHelper.UI.Visualizers
             var color = _image.color;
             color.a = 1f - accelerated;
             _image.color = color;
+
+            if (_elapsed < Lifetime)
+            {
+                return;
+            }
+
+            if (OnFadeOutCompleted != null)
+            {
+                OnFadeOutCompleted.Invoke();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -9,6 +9,7 @@ using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators.Utils;
 using TestHelper.UI.Random;
 using TestHelper.UI.Strategies;
+using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -28,6 +29,9 @@ namespace TestHelper.UI.Operators
 
         /// <inheritdoc/>
         public ScreenshotOptions ScreenshotOptions { private get; set; }
+
+        /// <inheritdoc/>
+        public IVisualizer Visualizer { get; set; }
 
         /// <inheritdoc/>
         public Func<GameObject, Vector2> GetScreenPoint { private get; set; }
@@ -63,8 +67,10 @@ namespace TestHelper.UI.Operators
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <exception cref="ArgumentException">Thrown when scrollPerFrame is zero or negative</exception>
+        /// <param name="visualizer">Visualizer set if you need</param>
         public UguiScrollWheelOperator(int scrollSpeed = 1200, Func<GameObject, Vector2> getScreenPoint = null,
-            IRandom random = null, ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+            IRandom random = null, ILogger logger = null, ScreenshotOptions screenshotOptions = null,
+            IVisualizer visualizer = null)
         {
             if (scrollSpeed <= 0)
             {
@@ -76,6 +82,7 @@ namespace TestHelper.UI.Operators
             _random = random;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
+            Visualizer = visualizer;
         }
 
         /// <inheritdoc />
@@ -214,7 +221,11 @@ namespace TestHelper.UI.Operators
             {
                 raycastResult = RaycastResultExtensions.CreateFrom(gameObject, GetScreenPoint);
             }
+
             scrollSpeed = scrollSpeed > 0 ? scrollSpeed : _scrollSpeed;
+
+            // Show visual effect
+            Visualizer?.ShowPointerOperationEffect(gameObject);
 
             if (logDestination)
             {
