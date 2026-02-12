@@ -122,11 +122,6 @@ namespace TestHelper.UI
                 {
                     GameViewControlHelper.SetGizmos(beforeGizmos);
                 }
-
-                if (config.Visualizer is IDisposable disposableVisualizer)
-                {
-                    disposableVisualizer.Dispose();
-                }
             }
         }
 
