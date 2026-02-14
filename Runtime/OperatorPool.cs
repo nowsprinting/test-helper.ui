@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using TestHelper.UI.Operators;
 
 namespace TestHelper.UI
@@ -22,7 +24,7 @@ namespace TestHelper.UI
         /// <param name="args">Constructor arguments for creating instances</param>
         public void Register<T>(params object[] args) where T : class, IOperator
         {
-            throw new NotImplementedException();
+            _registrations[typeof(T)] = args;
         }
 
         /// <summary>
@@ -32,7 +34,32 @@ namespace TestHelper.UI
         /// <returns>An instance of the requested operator type</returns>
         public T Rent<T>() where T : class, IOperator
         {
-            throw new NotImplementedException();
+            var type = typeof(T);
+
+            if (_pools.TryGetValue(type, out var stack) && stack.Count > 0)
+            {
+                return (T)stack.Pop();
+            }
+
+            if (!_registrations.TryGetValue(type, out var args))
+            {
+                throw new InvalidOperationException($"Type {type.Name} is not registered.");
+            }
+
+            if (args.Length > 0)
+            {
+                return (T)Activator.CreateInstance(type, args);
+            }
+
+            var constructor = type.GetConstructors().FirstOrDefault();
+            if (constructor == null)
+            {
+                throw new InvalidOperationException($"Type {type.Name} has no public constructor.");
+            }
+
+            var parameters = constructor.GetParameters();
+            var defaultArgs = parameters.Select(p => p.DefaultValue).ToArray();
+            return (T)constructor.Invoke(defaultArgs);
         }
 
         /// <summary>
@@ -41,7 +68,24 @@ namespace TestHelper.UI
         /// <param name="obj">The operator instance to return</param>
         public void Return(IOperator obj)
         {
-            throw new NotImplementedException();
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            var type = obj.GetType();
+            if (!_registrations.ContainsKey(type))
+            {
+                throw new InvalidOperationException($"Type {type.Name} is not registered.");
+            }
+
+            if (!_pools.TryGetValue(type, out var stack))
+            {
+                stack = new Stack<IOperator>();
+                _pools[type] = stack;
+            }
+
+            stack.Push(obj);
         }
     }
 }
