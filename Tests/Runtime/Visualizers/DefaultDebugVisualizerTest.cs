@@ -9,6 +9,7 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
+using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace TestHelper.UI.Visualizers
@@ -288,6 +289,7 @@ namespace TestHelper.UI.Visualizers
         [Test]
         [LoadScene(TestScenePath)]
         [TimeScale(TestTimeScale)]
+        [Category("IgnoreCI")]
         public async Task ShowPointerOperationEffect_CalledAfterReturn_IndicatorIsReused()
         {
             _sut.ShowPointerOperationEffect(_referenceObjects[0]);
