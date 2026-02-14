@@ -68,7 +68,7 @@ namespace TestHelper.UI.Visualizers
         /// <summary>
         /// Ripple scale amount per second.
         /// </summary>
-        public float RippleScalePerSecond { private get; set; } = 4.0f;
+        public float RippleScalePerSecond { private get; set; } = 7.0f;
 
         /// <summary>
         /// Number of ripples.
@@ -94,7 +94,7 @@ namespace TestHelper.UI.Visualizers
         /// <summary>
         /// Indicator lifetime in seconds.
         /// </summary>
-        public float IndicatorLifetime { private get; set; } = 1.0f;
+        public float IndicatorLifetime { internal get; set; } = 1.0f;
 
         /// <summary>
         /// Function of get screen point.
@@ -104,6 +104,7 @@ namespace TestHelper.UI.Visualizers
         private readonly Dictionary<string, Sprite> _pics = new Dictionary<string, Sprite>();
         private readonly Stack<GameObject> _blockerIndicatorPool = new Stack<GameObject>();
         private readonly Stack<GameObject> _indicatorPool = new Stack<GameObject>();
+        private readonly Stack<GameObject> _ripplePool = new Stack<GameObject>();
         private Canvas _overlayCanvas;
 
         /// <inheritdoc/>
@@ -122,13 +123,11 @@ namespace TestHelper.UI.Visualizers
             {
                 if (blocker && blocker.TryGetComponent<RectTransform>(out var blockerRectTransform))
                 {
-                    var blockerIndicator = GetOrCreateBlockerIndicator(blockerRectTransform);
-                    blockerIndicator.transform.position = screenPoint;
+                    PopOrCreateBlockerIndicator(blockerRectTransform);
                 }
                 // TODO: 3D objects
 
-                var indicator = GetOrCreateIndicator(NotReachablePictPath, NotReachablePictColor);
-                indicator.transform.position = screenPoint;
+                PopOrCreateIndicator(screenPoint, NotReachablePictPath, NotReachablePictColor);
             }
             catch (Exception e)
             {
@@ -141,8 +140,7 @@ namespace TestHelper.UI.Visualizers
         {
             try
             {
-                var indicator = GetOrCreateIndicator(NotInteractablePictPath, NotInteractablePictColor);
-                indicator.transform.position = GetScreenPoint(gameObject);
+                PopOrCreateIndicator(GetScreenPoint(gameObject), NotInteractablePictPath, NotInteractablePictColor);
             }
             catch (Exception e)
             {
@@ -155,8 +153,7 @@ namespace TestHelper.UI.Visualizers
         {
             try
             {
-                var indicator = GetOrCreateIndicator(IgnoredPictPath, IgnoredPictColor);
-                indicator.transform.position = GetScreenPoint(gameObject);
+                PopOrCreateIndicator(GetScreenPoint(gameObject), IgnoredPictPath, IgnoredPictColor);
             }
             catch (Exception e)
             {
@@ -189,23 +186,23 @@ namespace TestHelper.UI.Visualizers
 
             async UniTask ShowRippleEffectAfterDelay(int i)
             {
-                if (i > 0)
+                var interval = RippleIntervalMillis * i;
+                if (interval > 0)
                 {
-                    await UniTask.Delay(RippleIntervalMillis * i, ignoreTimeScale: true);
+                    await UniTask.Delay(interval, ignoreTimeScale: Time.timeScale == 0f);
                 }
 
-                var ripple = GetOrCreateIndicator(RipplePictPath, RipplePictColor, true);
-                ripple.transform.position = screenPoint;
+                var elapsedMillis = Math.Max(interval - RippleIntervalMillis * 0.5f, 0);
+                PopOrCreateRipple(screenPoint, elapsedMillis * 0.001f);
             }
         }
 
-        private GameObject GetOrCreateBlockerIndicator(RectTransform blockerRectTransform)
+        private void PopOrCreateBlockerIndicator(RectTransform blockerRectTransform)
         {
             GameObject indicator;
             if (_blockerIndicatorPool.Count > 0)
             {
                 indicator = _blockerIndicatorPool.Pop();
-                indicator.SetActive(true);
             }
             else
             {
@@ -231,21 +228,20 @@ namespace TestHelper.UI.Visualizers
             rectTransform.sizeDelta = blockerRectTransform.rect.size * blockerRectTransform.lossyScale;
             rectTransform.position = blockerRectTransform.position;
 
-            return indicator;
+            indicator.SetActive(true);
         }
 
-        private GameObject GetOrCreateIndicator(string pictPath, Color pictColor, bool withSpread = false)
+        private void PopOrCreateIndicator(Vector2 screenPoint, string pictPath, Color pictColor)
         {
             GameObject indicator;
             if (_indicatorPool.Count > 0)
             {
                 indicator = _indicatorPool.Pop();
-                indicator.SetActive(true);
             }
             else
             {
                 indicator = new GameObject($"Indicator", typeof(Image), typeof(ContentSizeFitter),
-                    typeof(FadeOutBehaviour), typeof(SpreadBehaviour));
+                    typeof(FadeOutBehaviour));
                 indicator.transform.SetParent(GetOrCreateOverlayCanvas().transform);
 
                 var contentSizeFitter = indicator.GetComponent<ContentSizeFitter>();
@@ -262,26 +258,68 @@ namespace TestHelper.UI.Visualizers
                 };
             }
 
-            indicator.transform.localScale = CalcScale();
+            var scale = CalcScale();
+            indicator.transform.localScale = new Vector3(scale, scale, 1f);
             // Note: Why not use CanvasScaler? Screen points may move depending on the aspect ratio.
-
-            var spreadBehaviour = indicator.GetComponent<SpreadBehaviour>();
-            spreadBehaviour.ScalePerSecond = RippleScalePerSecond;
-            spreadBehaviour.enabled = withSpread;
 
             var image = indicator.GetComponent<Image>();
             image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
             image.sprite = GetOrCreateSprite(pictPath);
             image.color = pictColor;
 
-            return indicator;
+            indicator.transform.position = screenPoint;
+            indicator.SetActive(true);
         }
 
-        private Vector3 CalcScale()
+        private void PopOrCreateRipple(Vector2 screenPoint, float elapsed)
+        {
+            GameObject ripple;
+            if (_ripplePool.Count > 0)
+            {
+                ripple = _ripplePool.Pop();
+            }
+            else
+            {
+                ripple = new GameObject($"Ripple", typeof(Image), typeof(ContentSizeFitter),
+                    typeof(FadeOutBehaviour), typeof(SpreadBehaviour));
+                ripple.transform.SetParent(GetOrCreateOverlayCanvas().transform);
+
+                var contentSizeFitter = ripple.GetComponent<ContentSizeFitter>();
+                contentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                var image = ripple.GetComponent<Image>();
+                image.raycastTarget = false; // Disable raycast target to avoid blocking UI interactions
+                image.sprite = GetOrCreateSprite(RipplePictPath);
+                image.color = RipplePictColor;
+
+                var fadeout = ripple.GetComponent<FadeOutBehaviour>();
+                fadeout.Lifetime = IndicatorLifetime;
+                fadeout.Acceleration = 2.0f; // Accelerated fade-out
+                fadeout.OnFadeOutCompleted = () =>
+                {
+                    ripple.SetActive(false);
+                    _ripplePool.Push(ripple);
+                };
+            }
+
+            var scale = CalcScale();
+            ripple.transform.localScale = new Vector3(scale, scale, 1f);
+            // Note: Why not use CanvasScaler? Screen points may move depending on the aspect ratio.
+
+            var spreadBehaviour = ripple.GetComponent<SpreadBehaviour>();
+            spreadBehaviour.ScalePerSecond = RippleScalePerSecond * scale;
+
+            ripple.GetComponent<FadeOutBehaviour>().InitialElapsed = elapsed;
+
+            ripple.transform.position = screenPoint;
+            ripple.SetActive(true);
+        }
+
+        private float CalcScale()
         {
             var shortSide = Math.Min(Screen.width, Screen.height);
-            var scale = (float)shortSide / ReferenceScreenResolutionShortSide;
-            return new Vector3(scale, scale, 1f);
+            return (float)shortSide / ReferenceScreenResolutionShortSide;
         }
 
         private Sprite GetOrCreateSprite(string pictPath)
