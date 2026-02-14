@@ -61,6 +61,7 @@ namespace TestHelper.UI
         /// <param name="args">Constructor arguments for creating instances</param>
         public OperatorPool Register<T>(params object[] args) where T : class, IOperator
         {
+            args = args ?? Array.Empty<object>();
             _registrations[typeof(T)] = args;
             return this;
         }
@@ -84,7 +85,13 @@ namespace TestHelper.UI
             return (T)Rent(typeof(T));
         }
 
-        private IOperator Rent(Type type)
+        /// <summary>
+        /// Rents an operator instance from the pool or creates a new one.
+        /// </summary>
+        /// <param name="type">The operator type to rent</param>
+        /// <returns>An instance of the requested operator type</returns>
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        public IOperator Rent(Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (!typeof(IOperator).IsAssignableFrom(type))
@@ -102,7 +109,7 @@ namespace TestHelper.UI
                 throw new InvalidOperationException($"{type.Name} is not registered.");
             }
 
-            if (args.Length > 0)
+            if (args == null || args.Length > 0)
             {
                 return (IOperator)Activator.CreateInstance(type, args);
             }

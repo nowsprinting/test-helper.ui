@@ -82,7 +82,7 @@ namespace TestHelper.UI
                     .SelectMany(x => x.gameObject.SelectOperators(_operators), (x, o) => (x, o));
             }
 
-            var operators = _operatorPool.RentAll();
+            var operators = _operatorPool.RentAll().ToArray();
             try
             {
                 return FindInteractableComponents()

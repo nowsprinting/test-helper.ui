@@ -62,9 +62,9 @@ namespace TestHelper.UI
                 SetupOperators(config);
             }
 
-            var interactableComponentsFinder = config.OperatorPool != null
-                ? new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool)
-                : new InteractableComponentsFinder(config.IsInteractable, config.Operators);
+            var interactableComponentsFinder = config.Operators != null
+                ? new InteractableComponentsFinder(config.IsInteractable, config.Operators)
+                : new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
 #pragma warning restore CS0618 // Type or member is obsolete
             var operationSequence = new List<int>(config.BufferLengthForDetectLooping);
 
