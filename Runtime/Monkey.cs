@@ -56,10 +56,16 @@ namespace TestHelper.UI
                 GameViewControlHelper.SetGizmos(true);
             }
 
-            SetupOperators(config);
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (config.Operators != null)
+            {
+                SetupOperators(config);
+            }
 
-            var interactableComponentsFinder =
-                new InteractableComponentsFinder(config.IsInteractable, config.Operators);
+            var interactableComponentsFinder = config.Operators != null
+                ? new InteractableComponentsFinder(config.IsInteractable, config.Operators)
+                : new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
+#pragma warning restore CS0618 // Type or member is obsolete
             var operationSequence = new List<int>(config.BufferLengthForDetectLooping);
 
             config.Logger.Log($"Using {config.Random}");
@@ -127,7 +133,9 @@ namespace TestHelper.UI
 
         private static void SetupOperators(MonkeyConfig config)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             foreach (var iOperator in config.Operators)
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 iOperator.Logger = config.Logger;
                 iOperator.ScreenshotOptions = config.Screenshots;

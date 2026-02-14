@@ -105,10 +105,17 @@ namespace TestHelper.UI
         /// <c>logger</c>, <c>screenshotOptions</c>, <c>GetScreenPoint</c>, and <c>ReachableStrategy</c> will be overridden at runtime by the same name properties in this <c>MonkeyConfig</c> instance.
         /// And <c>Random</c> will also be overridden at runtime by a forked instance from the <c>Random</c> property in this <c>MonkeyConfig</c> instance.
         /// </summary>
-        public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
-        {
-            new UguiClickOperator(),
-            new UguiTextInputOperator(),
-        };
+        [Obsolete("Use OperatorPool to manage operators instead of this property.")]
+        public IEnumerable<IOperator> Operators { get; set; }
+
+        /// <summary>
+        /// Operators that the monkey uses.
+        /// <p/>
+        /// If constructor arguments are required, pass them to the constructor args of <c>OperatorPool</c> or <c>Register&lt;T&gt;</c> method args.
+        /// However, the <c>Random</c> property is set by forking from the <c>MonkeyConfig.Random</c> property.
+        /// </summary>
+        public OperatorPool OperatorPool { get; set; } = new OperatorPool()
+            .Register<UguiClickOperator>()
+            .Register<UguiTextInputOperator>();
     }
 }

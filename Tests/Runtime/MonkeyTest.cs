@@ -32,19 +32,18 @@ namespace TestHelper.UI
     {
         private const string TestScene = "../Scenes/Operators.unity";
 
-        private IEnumerable<IOperator> _operators;
+        private OperatorPool _operatorPool;
         private InteractableComponentsFinder _interactableComponentsFinder;
 
         [SetUp]
         public void SetUp()
         {
-            _operators = new IOperator[]
-            {
-                new UguiClickOperator(),         // click
-                new UguiClickAndHoldOperator(1), // click and hold 1ms
-                new UguiTextInputOperator()
-            };
-            _interactableComponentsFinder = new InteractableComponentsFinder(operators: _operators);
+            _operatorPool = new OperatorPool()
+                .Register<UguiClickOperator>()
+                .Register<UguiClickAndHoldOperator>(1, null, null, null, null)
+                .Register<UguiTextInputOperator>();
+
+            _interactableComponentsFinder = new InteractableComponentsFinder(operators: _operatorPool);
         }
 
         [Test]
@@ -94,7 +93,8 @@ namespace TestHelper.UI
                 DelayMillis = 1,                           // 1ms
                 BufferLengthForDetectLooping = 0,          // disable loop detection
                 Logger = spyLogger,
-                Operators = _operators,
+                OperatorPool = new OperatorPool(logger: spyLogger)
+                    .Register<UguiClickOperator>(),
             };
 
             await Monkey.Run(config, oneStepMode: true);
@@ -114,7 +114,7 @@ namespace TestHelper.UI
                 Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                 DelayMillis = 1,                           // 1ms
                 BufferLengthForDetectLooping = 0,          // disable loop detection
-                Operators = _operators,
+                OperatorPool = _operatorPool,
             };
             var task = Monkey.Run(config);
             await UniTask.Delay(1000, DelayType.DeltaTime);
@@ -128,8 +128,8 @@ namespace TestHelper.UI
         {
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.MaxValue, // Test that it does not overflow
-                Operators = Enumerable.Empty<IOperator>(),
+                Lifetime = TimeSpan.MaxValue,      // Test that it does not overflow
+                OperatorPool = new OperatorPool(), // empty
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
@@ -203,7 +203,7 @@ namespace TestHelper.UI
                 Lifetime = TimeSpan.FromSeconds(1), // 1sec
                 Random = new RandomWrapper(0),      // pin seed
                 Logger = spyLogger,
-                Operators = _operators,
+                OperatorPool = _operatorPool,
             };
 
             await Monkey.Run(config);
@@ -224,7 +224,7 @@ namespace TestHelper.UI
                 DelayMillis = 1,                           // 1ms
                 BufferLengthForDetectLooping = 0,          // disable loop detection
                 Gizmos = true,                             // show Gizmos
-                Operators = _operators,
+                OperatorPool = _operatorPool,
             };
             var task = Monkey.Run(config);
             await UniTask.Delay(1000, DelayType.DeltaTime);
@@ -266,7 +266,7 @@ namespace TestHelper.UI
         [LoadScene(TestScene)]
         public void GetLotteryEntries_NoOperators_ReturnsEmpty()
         {
-            var notHasOperatorFinder = new InteractableComponentsFinder();
+            var notHasOperatorFinder = new InteractableComponentsFinder(operators: new OperatorPool());
             var actual = Monkey.GetLotteryEntries(notHasOperatorFinder);
 
             Assert.That(actual, Is.Not.Null.And.Empty);
@@ -367,21 +367,17 @@ namespace TestHelper.UI
             {
                 var config = new MonkeyConfig
                 {
-                    Operators = new IOperator[] { new UguiClickOperator() },
-                    Screenshots = screenshotOptions
+                    Screenshots = screenshotOptions,
+                    OperatorPool = new OperatorPool(screenshotOptions: screenshotOptions)
+                        .Register<UguiClickOperator>()
                 };
-                foreach (var iOperator in config.Operators)
-                {
-                    iOperator.Logger = config.Logger;
-                    iOperator.ScreenshotOptions = config.Screenshots;
-                }
 
                 return config;
             }
 
             private static InteractableComponentsFinder CreateInteractableComponentsFinder(MonkeyConfig config)
             {
-                return new InteractableComponentsFinder(operators: config.Operators);
+                return new InteractableComponentsFinder(operators: config.OperatorPool);
             }
 
             [Test]
@@ -495,13 +491,12 @@ namespace TestHelper.UI
         {
             private static InteractableComponentsFinder CreateInteractableComponentsFinder()
             {
-                var operators = new IOperator[]
-                {
-                    new UguiClickOperator(),         // click
-                    new UguiClickAndHoldOperator(1), // click and hold 1ms
-                    new UguiTextInputOperator()
-                };
-                return new InteractableComponentsFinder(operators: operators);
+                var operatorPool = new OperatorPool()
+                    .Register<UguiClickOperator>()
+                    .Register<UguiClickAndHoldOperator>(1, null, null, null, null)
+                    .Register<UguiTextInputOperator>();
+
+                return new InteractableComponentsFinder(operators: operatorPool);
             }
 
             [Test]
@@ -694,7 +689,8 @@ namespace TestHelper.UI
                     Lifetime = TimeSpan.FromSeconds(2), // 2sec
                     DelayMillis = 1,                    // 1ms
                     BufferLengthForDetectLooping = 10,  // repeating 5-step sequences can be detected
-                    Operators = new IOperator[] { new UguiClickOperator() },
+                    OperatorPool = new OperatorPool()
+                        .Register<UguiClickOperator>(),
                 };
 
                 try
