@@ -22,12 +22,12 @@ namespace TestHelper.UI
         private readonly Dictionary<Type, Stack<IOperator>> _pools = new Dictionary<Type, Stack<IOperator>>();
         private readonly Dictionary<Type, object[]> _registrations = new Dictionary<Type, object[]>();
 
-        private readonly ILogger _logger;
-        private readonly ScreenshotOptions _screenshotOptions;
-        private readonly IVisualizer _visualizer;
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
-        private readonly IReachableStrategy _reachableStrategy;
-        private readonly IRandom _random;
+        public ILogger Logger { get; set; }
+        public ScreenshotOptions ScreenshotOptions { get; set; }
+        public IVisualizer Visualizer { get; set; }
+        public Func<GameObject, Vector2> GetScreenPoint { get; set; }
+        public IReachableStrategy ReachableStrategy { get; set; }
+        public IRandom Random { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OperatorPool"/> class.
@@ -46,12 +46,12 @@ namespace TestHelper.UI
             IReachableStrategy reachableStrategy = null,
             IRandom random = null)
         {
-            _logger = logger;
-            _screenshotOptions = screenshotOptions;
-            _visualizer = visualizer;
-            _getScreenPoint = getScreenPoint;
-            _reachableStrategy = reachableStrategy;
-            _random = random;
+            Logger = logger;
+            ScreenshotOptions = screenshotOptions;
+            Visualizer = visualizer;
+            GetScreenPoint = getScreenPoint;
+            ReachableStrategy = reachableStrategy;
+            Random = random;
         }
 
         /// <summary>
@@ -156,12 +156,12 @@ namespace TestHelper.UI
         {
             var type = parameter.ParameterType;
 
-            if (type == typeof(ILogger) && _logger != null) return _logger;
-            if (type == typeof(ScreenshotOptions) && _screenshotOptions != null) return _screenshotOptions;
-            if (type == typeof(IVisualizer) && _visualizer != null) return _visualizer;
-            if (type == typeof(Func<GameObject, Vector2>) && _getScreenPoint != null) return _getScreenPoint;
-            if (type == typeof(IReachableStrategy) && _reachableStrategy != null) return _reachableStrategy;
-            if (type == typeof(IRandom) && _random != null) return _random.Fork();
+            if (type == typeof(ILogger) && Logger != null) return Logger;
+            if (type == typeof(ScreenshotOptions) && ScreenshotOptions != null) return ScreenshotOptions;
+            if (type == typeof(IVisualizer) && Visualizer != null) return Visualizer;
+            if (type == typeof(Func<GameObject, Vector2>) && GetScreenPoint != null) return GetScreenPoint;
+            if (type == typeof(IReachableStrategy) && ReachableStrategy != null) return ReachableStrategy;
+            if (type == typeof(IRandom) && Random != null) return Random.Fork();
 
             if (parameter.HasDefaultValue)
             {
