@@ -245,6 +245,9 @@ namespace TestHelper.UI.Operators
                     Logger.Log(builder.ToString());
                 }
             }
+
+            // Show visual effect
+            Visualizer?.ShowPointerOperationEffect(destination);
         }
 
         private static string Format(Vector2 vector2)
