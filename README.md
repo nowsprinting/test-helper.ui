@@ -294,7 +294,7 @@ Configurations in `MonkeyConfig`:
 - **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` or any of its ancestors has an enabled `IgnoreAnnotation` attached, or matches any of the configured ignore matchers (including their children).
 - **GetScreenPoint**: Function to get the screen point from `GameObject` used in the operators. The default implementation returns the pivot position of the `GameObject` in screen space.
 - **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **Operators**: A collection of `IOperator` that the monkey invokes. The default is `UguiClickOperator` and `UguiTextInputOperator`. There is support for standard uGUI components.
+- **OperatorPool**: An `OperatorPool` instance that manages `IOperator` creation and reuse. The default registers `UguiClickOperator` and `UguiTextInputOperator`. See [OperatorPool](#operatorpool) section below for details.
 
 Class diagram for default strategies:
 
@@ -304,7 +304,7 @@ classDiagram
         +Func&lt;Component, bool&gt; IsInteractable
         +IIgnoreStrategy IgnoreStrategy
         +IReachableStrategy ReachableStrategy
-        +IOperator[] Operators
+        +OperatorPool OperatorPool
     }
 
     MonkeyConfig --> DefaultComponentInteractableStrategy
@@ -343,7 +343,15 @@ classDiagram
         +GetScreenPointByWorldPosition(GameObject, Vector3) Vector2$
     }
 
-    MonkeyConfig --> "*" IOperator
+    MonkeyConfig --> OperatorPool
+    OperatorPool --> "*" IOperator
+
+    class OperatorPool {
+        +Register&lt;T&gt;(params object[]) OperatorPool
+        +RentAll() IEnumerable<IOperator>
+        +Rent<T>() T
+        +Return(IOperator) void
+    }
 
     class IOperator {
         +CanOperate(GameObject) bool*
@@ -356,6 +364,45 @@ classDiagram
     IOperator <|-- ITextInputOperator
     ITextInputOperator <|-- UguiTextInputOperator
 ```
+
+
+#### OperatorPool
+
+`OperatorPool` manages the lifecycle of operator instances, providing instance pooling and dependency injection capabilities.
+
+By default, `UguiClickOperator` and `UguiTextInputOperator` are registered in the pool.
+When the monkey selects a `GameObject` to operate on, the pool creates (or reuses) an appropriate operator instance based on the registered operator types.
+
+##### Registering Custom Operators
+
+You can register custom operator types using the `Register<T>()` method:
+
+```csharp
+var config = new MonkeyConfig();
+config.OperatorPool.Register<MyCustomOperator>();
+```
+
+##### Constructor Dependency Injection
+
+If your operator requires constructor arguments (e.g., custom configuration, logger, screenshot options), you can pass them to `Register<T>()`:
+
+###### Inject from OperatorPool constructor
+
+```csharp
+var logger = new MyCustomLogger();
+var pool = new OperatorPool(logger);
+var config = new MonkeyConfig() {OperatorPool = pool};
+config.OperatorPool.Register<UguiClickAndHoldOperator>();   // inject logger
+```
+
+###### Inject from Register method arguments
+
+```csharp
+var logger = new MyCustomLogger();
+config.OperatorPool.Register<UguiClickAndHoldOperator>(500, null, logger, null, null);  // inject hold-time and logger
+```
+
+The pool will inject these arguments when creating operator instances.
 
 
 
