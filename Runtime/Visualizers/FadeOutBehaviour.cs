@@ -21,7 +21,7 @@ namespace TestHelper.UI.Visualizers
         /// <summary>
         /// Initial elapsed time in seconds. Useful for starting fade-out from a specific point.
         /// </summary>
-        public float InitialElapsed { set { _elapsed = value; } }
+        public float InitialElapsed { private get; set; }
 
         /// <summary>
         /// Exponent for acceleration.
@@ -46,7 +46,7 @@ namespace TestHelper.UI.Visualizers
 
         private void OnEnable()
         {
-            _elapsed = 0f;
+            _elapsed = InitialElapsed;
         }
 
         private void Update()

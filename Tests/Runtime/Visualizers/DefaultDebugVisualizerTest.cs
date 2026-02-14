@@ -284,5 +284,21 @@ namespace TestHelper.UI.Visualizers
 
             Assert.That(ripple.activeInHierarchy, Is.False);
         }
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        [TimeScale(TestTimeScale)]
+        public async Task ShowPointerOperationEffect_CalledAfterReturn_IndicatorIsReused()
+        {
+            _sut.ShowPointerOperationEffect(_referenceObjects[0]);
+            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
+
+            _sut.ShowPointerOperationEffect(_referenceObjects[1]);
+            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
+
+            var rippleCount = GameObject.FindObjectsByType<SpreadBehaviour>(FindObjectsInactive.Include,
+                FindObjectsSortMode.None).Length;
+            Assert.That(rippleCount, Is.EqualTo(3)); // reused (not 6)
+        }
     }
 }
