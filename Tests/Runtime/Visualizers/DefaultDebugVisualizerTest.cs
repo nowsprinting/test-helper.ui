@@ -9,7 +9,6 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
-using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace TestHelper.UI.Visualizers
@@ -286,6 +285,7 @@ namespace TestHelper.UI.Visualizers
             Assert.That(ripple.activeInHierarchy, Is.False);
         }
 
+#if UNITY_2021_1_OR_NEWER
         [Test]
         [LoadScene(TestScenePath)]
         [TimeScale(TestTimeScale)]
@@ -302,5 +302,6 @@ namespace TestHelper.UI.Visualizers
                 FindObjectsSortMode.None).Length;
             Assert.That(rippleCount, Is.EqualTo(3)); // reused (not 6)
         }
+#endif
     }
 }
