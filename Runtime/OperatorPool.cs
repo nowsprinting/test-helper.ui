@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using TestHelper.UI.Operators;
 
 namespace TestHelper.UI
@@ -43,7 +42,7 @@ namespace TestHelper.UI
 
             if (!_registrations.TryGetValue(type, out var args))
             {
-                throw new InvalidOperationException($"Type {type.Name} is not registered.");
+                throw new InvalidOperationException($"{type.Name} is not registered.");
             }
 
             if (args.Length > 0)
@@ -54,7 +53,7 @@ namespace TestHelper.UI
             var constructor = type.GetConstructors().FirstOrDefault();
             if (constructor == null)
             {
-                throw new InvalidOperationException($"Type {type.Name} has no public constructor.");
+                throw new InvalidOperationException($"{type.Name} has no public constructor.");
             }
 
             var parameters = constructor.GetParameters();
@@ -76,7 +75,7 @@ namespace TestHelper.UI
             var type = obj.GetType();
             if (!_registrations.ContainsKey(type))
             {
-                throw new InvalidOperationException($"Type {type.Name} is not registered.");
+                throw new InvalidOperationException($"{type.Name} is not registered.");
             }
 
             if (!_pools.TryGetValue(type, out var stack))

@@ -1,119 +1,89 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.UI.Operators;
+using TestHelper.UI.TestDoubles;
 using TestHelper.UI.Visualizers;
-using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace TestHelper.UI
 {
     [TestFixture]
     public class OperatorPoolTest
     {
-        // Test dummy operator with default constructor parameters
-        private class DummyOperatorWithDefaults : IOperator
-        {
-            public ILogger Logger { get; set; }
-            public ScreenshotOptions ScreenshotOptions { get; set; }
-            public IVisualizer Visualizer { get; set; }
-
-            public int Value { get; }
-
-            public DummyOperatorWithDefaults(int value = 42)
-            {
-                Value = value;
-            }
-
-            public bool CanOperate(GameObject gameObject) => false;
-
-            public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
-                CancellationToken cancellationToken = default) => UniTask.CompletedTask;
-        }
-
-        // Test dummy operator with required constructor parameters
-        private class DummyOperatorWithArgs : IOperator
-        {
-            public ILogger Logger { get; set; }
-            public ScreenshotOptions ScreenshotOptions { get; set; }
-            public IVisualizer Visualizer { get; set; }
-
-            public string Name { get; }
-            public int Count { get; }
-
-            public DummyOperatorWithArgs(string name, int count)
-            {
-                Name = name;
-                Count = count;
-            }
-
-            public bool CanOperate(GameObject gameObject) => false;
-
-            public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
-                CancellationToken cancellationToken = default) => UniTask.CompletedTask;
-        }
-
-        // Test dummy operator without registration (for error cases)
-        private class UnregisteredOperator : IOperator
-        {
-            public ILogger Logger { get; set; }
-            public ScreenshotOptions ScreenshotOptions { get; set; }
-            public IVisualizer Visualizer { get; set; }
-
-            public bool CanOperate(GameObject gameObject) => false;
-
-            public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
-                CancellationToken cancellationToken = default) => UniTask.CompletedTask;
-        }
-
         [Test]
         public void Rent_RegisteredTypeWithNoArgs_ReturnsNewInstance()
         {
             var pool = new OperatorPool();
-            pool.Register<DummyOperatorWithDefaults>();
+            pool.Register<UguiClickOperator>();
 
-            var instance = pool.Rent<DummyOperatorWithDefaults>();
+            var instance = pool.Rent<UguiClickOperator>();
 
-            Assert.That(instance, Is.Not.Null);
-            Assert.That(instance, Is.InstanceOf<DummyOperatorWithDefaults>());
-            Assert.That(instance.Value, Is.EqualTo(42));
+            Assert.That(instance, Is.InstanceOf<UguiClickOperator>());
         }
 
         [Test]
         public void Rent_RegisteredTypeWithArgs_ReturnsInstanceCreatedWithArgs()
         {
+            const int IntValue = 42;
+            var logger = new SpyLogger();
+            var screenshotOptions = new ScreenshotOptions();
+            var visualizer = new DefaultDebugVisualizer();
+
             var pool = new OperatorPool();
-            pool.Register<DummyOperatorWithArgs>("test", 123);
+            pool.Register<FakeOperator>(IntValue, logger, screenshotOptions, visualizer);
 
-            var instance = pool.Rent<DummyOperatorWithArgs>();
+            var instance = pool.Rent<FakeOperator>();
 
-            Assert.That(instance, Is.Not.Null);
-            Assert.That(instance.Name, Is.EqualTo("test"));
-            Assert.That(instance.Count, Is.EqualTo(123));
+            Assert.That(instance, Is.InstanceOf<FakeOperator>());
+            Assert.That(instance.IntValue, Is.EqualTo(IntValue));
+            Assert.That(instance.Logger, Is.SameAs(logger));
+            Assert.That(instance.ScreenshotOptions, Is.SameAs(screenshotOptions));
+            Assert.That(instance.Visualizer, Is.SameAs(visualizer));
+        }
+
+        [Test]
+        public void Rent_RegisteredTypeWithoutPublicConstructor_ThrowsInvalidOperationException()
+        {
+            var pool = new OperatorPool();
+            pool.Register<FakeOperatorWithoutPublicConstructor>();
+
+            Assert.That(() => pool.Rent<FakeOperatorWithoutPublicConstructor>(),
+                Throws.InvalidOperationException
+                    .With.Message.EqualTo("FakeOperatorWithoutPublicConstructor has no public constructor."));
+        }
+
+        [Test]
+        public void Rent_PoolIsEmpty_ThrowsInvalidOperationException()
+        {
+            var pool = new OperatorPool();
+
+            Assert.That(() => pool.Rent<UguiClickOperator>(),
+                Throws.InvalidOperationException
+                    .With.Message.EqualTo("UguiClickOperator is not registered."));
         }
 
         [Test]
         public void Rent_UnregisteredType_ThrowsInvalidOperationException()
         {
             var pool = new OperatorPool();
+            pool.Register<UguiClickAndHoldOperator>();
 
-            Assert.Throws<InvalidOperationException>(() => pool.Rent<UnregisteredOperator>());
+            Assert.That(() => pool.Rent<UguiClickOperator>(),
+                Throws.InvalidOperationException
+                    .With.Message.EqualTo("UguiClickOperator is not registered."));
         }
 
         [Test]
         public void Rent_AfterReturn_ReturnsSameInstance()
         {
             var pool = new OperatorPool();
-            pool.Register<DummyOperatorWithDefaults>();
+            pool.Register<UguiClickOperator>();
 
-            var instance1 = pool.Rent<DummyOperatorWithDefaults>();
+            var instance1 = pool.Rent<UguiClickOperator>();
             pool.Return(instance1);
-            var instance2 = pool.Rent<DummyOperatorWithDefaults>();
 
+            var instance2 = pool.Rent<UguiClickOperator>();
             Assert.That(instance2, Is.SameAs(instance1));
         }
 
@@ -122,29 +92,40 @@ namespace TestHelper.UI
         {
             var pool = new OperatorPool();
 
-            Assert.Throws<ArgumentNullException>(() => pool.Return(null));
+            Assert.That(() => pool.Return(null), Throws.ArgumentNullException);
         }
 
         [Test]
         public void Return_UnregisteredType_ThrowsInvalidOperationException()
         {
             var pool = new OperatorPool();
-            var instance = new UnregisteredOperator();
 
-            Assert.Throws<InvalidOperationException>(() => pool.Return(instance));
+            var unregisteredInstance = new UguiClickOperator();
+
+            Assert.That(() => pool.Return(unregisteredInstance),
+                Throws.InvalidOperationException
+                    .With.Message.EqualTo("UguiClickOperator is not registered."));
         }
 
         [Test]
         public void Register_CalledTwice_OverwritesPreviousRegistration()
         {
+            const int IntValue = 42;
+            var logger = new SpyLogger();
+            var screenshotOptions = new ScreenshotOptions();
+            var visualizer = new DefaultDebugVisualizer();
+
             var pool = new OperatorPool();
-            pool.Register<DummyOperatorWithArgs>("first", 100);
-            pool.Register<DummyOperatorWithArgs>("second", 200);
+            pool.Register<FakeOperator>(); // dummy
+            pool.Register<FakeOperator>(IntValue, logger, screenshotOptions, visualizer);
 
-            var instance = pool.Rent<DummyOperatorWithArgs>();
+            var instance = pool.Rent<FakeOperator>();
 
-            Assert.That(instance.Name, Is.EqualTo("second"));
-            Assert.That(instance.Count, Is.EqualTo(200));
+            Assert.That(instance, Is.InstanceOf<FakeOperator>());
+            Assert.That(instance.IntValue, Is.EqualTo(IntValue));
+            Assert.That(instance.Logger, Is.SameAs(logger));
+            Assert.That(instance.ScreenshotOptions, Is.SameAs(screenshotOptions));
+            Assert.That(instance.Visualizer, Is.SameAs(visualizer));
         }
     }
 }
