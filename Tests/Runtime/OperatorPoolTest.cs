@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Linq;
 using NUnit.Framework;
 using TestHelper.UI.Operators;
 using TestHelper.UI.TestDoubles;
@@ -85,6 +86,22 @@ namespace TestHelper.UI
 
             var instance2 = pool.Rent<UguiClickOperator>();
             Assert.That(instance2, Is.SameAs(instance1));
+        }
+
+        [Test]
+        public void RentAll_ReturnsAllOperatorInstances()
+        {
+            var pool = new OperatorPool();
+            pool.Register<UguiClickAndHoldOperator>();
+            pool.Register<UguiClickOperator>();
+
+            var operators = pool.RentAll().ToArray();
+            var operatorTypes = operators.Select(instance => instance.GetType()).ToArray();
+            Assert.That(operatorTypes, Is.EquivalentTo(new[]
+            {
+                typeof(UguiClickAndHoldOperator),
+                typeof(UguiClickOperator)
+            }));
         }
 
         [Test]
