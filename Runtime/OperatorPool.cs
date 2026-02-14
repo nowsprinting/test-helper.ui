@@ -163,7 +163,14 @@ namespace TestHelper.UI
             if (type == typeof(IReachableStrategy) && _reachableStrategy != null) return _reachableStrategy;
             if (type == typeof(IRandom) && _random != null) return _random.Fork();
 
-            return parameter.DefaultValue;
+            if (parameter.HasDefaultValue)
+            {
+                return parameter.DefaultValue;
+            }
+
+            throw new InvalidOperationException(
+                $"Cannot resolve required parameter '{parameter.Name}' of type {parameter.ParameterType.Name}. " +
+                $"Register with explicit constructor arguments or add a default value.");
         }
     }
 }

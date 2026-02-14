@@ -272,5 +272,18 @@ namespace TestHelper.UI
 
             Assert.That(instance.Logger, Is.SameAs(loggerInArgs));
         }
+
+        [Test]
+        public void Rent_RegisteredTypeWithRequiredUnresolvableParameter_ThrowsInvalidOperationException()
+        {
+            var pool = new OperatorPool();
+            pool.Register<FakeOperatorWithRequiredParam>();
+
+            Assert.That(() => pool.Rent<FakeOperatorWithRequiredParam>(),
+                Throws.InvalidOperationException
+                    .With.Message.EqualTo(
+                        "Cannot resolve required parameter 'requiredParam' of type String. " +
+                        "Register with explicit constructor arguments or add a default value."));
+        }
     }
 }
