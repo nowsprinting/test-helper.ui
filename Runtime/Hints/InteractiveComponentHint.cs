@@ -100,7 +100,7 @@ namespace TestHelper.UI.Hints
         {
             Clear();
 
-            var interactiveComponentCollector = new InteractableComponentsFinder();
+            var interactiveComponentCollector = new InteractableComponentsFinder(operators: new OperatorPool());
             foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
                 var dst = _reachableStrategy.IsReachable(component.gameObject, out _)

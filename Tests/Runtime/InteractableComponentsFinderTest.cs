@@ -44,7 +44,8 @@ namespace TestHelper.UI
             [LoadScene(TestScene)]
             public void FindInteractiveObjects_findAllInteractiveObjects()
             {
-                var actual = new InteractableComponentsFinder().FindInteractableComponents()
+                var actual = new InteractableComponentsFinder(operators: new OperatorPool())
+                    .FindInteractableComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_interactiveObjects()));
@@ -81,7 +82,8 @@ namespace TestHelper.UI
             [LoadScene(TestScene)]
             public void FindInteractiveObjects_findAllInteractiveObjects()
             {
-                var actual = new InteractableComponentsFinder().FindInteractableComponents()
+                var actual = new InteractableComponentsFinder(operators: new OperatorPool())
+                    .FindInteractableComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_interactiveObjects()));
@@ -134,7 +136,8 @@ namespace TestHelper.UI
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = new InteractableComponentsFinder().FindInteractableComponents()
+                    var actual = new InteractableComponentsFinder(operators: new OperatorPool())
+                        .FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjectsInOverlayCanvas()));
@@ -153,7 +156,8 @@ namespace TestHelper.UI
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = new InteractableComponentsFinder().FindInteractableComponents()
+                    var actual = new InteractableComponentsFinder(operators: new OperatorPool())
+                        .FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjects()));
@@ -172,7 +176,8 @@ namespace TestHelper.UI
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = new InteractableComponentsFinder().FindInteractableComponents()
+                    var actual = new InteractableComponentsFinder(operators: new OperatorPool())
+                        .FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjects()));

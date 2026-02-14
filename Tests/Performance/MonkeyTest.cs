@@ -20,12 +20,12 @@ namespace TestHelper.UI.Performance
         public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
             var config = new MonkeyConfig();
-            var interactableComponentsFinder = new InteractableComponentsFinder(config.IsInteractable, config.Operators);
+            var finder = new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
 
             Measure.Method(() =>
                 {
                     // ReSharper disable once IteratorMethodResultIsIgnored
-                    Monkey.GetLotteryEntries(interactableComponentsFinder);
+                    Monkey.GetLotteryEntries(finder);
                 })
                 .WarmupCount(5)
                 .MeasurementCount(20)
@@ -39,8 +39,8 @@ namespace TestHelper.UI.Performance
         public void LotteryOperator_BingoReachableComponent()
         {
             var config = new MonkeyConfig();
-            var interactableComponentsFinder = new InteractableComponentsFinder(config.IsInteractable, config.Operators);
-            var operators = Monkey.GetLotteryEntries(interactableComponentsFinder);
+            var finder = new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
+            var operators = Monkey.GetLotteryEntries(finder);
 
             Measure.Method(() =>
                 {
@@ -58,14 +58,14 @@ namespace TestHelper.UI.Performance
         public IEnumerator RunStep_finish()
         {
             var config = new MonkeyConfig();
-            var interactableComponentsFinder = new InteractableComponentsFinder(config.IsInteractable, config.Operators);
+            var finder = new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
 
             using (Measure.Frames().Scope())
             {
                 yield return Monkey.RunStep(
                         config.Random,
                         config.Logger,
-                        interactableComponentsFinder,
+                        finder,
                         config.IgnoreStrategy,
                         config.ReachableStrategy)
                     .ToCoroutine();

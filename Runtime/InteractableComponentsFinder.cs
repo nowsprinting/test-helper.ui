@@ -21,18 +21,31 @@ namespace TestHelper.UI
     {
         private readonly Func<Component, bool> _isInteractable;
         private readonly IEnumerable<IOperator> _operators;
+        private readonly OperatorPool _operatorPool;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not. Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
+        [Obsolete("Use InteractableComponentsFinder(Func<Component, bool>, OperatorPool) instead.")]
         public InteractableComponentsFinder(
             Func<Component, bool> isInteractable = null,
             IEnumerable<IOperator> operators = null)
         {
             _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
             _operators = operators ?? Array.Empty<IOperator>();
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not. Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="operators">All available operators in autopilot/tests.</param>
+        public InteractableComponentsFinder(Func<Component, bool> isInteractable = null, OperatorPool operators = null)
+        {
+            _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+            _operatorPool = operators ?? new OperatorPool();
         }
 
         /// <summary>
@@ -63,8 +76,25 @@ namespace TestHelper.UI
         /// <returns>Tuple of interactable component and operator</returns>
         public IEnumerable<(MonoBehaviour, IOperator)> FindInteractableComponentsAndOperators()
         {
-            return FindInteractableComponents()
-                .SelectMany(x => x.gameObject.SelectOperators(_operators), (x, o) => (x, o));
+            if (_operators != null)
+            {
+                return FindInteractableComponents()
+                    .SelectMany(x => x.gameObject.SelectOperators(_operators), (x, o) => (x, o));
+            }
+
+            var operators = _operatorPool.RentAll();
+            try
+            {
+                return FindInteractableComponents()
+                    .SelectMany(x => x.gameObject.SelectOperators(operators), (x, o) => (x, o));
+            }
+            finally
+            {
+                foreach (var op in operators)
+                {
+                    _operatorPool.Return(op);
+                }
+            }
         }
 
         /// <summary>

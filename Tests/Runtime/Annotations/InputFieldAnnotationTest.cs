@@ -30,7 +30,8 @@ namespace TestHelper.UI.Annotations
                 Lifetime = TimeSpan.FromMilliseconds(500), // 500ms
                 DelayMillis = 1,                           // 1ms
                 BufferLengthForDetectLooping = 0,          // disable loop operation detection
-                Operators = new[] { new UguiTextInputOperator() }
+                OperatorPool = new OperatorPool()
+                    .Register<UguiTextInputOperator>()
             };
         }
 
