@@ -189,7 +189,10 @@ namespace TestHelper.UI.Visualizers
 
             async UniTask ShowRippleEffectAfterDelay(int i)
             {
-                await UniTask.Delay(RippleIntervalMillis * i, ignoreTimeScale: false);
+                if (i > 0)
+                {
+                    await UniTask.Delay(RippleIntervalMillis * i, ignoreTimeScale: true);
+                }
 
                 var ripple = GetOrCreateIndicator(RipplePictPath, RipplePictColor, true);
                 ripple.transform.position = screenPoint;
