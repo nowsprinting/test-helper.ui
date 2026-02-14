@@ -19,6 +19,11 @@ namespace TestHelper.UI.Visualizers
         public float Lifetime { private get; set; }
 
         /// <summary>
+        /// Initial elapsed time in seconds. Useful for starting fade-out from a specific point.
+        /// </summary>
+        public float InitialElapsed { private get; set; }
+
+        /// <summary>
         /// Exponent for acceleration.
         /// 1 = linear,
         /// &gt;1 = accelerating (slow -> fast),
@@ -41,13 +46,7 @@ namespace TestHelper.UI.Visualizers
 
         private void OnEnable()
         {
-            _elapsed = 0f;
-            if (_image)
-            {
-                var color = _image.color;
-                color.a = 1f;
-                _image.color = color;
-            }
+            _elapsed = InitialElapsed;
         }
 
         private void Update()
