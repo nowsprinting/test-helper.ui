@@ -81,10 +81,12 @@ namespace TestHelper.UI.TestDoubles
             throw new NotImplementedException();
         }
 
+#if UNITY_2021_2_OR_NEWER
         public void NextBytes(Span<byte> buffer)
         {
             throw new NotImplementedException();
         }
+#endif
 
         public double NextDouble()
         {
