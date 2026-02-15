@@ -36,7 +36,7 @@ namespace TestHelper.UI
             var visualizer = new DefaultDebugVisualizer();
             Func<GameObject, Vector2> getScreenPoint = _ => Vector2.zero;
             var reachableStrategy = new DefaultReachableStrategy();
-            var random = new StubRandom(0);
+            var random = new SpyRandom();
 
             var pool = new OperatorPool();
             pool.Register<FakeOperator>(
@@ -51,7 +51,7 @@ namespace TestHelper.UI
             Assert.That(instance.Visualizer, Is.SameAs(visualizer));
             Assert.That(instance.GetScreenPoint, Is.SameAs(getScreenPoint));
             Assert.That(instance.ReachableStrategy, Is.SameAs(reachableStrategy));
-            Assert.That(instance.Random, Is.SameAs(random));
+            Assert.That(((SpyRandom)instance.Random).ForkedFrom, Is.SameAs(random)); // forked instance
         }
 
         [Test]
@@ -218,16 +218,15 @@ namespace TestHelper.UI
         }
 
         [Test]
-        public void Rent_PoolConstructedWithRandom_InjectsRandomIntoOperator()
+        public void Rent_PoolConstructedWithRandom_InjectsForkedRandomIntoOperator()
         {
-            var random = new StubRandom(0);
+            var random = new SpyRandom();
             var pool = new OperatorPool(random: random);
             pool.Register<FakeOperator>(); // no args
 
             var instance = pool.Rent<FakeOperator>();
 
-            Assert.That(instance.Random, Is.Not.Null);
-            Assert.That(instance.Random, Is.Not.SameAs(random)); // forked instance should be injected
+            Assert.That(((SpyRandom)instance.Random).ForkedFrom, Is.SameAs(random));
         }
 
         [Test]
@@ -239,7 +238,7 @@ namespace TestHelper.UI
             var visualizer = new DefaultDebugVisualizer();
             Func<GameObject, Vector2> getScreenPoint = _ => Vector2.zero;
             var reachableStrategy = new DefaultReachableStrategy();
-            var random = new StubRandom(0);
+            var random = new SpyRandom();
             var pool = new OperatorPool(
                 logger: logger,
                 screenshotOptions: screenshotOptions,
@@ -256,8 +255,7 @@ namespace TestHelper.UI
             Assert.That(instance.Visualizer, Is.SameAs(visualizer));
             Assert.That(instance.GetScreenPoint, Is.SameAs(getScreenPoint));
             Assert.That(instance.ReachableStrategy, Is.SameAs(reachableStrategy));
-            Assert.That(instance.Random, Is.Not.Null);
-            Assert.That(instance.Random, Is.Not.SameAs(random)); // forked instance should be injected
+            Assert.That(((SpyRandom)instance.Random).ForkedFrom, Is.SameAs(random)); // forked instance
         }
 
         [Test]

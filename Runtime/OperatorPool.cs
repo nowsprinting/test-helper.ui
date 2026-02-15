@@ -37,7 +37,7 @@ namespace TestHelper.UI
         /// <param name="visualizer">Visualizer to inject into operators</param>
         /// <param name="getScreenPoint">Screen point function to inject into operators</param>
         /// <param name="reachableStrategy">Reachable strategy to inject into operators</param>
-        /// <param name="random">Random instance to inject into operators</param>
+        /// <param name="random">The parent of the random instance to inject into the operators</param>
         public OperatorPool(
             ILogger logger = null,
             ScreenshotOptions screenshotOptions = null,
@@ -93,7 +93,11 @@ namespace TestHelper.UI
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public IOperator Rent(Type type)
         {
-            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
             if (!typeof(IOperator).IsAssignableFrom(type))
             {
                 throw new InvalidOperationException($"{type.Name} does not implement IOperator.");
@@ -109,9 +113,9 @@ namespace TestHelper.UI
                 throw new InvalidOperationException($"{type.Name} is not registered.");
             }
 
-            if (args == null || args.Length > 0)
+            if (args?.Length > 0)
             {
-                return (IOperator)Activator.CreateInstance(type, args);
+                return (IOperator)Activator.CreateInstance(type, ConvertRegisteredArgs(args));
             }
 
             var constructor = type.GetConstructors().FirstOrDefault();
@@ -149,6 +153,24 @@ namespace TestHelper.UI
             }
 
             stack.Push(obj);
+        }
+
+        private static object[] ConvertRegisteredArgs(object[] sources)
+        {
+            var args = new object[sources.Length];
+            for (var i = 0; i < sources.Length; i++)
+            {
+                if (sources[i] is IRandom random)
+                {
+                    args[i] = random.Fork();
+                }
+                else
+                {
+                    args[i] = sources[i];
+                }
+            }
+
+            return args;
         }
 
         [SuppressMessage("ReSharper", "CognitiveComplexity")]
