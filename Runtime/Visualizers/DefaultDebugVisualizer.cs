@@ -346,6 +346,11 @@ namespace TestHelper.UI.Visualizers
                 return _overlayCanvas;
             }
 
+            if (!ReferenceEquals(_overlayCanvas, null))
+            {
+                throw new InvalidOperationException("Visualizer instance has been disposed.");
+            }
+
             var gameObject = new GameObject("DebugVisualizer Overlay Canvas", typeof(Canvas));
             Object.DontDestroyOnLoad(gameObject);
 

@@ -9,6 +9,7 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
+using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace TestHelper.UI.Visualizers
@@ -303,5 +304,21 @@ namespace TestHelper.UI.Visualizers
             Assert.That(rippleCount, Is.EqualTo(3)); // reused (not 6)
         }
 #endif
+
+        [Test]
+        [LoadScene(TestScenePath)]
+        [TimeScale(TestTimeScale)]
+        public async Task ShowPointerOperationEffect_Disposed_ThrowsInvalidOperationException()
+        {
+            using (var sut = new DefaultDebugVisualizer())
+            {
+                sut.ShowPointerOperationEffect(_referenceObjects[0]);
+                await UniTask.Delay(TimeSpan.FromSeconds(sut.IndicatorLifetime * 0.5f)); // dispose midway
+            }
+
+            LogAssert.Expect(LogType.Exception, "InvalidOperationException: Visualizer instance has been disposed.");
+
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime * 0.5f)); // wait for end of life
+        }
     }
 }
