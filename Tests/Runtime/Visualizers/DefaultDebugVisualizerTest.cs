@@ -78,7 +78,7 @@ namespace TestHelper.UI.Visualizers
                 _sut.ShowNotReachableIndicator(screenPoint, reference);
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace TestHelper.UI.Visualizers
                 _sut.ShowNotReachableIndicator(screenPoint, reference);
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace TestHelper.UI.Visualizers
             Assert.That(image.sprite.name, Is.EqualTo("eye_slash"));
             Assert.That(image.raycastTarget, Is.False);
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace TestHelper.UI.Visualizers
             var image = indicator.GetComponent<Image>();
             Assert.That(image.raycastTarget, Is.False);
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace TestHelper.UI.Visualizers
             _sut.ShowNotReachableIndicator(screenPoint);
 
             var indicator = GameObject.Find("Indicator");
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
             Assert.That(indicator.activeInHierarchy, Is.False);
         }
 
@@ -156,7 +156,7 @@ namespace TestHelper.UI.Visualizers
             _sut.ShowNotReachableIndicator(screenPoint, blocker);
 
             var indicator = GameObject.Find("Blocker Indicator");
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
             Assert.That(indicator.activeInHierarchy, Is.False);
         }
 
@@ -169,13 +169,13 @@ namespace TestHelper.UI.Visualizers
             _sut.ShowNotReachableIndicator(screenPoint);
 
             var firstIndicator = GameObject.Find("Indicator");
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
 
             _sut.ShowNotReachableIndicator(screenPoint);
             var secondIndicator = GameObject.Find("Indicator");
             Assert.That(secondIndicator, Is.SameAs(firstIndicator)); // latest indicator is reused
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -188,13 +188,13 @@ namespace TestHelper.UI.Visualizers
             _sut.ShowNotReachableIndicator(screenPoint, blocker);
 
             var firstIndicator = GameObject.Find("Blocker Indicator");
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
 
             _sut.ShowNotReachableIndicator(screenPoint, blocker);
             var secondIndicator = GameObject.Find("Blocker Indicator");
             Assert.That(secondIndicator, Is.SameAs(firstIndicator)); // latest indicator is reused
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -209,7 +209,7 @@ namespace TestHelper.UI.Visualizers
             Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("hand_slash"));
             Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -221,7 +221,7 @@ namespace TestHelper.UI.Visualizers
             _sut.ShowNotInteractableIndicator(target);
 
             var indicator = GameObject.Find("Indicator");
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
             Assert.That(indicator.activeInHierarchy, Is.False);
         }
 
@@ -237,7 +237,7 @@ namespace TestHelper.UI.Visualizers
             Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("lock"));
             Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
         [Test]
@@ -249,7 +249,7 @@ namespace TestHelper.UI.Visualizers
             _sut.ShowIgnoredIndicator(target);
 
             var indicator = GameObject.Find("Indicator");
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.1f));
             Assert.That(indicator.activeInHierarchy, Is.False);
         }
 
@@ -270,7 +270,7 @@ namespace TestHelper.UI.Visualizers
             Assert.That(ripple.GetComponent<Image>().sprite.name, Is.EqualTo("ripple"));
             Assert.That(ripple.GetComponent<Image>().raycastTarget, Is.False);
 
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
         }
 
         [Test]
@@ -281,7 +281,7 @@ namespace TestHelper.UI.Visualizers
             _sut.ShowPointerOperationEffect(_referenceObjects[0]);
 
             var ripple = GameObject.Find("Ripple");
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
 
             Assert.That(ripple.activeInHierarchy, Is.False);
         }
@@ -294,10 +294,10 @@ namespace TestHelper.UI.Visualizers
         public async Task ShowPointerOperationEffect_CalledAfterReturn_IndicatorIsReused()
         {
             _sut.ShowPointerOperationEffect(_referenceObjects[0]);
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
 
             _sut.ShowPointerOperationEffect(_referenceObjects[1]);
-            await Task.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
+            await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
 
             var rippleCount = GameObject.FindObjectsByType<SpreadBehaviour>(FindObjectsInactive.Include,
                 FindObjectsSortMode.None).Length;
