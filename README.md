@@ -657,15 +657,53 @@ If multiple `GameObjects` matching the condition are found, throw `MultipleGameO
 Multiple GameObjects matching the condition (name=Button) were found.
 ```
 
-#### Debug Visualizer
+#### Visualizer
 
-Using the Debug Visualizer can help you investigate why a `GameObject` cannot be found.
+Using the `IVisualizer` can help you investigate why a `GameObject` cannot be found.
+
 `DefaultDebugVisualizer` shows visual indicators when "not reachable" or "not interactable" occurs.
+"not reachable" is indicated by a red eye icon with a slash, and "not interactable" is indicated by a red hand icon with a slash.
 
 To use it, simply pass an instance to the `GameObjectFinder` constructor, like this:
 
 ```csharp
-var finder = new GameObjectFinder(visualizer: new DefaultDebugVisualizer());
+using var visualizer = new DefaultDebugVisualizer();
+var finder = new GameObjectFinder(visualizer: visualizer);
+```
+
+
+
+### Operators
+
+#### Log messages
+
+Built-in operators output log messages such as the following immediately before an operation:
+
+```
+UguiClickOperator operates to StartButton(-12345), screenshot=UguiMonkeyAgent01_0001.png
+```
+
+This log message is output just before the operator `UguiClickOperator` operates on the `GameObject` named `StartButton`.
+"UguiMonkeyAgent01_0001.png" is the screenshot file name taken just before the operation.
+
+#### Visualizer
+
+Using the `IVisualizer` can help visualize the operator's operation.
+
+`DefaultDebugVisualizer` shows a ripple effect on the screen position of the operation.
+
+To use it, simply pass an instance to the operator's constructor, like this:
+
+```csharp
+using var visualizer = new DefaultDebugVisualizer();
+var clickOperator = new UguiClickOperator(visualizer: visualizer);
+```
+
+If you use operators with `OperatorPool`, you can inject the visualizer into the operator instance via the constructor arguments or properties when registering the operator type in the pool, like this:
+
+```csharp
+using var visualizer = new DefaultDebugVisualizer();
+var operatorPool = new OperatorPool(visualizer: visualizer);
 ```
 
 
@@ -705,18 +743,6 @@ Numbers are the instance ID of the operated `GameObject`.
 The detectable repeating pattern max length is half the buffer length.
 The buffer length can be specified in the `MonkeyConfig.BufferLengthForDetectLooping`.
 If you want to disable this feature, specify `0`.
-
-
-#### Operation log message
-
-```
-UguiClickOperator operates to StartButton(-12345), screenshot=UguiMonkeyAgent01_0001.png
-```
-
-This log message is output just before the operator `UguiClickOperator` operates on the `GameObject` named `StartButton`.
-"UguiMonkeyAgent01_0001.png" is the screenshot file name taken just before the operation.
-
-Screenshots are taken when the `MonkeyConfig.Screenshots` is set.
 
 
 #### Verbose log messages
@@ -780,17 +806,22 @@ If this condition persists, a `TimeoutException` will be thrown.
 Lottery entries are empty or all of not reachable.
 ```
 
-#### Debug Visualizer
+#### Visualizer
 
-Using the Debug Visualizer can help you investigate why a `GameObject` cannot be operated on.
-`DefaultDebugVisualizer` shows visual indicators for operating, "not reachable", and "ignored".
+Using the `IVisualizer` can help you investigate why a `GameObject` cannot be operated on.
 
-To use it, simply set an instance to the `MonkeyConfig.Visualizer`, like this:
+`DefaultDebugVisualizer` shows visual indicators when "not reachable" or "ignored" occurs.
+"not reachable" is indicated by a red eye icon with a slash, and "ignored" is indicated by a yellow lock icon.
+
+To use it, simply set an instance to the `MonkeyConfig`, like this:
 
 ```csharp
+using var visualizer = new DefaultDebugVisualizer();
 var config = new MonkeyConfig()
 {
-    Visualizer = new DefaultDebugVisualizer(),
+    Visualizer = visualizer,                                // for use by GameObjectFinder and Monkey
+    OperatorPool = new OperatorPool(visualizer: visualizer) // for use by operators
+        .Register<UguiClickOperator>()
 };
 await Monkey.Run(config);
 ```
