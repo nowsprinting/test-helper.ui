@@ -106,6 +106,7 @@ namespace TestHelper.UI.Visualizers
         private readonly Stack<GameObject> _indicatorPool = new Stack<GameObject>();
         private readonly Stack<GameObject> _ripplePool = new Stack<GameObject>();
         private Canvas _overlayCanvas;
+        private bool _isDisposed;
 
         /// <inheritdoc/>
         public void Dispose()
@@ -114,6 +115,8 @@ namespace TestHelper.UI.Visualizers
             {
                 Object.Destroy(_overlayCanvas);
             }
+
+            _isDisposed = true;
         }
 
         /// <inheritdoc/>
@@ -346,7 +349,7 @@ namespace TestHelper.UI.Visualizers
                 return _overlayCanvas;
             }
 
-            if (!ReferenceEquals(_overlayCanvas, null))
+            if (_isDisposed)
             {
                 throw new InvalidOperationException("Visualizer instance has been disposed.");
             }
