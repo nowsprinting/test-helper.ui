@@ -21,6 +21,7 @@ namespace TestHelper.UI
     {
         private readonly Dictionary<Type, Stack<IOperator>> _pools = new Dictionary<Type, Stack<IOperator>>();
         private readonly Dictionary<Type, object[]> _registrations = new Dictionary<Type, object[]>();
+        private readonly bool _requireRegistration;
 
         private readonly ILogger _logger;
         private readonly ScreenshotOptions _screenshotOptions;
@@ -38,13 +39,15 @@ namespace TestHelper.UI
         /// <param name="getScreenPoint">Screen point function to inject into operators</param>
         /// <param name="reachableStrategy">Reachable strategy to inject into operators</param>
         /// <param name="random">The parent of the random instance to inject into the operators</param>
+        /// <param name="requireRegistration">If true, only operators registered via <c>Register&lt;T&gt;</c> can be rented.</param>
         public OperatorPool(
             ILogger logger = null,
             ScreenshotOptions screenshotOptions = null,
             IVisualizer visualizer = null,
             Func<GameObject, Vector2> getScreenPoint = null,
             IReachableStrategy reachableStrategy = null,
-            IRandom random = null)
+            IRandom random = null,
+            bool requireRegistration = true)
         {
             _logger = logger;
             _screenshotOptions = screenshotOptions;
@@ -52,6 +55,7 @@ namespace TestHelper.UI
             _getScreenPoint = getScreenPoint;
             _reachableStrategy = reachableStrategy;
             _random = random;
+            _requireRegistration = requireRegistration;
         }
 
         /// <summary>
@@ -108,7 +112,7 @@ namespace TestHelper.UI
                 return stack.Pop();
             }
 
-            if (!_registrations.TryGetValue(type, out var args))
+            if (!_registrations.TryGetValue(type, out var args) && _requireRegistration)
             {
                 throw new InvalidOperationException($"{type.Name} is not registered.");
             }
