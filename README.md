@@ -382,27 +382,35 @@ var config = new MonkeyConfig();
 config.OperatorPool.Register<MyCustomOperator>();
 ```
 
-##### Constructor Dependency Injection
+##### Dependency Injection
 
 If your operator requires constructor arguments (e.g., custom configuration, logger, screenshot options), you can pass them to `Register<T>()`:
-
-###### Inject from OperatorPool constructor
-
-```csharp
-var logger = new MyCustomLogger();
-var pool = new OperatorPool(logger);
-var config = new MonkeyConfig() {OperatorPool = pool};
-config.OperatorPool.Register<UguiClickAndHoldOperator>();   // inject logger
-```
-
-###### Inject from Register method arguments
-
-```csharp
-var logger = new MyCustomLogger();
-config.OperatorPool.Register<UguiClickAndHoldOperator>(500, null, logger, null, null);  // inject hold-time and logger
-```
-
 The pool will inject these arguments when creating operator instances.
+
+If `IRandom`, a fork of the instance is injected.
+
+```csharp
+var logger = new MyCustomLogger();
+config.OperatorPool.Register<UguiClickAndHoldOperator>(500, null, logger, null, null);
+
+var op = config.OperatorPool.Rent<UguiClickAndHoldOperator>(); // get an instance with injected hold-time and logger
+```
+
+Alternatively, it can be specified as an `OperatorPool` constructor argument.
+
+```csharp
+var config = new MonkeyConfig()
+{
+    OperatorPool = new OperatorPool(
+        logger: new MyCustomLogger(),
+        screenshotOptions: new ScreenshotOptions(),
+        visualizer: new DebugVisualizer(),
+        random: new MyCustomRandom())
+};
+config.OperatorPool.Register<UguiClickOperator>();
+
+var op = config.OperatorPool.Rent<UguiClickOperator>(); // get an instance with injected logger, screenshot options, visualizer, and forked random instance
+```
 
 
 
