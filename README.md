@@ -387,7 +387,7 @@ config.OperatorPool.Register<MyCustomOperator>();
 If your operator requires constructor arguments (e.g., custom configuration, logger, screenshot options), you can pass them to `Register<T>()`:
 The pool will inject these arguments when creating operator instances.
 
-If `IRandom`, a fork of the instance is injected.
+For `IRandom` arguments, a forked instance is injected.
 
 ```csharp
 var logger = new MyCustomLogger();
