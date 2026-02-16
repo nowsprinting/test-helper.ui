@@ -66,7 +66,7 @@ namespace TestHelper.UI
         }
 
         [Test]
-        public void Rent_PoolIsEmpty_ThrowsInvalidOperationException()
+        public void Rent_UnregisteredType_NoRegistrations_ThrowsInvalidOperationException()
         {
             var pool = new OperatorPool();
 
@@ -87,10 +87,33 @@ namespace TestHelper.UI
         }
 
         [Test]
+        public void Rent_UnregisteredType_NotRequireRegistration_ReturnsNewInstance()
+        {
+            var pool = new OperatorPool(requireRegistration: false);
+
+            pool.Rent<UguiClickOperator>();
+            var instance = pool.Rent<UguiClickOperator>();
+
+            Assert.That(instance, Is.InstanceOf<UguiClickOperator>());
+        }
+
+        [Test]
         public void Rent_AfterReturn_ReturnsSameInstance()
         {
             var pool = new OperatorPool();
             pool.Register<UguiClickOperator>();
+
+            var instance1 = pool.Rent<UguiClickOperator>();
+            pool.Return(instance1);
+
+            var instance2 = pool.Rent<UguiClickOperator>();
+            Assert.That(instance2, Is.SameAs(instance1));
+        }
+
+        [Test]
+        public void Rent_AfterReturn_UnregisteredType_NotRequireRegistration_ReturnsSameInstance()
+        {
+            var pool = new OperatorPool(requireRegistration: false);
 
             var instance1 = pool.Rent<UguiClickOperator>();
             pool.Return(instance1);
