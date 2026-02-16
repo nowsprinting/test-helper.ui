@@ -111,6 +111,18 @@ namespace TestHelper.UI
         }
 
         [Test]
+        public void Rent_AfterReturn_UnregisteredType_NotRequireRegistration_ReturnsSameInstance()
+        {
+            var pool = new OperatorPool(requireRegistration: false);
+
+            var instance1 = pool.Rent<UguiClickOperator>();
+            pool.Return(instance1);
+
+            var instance2 = pool.Rent<UguiClickOperator>();
+            Assert.That(instance2, Is.SameAs(instance1));
+        }
+
+        [Test]
         public void RentAll_ReturnsAllOperatorInstances()
         {
             var pool = new OperatorPool();

@@ -145,7 +145,7 @@ namespace TestHelper.UI
             }
 
             var type = obj.GetType();
-            if (!_registrations.ContainsKey(type))
+            if (!_registrations.ContainsKey(type) && _requireRegistration)
             {
                 throw new InvalidOperationException($"{type.Name} is not registered.");
             }
