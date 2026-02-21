@@ -44,7 +44,7 @@ jobs:
           - 2019.4.41f2
           - 2022.3.62f3 # Non-Enterprise LTS
           - 6000.0.67f1
-          - &latest_unity_version 6000.3.7f1
+          - &latest_unity_version 6000.3.8f1
         testMode:
           - All # run tests in editor
         inputHandler:
@@ -55,7 +55,7 @@ jobs:
           - unityVersion: 2022.3.62f3 # inputsystem package is not pre-installed
             inputHandler: '0' # legacy only
             testMode: PlayMode
-          - unityVersion: 2022.3.62f3 # "Error building Player because scripts are compiling" in 6000.0.65f1 and 6000.3.4f1
+          - unityVersion: 6000.0.63f1 # "Error building Player because scripts are compiling" in 6000.0.64f1 and 6000.3.1f1
             inputHandler: '2'
             testMode: Standalone  # run tests on player
 
