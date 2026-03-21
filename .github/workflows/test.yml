@@ -44,7 +44,8 @@ jobs:
           - 2019.4.41f2
           - 2022.3.62f3 # Non-Enterprise LTS
           - 6000.0.67f1
-          - &latest_unity_version 6000.3.8f1
+          - 6000.3.11f1
+          - &latest_unity_version 6000.4.0f1
         testMode:
           - All # run tests in editor
         inputHandler:
