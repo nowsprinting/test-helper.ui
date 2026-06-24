@@ -157,7 +157,9 @@ namespace TestHelper.UI.Operators
 
         private static IEnumerable<DropAnnotation> FindDropAnnotations()
         {
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
+            return Object.FindObjectsByType<DropAnnotation>(FindObjectsInactive.Exclude);
+#elif UNITY_2022_3_OR_NEWER
             return Object.FindObjectsByType<DropAnnotation>(FindObjectsSortMode.None);
             // Note: Supported in Unity 2020.3.4, 2021.3.18, 2022.2.5 or later.
 #else

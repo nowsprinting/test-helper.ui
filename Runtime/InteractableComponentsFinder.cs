@@ -124,7 +124,9 @@ namespace TestHelper.UI
 
         private static IEnumerable<MonoBehaviour> FindMonoBehaviours()
         {
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
+            return Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);
+#elif UNITY_2022_3_OR_NEWER
             return Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             // Note: Supported in Unity 2020.3.4, 2021.3.18, 2022.2.5 or later.
 #else
