@@ -407,6 +407,10 @@ namespace TestHelper.UI
                 {
                     Assert.Pass();
                 }
+                finally
+                {
+                    cts.Dispose();
+                }
             }
 
             [Test]
