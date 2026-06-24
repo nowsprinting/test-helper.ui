@@ -70,8 +70,10 @@ namespace TestHelper.UI.Operators.Utils
                 await ScreenshotHelper.TakeScreenshot(
                         directory: _screenshotOptions.Directory,
                         filename: _lastScreenshotPath,
+#pragma warning disable CS0618 // Type or member is obsolete
                         superSize: _screenshotOptions.SuperSize,
                         stereoCaptureMode: _screenshotOptions.StereoCaptureMode,
+#pragma warning restore CS0618 // Type or member is obsolete
                         logFilepath: false
                     )
                     .ToUniTask(_gameObject.GetComponent<MonoBehaviour>());

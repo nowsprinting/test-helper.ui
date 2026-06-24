@@ -335,8 +335,10 @@ namespace TestHelper.UI
             await ScreenshotHelper.TakeScreenshot(
                     directory: screenshotOptions.Directory,
                     filename: filename,
+#pragma warning disable CS0618 // Type or member is obsolete
                     superSize: screenshotOptions.SuperSize,
                     stereoCaptureMode: screenshotOptions.StereoCaptureMode,
+#pragma warning restore CS0618 // Type or member is obsolete
                     logFilepath: false
                 )
                 .ToUniTask(s_coroutineRunner);
