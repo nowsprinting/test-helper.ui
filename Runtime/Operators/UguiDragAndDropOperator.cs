@@ -240,7 +240,7 @@ namespace TestHelper.UI.Operators
                 {
                     var builder = new StringBuilder();
                     builder.Append($"{this.GetType().Name} drop to {dropGameObject.name}");
-                    builder.Append($"({dropGameObject.GetInstanceID()})");
+                    builder.Append($"({dropGameObject.GetId()})");
                     builder.Append($", position={Format(dropPosition)}");
                     Logger.Log(builder.ToString());
                 }

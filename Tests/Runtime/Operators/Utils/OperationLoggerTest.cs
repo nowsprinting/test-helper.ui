@@ -31,7 +31,7 @@ namespace TestHelper.UI.Operators.Utils
             await sut.Log();
 
             Assume.That(_spyLogger.Messages, Has.Count.EqualTo(1));
-            Assert.That(_spyLogger.Messages[0], Does.Match(@"UguiClickOperator operates to Target\(-?\d+\)"));
+            Assert.That(_spyLogger.Messages[0], Does.Match(@"UguiClickOperator operates to Target\([^)]+\)"));
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace TestHelper.UI.Operators.Utils
         {
             var sut = CreateOperationLogger();
             var actual = sut.BuildMessage();
-            Assert.That(actual, Does.Match(@"UguiClickOperator operates to Target\(-?\d+\)"));
+            Assert.That(actual, Does.Match(@"UguiClickOperator operates to Target\([^)]+\)"));
         }
 
         [Test]
@@ -96,7 +96,7 @@ namespace TestHelper.UI.Operators.Utils
 
             var actual = sut.BuildMessage();
 
-            Assert.That(actual, Does.Match(@"UguiClickOperator operates to Target\(-?\d+\), bar=baz"));
+            Assert.That(actual, Does.Match(@"UguiClickOperator operates to Target\([^)]+\), bar=baz"));
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace TestHelper.UI.Operators.Utils
             var actual = sut.BuildMessage();
 
             Assert.That(actual, Does.Match(
-                @"UguiClickOperator operates to Target\(-?\d+\), screen-pos=\(1.00, -2.35\), world-pos=\(-3.00, 4.00, 5.68\)"));
+                @"UguiClickOperator operates to Target\([^)]+\), screen-pos=\(1.00, -2.35\), world-pos=\(-3.00, 4.00, 5.68\)"));
             // Note: screen-pos is formatted as an integer because the screen position
         }
     }

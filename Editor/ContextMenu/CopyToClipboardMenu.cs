@@ -23,8 +23,12 @@ namespace TestHelper.UI.Editor.ContextMenu
             EditorGUIUtility.systemCopyBuffer = path;
         }
 
+#if UNITY_6000_4_OR_NEWER
+        [MenuItem(Prefix + "Entity ID")]
+#else
         [MenuItem(Prefix + "Instance ID")]
-        private static void CopyInstanceIdMenuItem()
+#endif
+        private static void CopyObjectIdMenuItem()
         {
             var selected = Selection.activeGameObject;
             if (selected == null)
@@ -32,7 +36,7 @@ namespace TestHelper.UI.Editor.ContextMenu
                 return;
             }
 
-            EditorGUIUtility.systemCopyBuffer = selected.GetInstanceID().ToString();
+            EditorGUIUtility.systemCopyBuffer = selected.GetId().ToString();
         }
     }
 }

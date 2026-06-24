@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cysharp.Threading.Tasks;
 using TestHelper.RuntimeInternals;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 
 namespace TestHelper.UI.Operators.Utils
@@ -93,7 +94,7 @@ namespace TestHelper.UI.Operators.Utils
             }
             else
             {
-                builder.Append($"({_gameObject.GetInstanceID()})");
+                builder.Append($"({_gameObject.GetId()})");
             }
 
             if (Properties.Count > 0)

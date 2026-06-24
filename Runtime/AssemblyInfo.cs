@@ -3,5 +3,6 @@
 
 using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("TestHelper.UI.Editor")]
 [assembly: InternalsVisibleTo("TestHelper.UI.Tests")]
 [assembly: InternalsVisibleTo("TestHelper.UI.Performance.Tests")]
