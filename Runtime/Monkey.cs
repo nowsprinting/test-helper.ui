@@ -17,6 +17,12 @@ using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TestHelper.UI.Extensions;
+#if UNITY_6000_4_OR_NEWER
+using InstanceIdentifier = UnityEngine.EntityId;
+#else
+using InstanceIdentifier = System.Int32;
+#endif
 
 namespace TestHelper.UI
 {
@@ -66,7 +72,7 @@ namespace TestHelper.UI
                 ? new InteractableComponentsFinder(config.IsInteractable, config.Operators)
                 : new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
 #pragma warning restore CS0618 // Type or member is obsolete
-            var operationSequence = new List<int>(config.BufferLengthForDetectLooping);
+            var operationSequence = new List<InstanceIdentifier>(config.BufferLengthForDetectLooping);
 
             config.Logger.Log($"Using {config.Random}");
 
@@ -159,7 +165,7 @@ namespace TestHelper.UI
         }
 
         [Obsolete("Use Run(oneStepMode: true) instead")]
-        public static UniTask<(bool, int)> RunStep(
+        public static UniTask<(bool, InstanceIdentifier)> RunStep(
             IRandom random,
             ILogger logger,
             ScreenshotOptions screenshotOptions,
@@ -174,7 +180,7 @@ namespace TestHelper.UI
                 verbose, visualizer, cancellationToken);
         }
 
-        internal static async UniTask<(bool, int)> RunStep(
+        internal static async UniTask<(bool, InstanceIdentifier)> RunStep(
             IRandom random,
             ILogger logger,
             InteractableComponentsFinder interactableComponentsFinder,
@@ -190,12 +196,12 @@ namespace TestHelper.UI
                 verbose ? logger : null, visualizer: visualizer);
             if (selectedObject == null || selectedOperator == null)
             {
-                return (false, 0);
+                return (false, default);
             }
 
             await selectedOperator.OperateAsync(selectedObject, raycastResult, cancellationToken);
 
-            return (true, selectedObject.GetInstanceID());
+            return (true, selectedObject.GetId());
         }
 
         internal static IEnumerable<(GameObject, IOperator)> GetLotteryEntries(
@@ -210,7 +216,7 @@ namespace TestHelper.UI
                 if (verboseLogger != null)
                 {
                     lotteryEntries.Append(
-                        $"{gameObject.name}({gameObject.GetInstanceID()}):{component.GetType().Name}:{@operator.GetType().Name}, ");
+                        $"{gameObject.name}({gameObject.GetId()}):{component.GetType().Name}:{@operator.GetType().Name}, ");
                 }
 
                 yield return (gameObject, @operator);
@@ -266,7 +272,7 @@ namespace TestHelper.UI
             return (null, null, default);
         }
 
-        private static void AddToSequence(List<int> sequence, int instanceId, int bufferLength)
+        private static void AddToSequence<T>(List<T> sequence, T instanceId, int bufferLength)
         {
             if (sequence.Count >= bufferLength)
             {
@@ -277,15 +283,16 @@ namespace TestHelper.UI
         }
 
         [SuppressMessage("ReSharper", "CognitiveComplexity")]
-        internal static bool DetectInfiniteLoop(List<int> sequence)
+        internal static bool DetectInfiniteLoop<T>(List<T> sequence)
         {
+            var comparer = EqualityComparer<T>.Default;
             for (var patternLength = 2; patternLength <= sequence.Count / 2; patternLength++)
             {
                 var pattern = sequence.Take(patternLength).ToArray();
                 var patternIndex = 0;
                 for (var i = patternLength; i < sequence.Count; i++)
                 {
-                    if (pattern[patternIndex++] != sequence[i])
+                    if (!comparer.Equals(pattern[patternIndex++], sequence[i]))
                     {
                         break; // not loop
                     }
@@ -328,8 +335,10 @@ namespace TestHelper.UI
             await ScreenshotHelper.TakeScreenshot(
                     directory: screenshotOptions.Directory,
                     filename: filename,
+#pragma warning disable CS0618 // Type or member is obsolete
                     superSize: screenshotOptions.SuperSize,
                     stereoCaptureMode: screenshotOptions.StereoCaptureMode,
+#pragma warning restore CS0618 // Type or member is obsolete
                     logFilepath: false
                 )
                 .ToUniTask(s_coroutineRunner);

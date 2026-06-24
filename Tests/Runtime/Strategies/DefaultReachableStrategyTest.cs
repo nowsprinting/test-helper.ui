@@ -207,7 +207,7 @@ namespace TestHelper.UI.Strategies
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Does.Match(
-                    @"Not reachable to OutOfSight\(\d+\), position=\(\d+,\d+\)\. Raycast is not hit\."));
+                    @"Not reachable to OutOfSight\([^)]+\), position=\(\d+,\d+\)\. Raycast is not hit\."));
                 // Note: No camera when ScreenSpaceOverlay canvas.
             }
 
@@ -223,7 +223,7 @@ namespace TestHelper.UI.Strategies
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Does.Match(
-                    @"Not reachable to BehindTheWall\(\d+\), position=\(\d+,\d+\)\. Raycast hit other objects: \[ChildOfWall\(\d+\), Wall\(\d+\), BehindTheWall\(\d+\)\]"));
+                    @"Not reachable to BehindTheWall\([^)]+\), position=\(\d+,\d+\)\. Raycast hit other objects: \[ChildOfWall\([^)]+\), Wall\([^)]+\), BehindTheWall\([^)]+\)\]"));
                 // Note: No camera when ScreenSpaceOverlay canvas.
             }
 
@@ -243,7 +243,7 @@ namespace TestHelper.UI.Strategies
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Does.Match(
-                    @"Not reachable to OutOfSight\(\d+\), position=\(\d+,\d+\), camera=Main Camera\(\d+\)\. Raycast is not hit\."));
+                    @"Not reachable to OutOfSight\([^)]+\), position=\(\d+,\d+\), camera=Main Camera\([^)]+\)\. Raycast is not hit\."));
             }
         }
     }

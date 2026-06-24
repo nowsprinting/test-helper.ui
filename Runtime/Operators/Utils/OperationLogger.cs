@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cysharp.Threading.Tasks;
 using TestHelper.RuntimeInternals;
+using TestHelper.UI.Extensions;
 using UnityEngine;
 
 namespace TestHelper.UI.Operators.Utils
@@ -69,8 +70,10 @@ namespace TestHelper.UI.Operators.Utils
                 await ScreenshotHelper.TakeScreenshot(
                         directory: _screenshotOptions.Directory,
                         filename: _lastScreenshotPath,
+#pragma warning disable CS0618 // Type or member is obsolete
                         superSize: _screenshotOptions.SuperSize,
                         stereoCaptureMode: _screenshotOptions.StereoCaptureMode,
+#pragma warning restore CS0618 // Type or member is obsolete
                         logFilepath: false
                     )
                     .ToUniTask(_gameObject.GetComponent<MonoBehaviour>());
@@ -93,7 +96,7 @@ namespace TestHelper.UI.Operators.Utils
             }
             else
             {
-                builder.Append($"({_gameObject.GetInstanceID()})");
+                builder.Append($"({_gameObject.GetId()})");
             }
 
             if (Properties.Count > 0)

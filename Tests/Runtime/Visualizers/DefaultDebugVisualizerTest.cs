@@ -286,7 +286,7 @@ namespace TestHelper.UI.Visualizers
             Assert.That(ripple.activeInHierarchy, Is.False);
         }
 
-#if UNITY_2021_1_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
         [Test]
         [LoadScene(TestScenePath)]
         [TimeScale(TestTimeScale)]
@@ -299,8 +299,7 @@ namespace TestHelper.UI.Visualizers
             _sut.ShowPointerOperationEffect(_referenceObjects[1]);
             await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime + 0.2f)); // wait for end of life
 
-            var rippleCount = GameObject.FindObjectsByType<SpreadBehaviour>(FindObjectsInactive.Include,
-                FindObjectsSortMode.None).Length;
+            var rippleCount = GameObject.FindObjectsByType<SpreadBehaviour>(FindObjectsInactive.Include).Length;
             Assert.That(rippleCount, Is.EqualTo(3)); // reused (not 6)
         }
 #endif

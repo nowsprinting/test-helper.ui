@@ -130,7 +130,7 @@ namespace TestHelper.UI
 
                 Assert.That(spyLogger.Messages, Is.Not.Empty);
                 Assert.That(spyLogger.Messages[0],
-                    Does.Match(@"Not reachable to OutOfSight\(\d+\), position=\(\d+,\d+\).*\. Raycast is not hit\."));
+                    Does.Match(@"Not reachable to OutOfSight\([^)]+\), position=\(\d+,\d+\).*\. Raycast is not hit\."));
                 // Note: with or without camera
             }
 
@@ -407,6 +407,10 @@ namespace TestHelper.UI
                 {
                     Assert.Pass();
                 }
+                finally
+                {
+                    cts.Dispose();
+                }
             }
 
             [Test]
@@ -507,7 +511,8 @@ namespace TestHelper.UI
             [TearDown]
             public async Task TearDown()
             {
-                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+                await UniTask.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // game-time wait (same basis as FadeOutBehaviour)
+                await UniTask.DelayFrame(1); // one extra frame to ensure FadeOutBehaviour.Update() calls OnFadeOutCompleted
             }
 
             [Test]

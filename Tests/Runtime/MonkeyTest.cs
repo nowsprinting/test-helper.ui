@@ -523,17 +523,17 @@ namespace TestHelper.UI
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 // @formatter:off
                 Assert.That(spyLogger.Messages[0], Does.StartWith("Lottery entries: "));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\(\d+\):EventTrigger:UguiClickOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\):SpyOnPointerDownHandler:UguiClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\):SpyOnPointerUpHandler:UguiClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\(\d+\):EventTrigger:UguiClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerClickHandler\(\d+\):SpyOnPointerClickHandler:UguiClickOperator")); // includes ignored objects
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UguiClickOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UguiClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"DestroyItselfIfPointerDown\(\d+\):StubDestroyingItselfWhenPointerDown:UguiClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UguiClickOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UguiClickAndHoldOperator"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UguiTextInputOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\([^)]+\):EventTrigger:UguiClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\([^)]+\):SpyOnPointerDownHandler:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\([^)]+\):SpyOnPointerUpHandler:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\([^)]+\):EventTrigger:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerClickHandler\([^)]+\):SpyOnPointerClickHandler:UguiClickOperator")); // includes ignored objects
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\([^)]+\):EventTrigger:UguiClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\([^)]+\):EventTrigger:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"DestroyItselfIfPointerDown\([^)]+\):StubDestroyingItselfWhenPointerDown:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\([^)]+\):InputField:UguiClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\([^)]+\):InputField:UguiClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\([^)]+\):InputField:UguiTextInputOperator"));
                 // @formatter:on
             }
 
@@ -581,7 +581,7 @@ namespace TestHelper.UI
                 Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"Ignored Cube\(\d+\)."));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"Ignored Cube\([^)]+\)."));
                 Assert.That(spyLogger.Messages[1], Is.EqualTo("Lottery entries are empty or all of not reachable."));
             }
 
@@ -603,7 +603,7 @@ namespace TestHelper.UI
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
                 Assert.That(spyLogger.Messages[0],
                     Does.Match(
-                        @"Not reachable to Cube\(\d+\), position=\(\d+,\d+\), camera=Main Camera\(\d+\)\. Raycast is not hit\."));
+                        @"Not reachable to Cube\([^)]+\), position=\(\d+,\d+\), camera=Main Camera\([^)]+\)\. Raycast is not hit\."));
                 Assert.That(spyLogger.Messages[1], Is.EqualTo("Lottery entries are empty or all of not reachable."));
             }
         }
@@ -629,7 +629,8 @@ namespace TestHelper.UI
             [TearDown]
             public async Task TearDown()
             {
-                await Task.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // wait for end of life
+                await UniTask.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // game-time wait (same basis as FadeOutBehaviour)
+                await UniTask.DelayFrame(1); // one extra frame to ensure FadeOutBehaviour.Update() calls OnFadeOutCompleted
             }
 
             [Test]
@@ -662,7 +663,8 @@ namespace TestHelper.UI
                 var blocker = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 blocker.transform.position = new Vector3(0, 1, -7);
                 blocker.GetComponent<MeshRenderer>().materials[0].color = Color.gray;
-                await UniTask.DelayFrame(5); // warm up for physics raycaster (maybe)
+                Physics.SyncTransforms(); // sync collider positions before PhysicsRaycaster queries
+                await UniTask.DelayFrame(5); // warm up for physics raycaster
 
                 var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };
                 var random = new RandomWrapper();
