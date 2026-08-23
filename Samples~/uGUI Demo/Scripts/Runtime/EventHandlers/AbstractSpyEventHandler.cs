@@ -33,7 +33,13 @@ namespace TestHelper.UI.Samples.UguiDemo
             _popupPrefab = Resources.Load<GameObject>("TestHelper.UI.Samples.UguiDemo/EventPopup");
             _content = GetComponentInParent<TabContent>();
 
+#if UNITY_6000_4_OR_NEWER
+            foreach (var toggle in FindObjectsByType<Toggle>())
+#elif UNITY_2022_3_OR_NEWER
+            foreach (var toggle in FindObjectsByType<Toggle>(FindObjectsSortMode.None))
+#else
             foreach (var toggle in FindObjectsOfType<Toggle>())
+#endif
             {
                 switch (toggle.name)
                 {

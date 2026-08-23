@@ -9,11 +9,17 @@ namespace TestHelper.UI.Samples.UguiDemo
 {
     public class TabContent : MonoBehaviour
     {
-        private List<TabContent> _tabContents = new List<TabContent>();
+        private TabContent[] _tabContents;
 
         private void Start()
         {
-            _tabContents = FindObjectsOfType<TabContent>().ToList();
+#if UNITY_6000_4_OR_NEWER
+            _tabContents = FindObjectsByType<TabContent>(FindObjectsInactive.Exclude);
+#elif UNITY_2022_3_OR_NEWER
+            _tabContents = FindObjectsByType<TabContent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+#else
+            _tabContents = FindObjectsOfType<TabContent>();
+#endif
         }
 
         /// <summary>

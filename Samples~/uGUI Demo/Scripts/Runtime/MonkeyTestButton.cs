@@ -54,16 +54,14 @@ namespace TestHelper.UI.Samples.UguiDemo
                 {
                     FilenameStrategy = new CounterBasedStrategy("UguiDemo"),
                 },
-                Operators = new IOperator[]
-                {
-                    new UguiClickAndHoldOperator(),
-                    new UguiClickOperator(),
-                    new UguiDoubleClickOperator(),
-                    new UguiDragAndDropOperator(),
-                    new UguiScrollWheelOperator(),
-                    new UguiSwipeOperator(),
-                    new UguiTextInputOperator(),
-                }
+                OperatorPool = new OperatorPool()
+                    .Register<UguiClickAndHoldOperator>()
+                    .Register<UguiClickOperator>()
+                    .Register<UguiDoubleClickOperator>()
+                    .Register<UguiDragAndDropOperator>()
+                    .Register<UguiScrollWheelOperator>()
+                    .Register<UguiSwipeOperator>()
+                    .Register<UguiTextInputOperator>()
             };
 
             try

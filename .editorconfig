@@ -264,9 +264,6 @@ resharper_csharp_keep_existing_initializer_arrangement = true
 # Some values of the enum are not processed inside 'switch' statement and are handled via default section
 resharper_switch_statement_handles_some_known_enum_values_with_default_highlighting = warning
 
-# BannedApiAnalyzers
-dotnet_diagnostic.RS0030.severity = error
-
 # Suppress C#8.0+ syntax sugar (for under Unity 2020.2 compatibility)
 # See: https://www.jetbrains.com/help/resharper/Reference__Code_Inspections_CSHARP.html
 resharper_convert_to_using_declaration_highlighting = none
@@ -279,9 +276,6 @@ resharper_use_negated_pattern_in_is_expression_highlighting = none
 
 # Access to a static member of a type via a derived type (e.g., NUnit.Framework.Is)
 resharper_access_to_static_member_via_derived_type_highlighting = none
-
-# NUnit2045: Use Assert.Multiple
-dotnet_diagnostic.NUnit2045.severity = none
 
 [src/{Compilers,ExpressionEvaluator,Scripting}/**Test**/*.{cs,vb}]
 
