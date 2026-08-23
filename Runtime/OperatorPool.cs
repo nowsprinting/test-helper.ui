@@ -73,7 +73,7 @@ namespace TestHelper.UI
         /// Rents all registered operator types from the pool or creates new ones.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IOperator> RentAll()
+        public IReadOnlyList<IOperator> RentAll()
         {
             var operators = new List<IOperator>(_registrations.Count);
             foreach (var type in _registrations.Keys)

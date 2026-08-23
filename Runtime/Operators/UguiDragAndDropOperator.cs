@@ -144,7 +144,7 @@ namespace TestHelper.UI.Operators
                 }
             }
 
-            var dropAnnotation = LotteryComponent(dropAnnotations.ToArray());
+            var dropAnnotation = LotteryComponent(dropAnnotations);
             if (dropAnnotation != null)
             {
                 return OperateAsync(gameObject, dropAnnotation.gameObject, _dragSpeed, raycastResult,
@@ -157,7 +157,7 @@ namespace TestHelper.UI.Operators
                 dropHandlers.Add(handler);
             }
 
-            var dropHandler = LotteryComponent(dropHandlers.ToArray());
+            var dropHandler = LotteryComponent(dropHandlers);
             if (dropHandler != null)
             {
                 return OperateAsync(gameObject, dropHandler.gameObject, _dragSpeed, raycastResult, cancellationToken);
@@ -179,7 +179,7 @@ namespace TestHelper.UI.Operators
 #endif
         }
 
-        internal Component LotteryComponent(Component[] components)
+        internal Component LotteryComponent(IReadOnlyList<Component> components)
         {
             if (components == null)
             {

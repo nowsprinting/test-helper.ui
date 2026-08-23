@@ -88,7 +88,7 @@ namespace TestHelper.UI
                 yield break;
             }
 
-            var operators = new List<IOperator>(_operatorPool.RentAll());
+            var operators = _operatorPool.RentAll();
             try
             {
                 foreach (var component in FindInteractableComponents())
