@@ -169,6 +169,10 @@ namespace TestHelper.UI
             var rootGameObjects = new List<GameObject>();
             foreach (var loadedScene in scenes)
             {
+                // Do not rely on GetRootGameObjects clearing the buffer. It does not on Unity 6000.5,
+                // so a reused buffer keeps the previous scenes' roots and walks them again. With three
+                // or more scenes loaded, that makes a single GameObject match more than once.
+                rootGameObjects.Clear();
                 loadedScene.GetRootGameObjects(rootGameObjects);
                 foreach (var rootGameObject in rootGameObjects)
                 {
