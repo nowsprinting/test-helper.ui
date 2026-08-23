@@ -81,6 +81,7 @@ namespace TestHelper.UI.Operators
             Random = random;
             Logger = logger ?? Debug.unityLogger;
             ScreenshotOptions = screenshotOptions;
+            Visualizer = visualizer;
         }
 
         /// <inheritdoc/>
