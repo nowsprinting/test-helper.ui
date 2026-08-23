@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -136,16 +135,29 @@ namespace TestHelper.UI.Operators
         public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
             CancellationToken cancellationToken = default)
         {
-            var dropAnnotations = FindDropAnnotations().Where(x => x.isActiveAndEnabled).ToArray<Component>();
-            var dropAnnotation = LotteryComponent(dropAnnotations);
+            var dropAnnotations = new List<Component>();
+            foreach (var annotation in FindDropAnnotations())
+            {
+                if (annotation.isActiveAndEnabled)
+                {
+                    dropAnnotations.Add(annotation);
+                }
+            }
+
+            var dropAnnotation = LotteryComponent(dropAnnotations.ToArray());
             if (dropAnnotation != null)
             {
                 return OperateAsync(gameObject, dropAnnotation.gameObject, _dragSpeed, raycastResult,
                     cancellationToken);
             }
 
-            var dropHandlers = InteractableComponentsFinder.FindEventHandlers<IDropHandler>().ToArray<Component>();
-            var dropHandler = LotteryComponent(dropHandlers);
+            var dropHandlers = new List<Component>();
+            foreach (var handler in InteractableComponentsFinder.FindEventHandlers<IDropHandler>())
+            {
+                dropHandlers.Add(handler);
+            }
+
+            var dropHandler = LotteryComponent(dropHandlers.ToArray());
             if (dropHandler != null)
             {
                 return OperateAsync(gameObject, dropHandler.gameObject, _dragSpeed, raycastResult, cancellationToken);

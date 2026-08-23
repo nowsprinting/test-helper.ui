@@ -4,6 +4,12 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+// System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
+#if UNITY_2021_2_OR_NEWER
+using MathF = System.MathF;
+#else
+using MathF = UnityEngine.Mathf;
+#endif
 
 namespace TestHelper.UI.Visualizers
 {
@@ -53,7 +59,7 @@ namespace TestHelper.UI.Visualizers
         {
             _elapsed += Time.deltaTime;
             var t = Mathf.Clamp01(_elapsed / Lifetime);   // 0..1
-            var accelerated = Mathf.Pow(t, Acceleration); // 0..1 with acceleration
+            var accelerated = MathF.Pow(t, Acceleration); // 0..1 with acceleration
             var color = _image.color;
             color.a = 1f - accelerated;
             _image.color = color;

@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2023-2025 Koji Hasegawa.
+﻿// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
@@ -52,7 +51,7 @@ namespace TestHelper.UI
         /// Find components attached <see cref="EventTrigger"/> or implements <see cref="IEventSystemHandler"/> in the scene.
         /// Includes UI elements that inherit from the <see cref="Selectable"/> class, such as the <see cref="Button"/>.
         /// <p/>
-        /// Note: If you only need uGUI elements, use <see cref="UnityEngine.UI.Selectable.allSelectablesArray"/> is faster.
+        /// Note: If you only need uGUI elements, using <c>Selectable.AllSelectablesNoAlloc</c> is faster.
         /// <br/>
         /// Note: Does not check if reachable by user. 
         /// </summary>
@@ -78,21 +77,33 @@ namespace TestHelper.UI
         {
             if (_operators != null)
             {
-                return FindInteractableComponents()
-                    .SelectMany(x => x.gameObject.SelectOperators(_operators), (x, o) => (x, o));
+                foreach (var component in FindInteractableComponents())
+                {
+                    foreach (var iOperator in component.gameObject.SelectOperators(_operators))
+                    {
+                        yield return (component, iOperator);
+                    }
+                }
+
+                yield break;
             }
 
-            var operators = _operatorPool.RentAll().ToArray();
+            var operators = new List<IOperator>(_operatorPool.RentAll());
             try
             {
-                return FindInteractableComponents()
-                    .SelectMany(x => x.gameObject.SelectOperators(operators), (x, o) => (x, o));
+                foreach (var component in FindInteractableComponents())
+                {
+                    foreach (var iOperator in component.gameObject.SelectOperators(operators))
+                    {
+                        yield return (component, iOperator);
+                    }
+                }
             }
             finally
             {
-                foreach (var op in operators)
+                foreach (var iOperator in operators)
                 {
-                    _operatorPool.Return(op);
+                    _operatorPool.Return(iOperator);
                 }
             }
         }
@@ -106,8 +117,13 @@ namespace TestHelper.UI
         /// <returns>Components can handle the specified event handler</returns>
         public static IEnumerable<MonoBehaviour> FindEventHandlers<T>() where T : IEventSystemHandler
         {
-            foreach (var component in FindMonoBehaviours().Where(x => x.isActiveAndEnabled))
+            foreach (var component in FindMonoBehaviours())
             {
+                if (!component.isActiveAndEnabled)
+                {
+                    continue;
+                }
+
                 if (component is EventTrigger eventTrigger)
                 {
                     if (eventTrigger.CanHandle<T>())

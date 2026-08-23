@@ -1,9 +1,8 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Exceptions;
@@ -138,7 +137,7 @@ namespace TestHelper.UI
             for (var i = objects.Count - 1; i >= 0; i--)
             {
                 var current = objects[i];
-                if (current.GetComponents<Component>().Any(c => _isInteractable(c)))
+                if (HasInteractableComponent(current))
                 {
                     continue;
                 }
@@ -150,15 +149,44 @@ namespace TestHelper.UI
             return objects.Count > 0;
         }
 
+        private bool HasInteractableComponent(GameObject gameObject)
+        {
+            foreach (var component in gameObject.GetComponents<Component>())
+            {
+                if (_isInteractable(component))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher, Scene scene)
+        {
+            var scenes = scene != default ? new List<Scene> { scene } : GetAllScenes();
+            var foundObjects = new List<GameObject>();
+            var rootGameObjects = new List<GameObject>();
+            foreach (var loadedScene in scenes)
+            {
+                loadedScene.GetRootGameObjects(rootGameObjects);
+                foreach (var rootGameObject in rootGameObjects)
+                {
+                    foreach (var found in FindGameObjectRecursive(rootGameObject, matcher))
+                    {
+                        foundObjects.Add(found);
+                    }
+                }
+            }
+
+            return foundObjects;
+        }
+
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
             bool reachable, bool interactable, Scene scene = default)
         {
-            var scenes = scene != default ? new List<Scene> { scene } : GetAllScenes();
-            var foundObjects = scenes.Select(x => x.GetRootGameObjects())
-                .SelectMany(objects => objects, (objects, r) => new { rootGameObjects = objects, rootGameObject = r })
-                .SelectMany(t => FindGameObjectRecursive(t.rootGameObject, matcher)).ToList();
-
-            if (!foundObjects.Any())
+            var foundObjects = FindAllByMatcher(matcher, scene);
+            if (foundObjects.Count == 0)
             {
                 return (null, default, Reason.NotFound);
             }
@@ -178,7 +206,7 @@ namespace TestHelper.UI
                 return (null, default, Reason.MultipleMatching);
             }
 
-            var resultObject = foundObjects.First();
+            var resultObject = foundObjects[0];
             if (!reachable)
             {
                 return (resultObject, new RaycastResult(), Reason.None);

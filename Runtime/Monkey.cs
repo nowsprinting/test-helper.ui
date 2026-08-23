@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2023-2025 Koji Hasegawa.
+﻿// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -45,6 +44,9 @@ namespace TestHelper.UI
         /// <param name="cancellationToken">Cancellation token</param>
         /// <exception cref="InfiniteLoopException">Thrown if a repeating operation is detected within the specified buffer length</exception>
         /// <exception cref="TimeoutException">Thrown if an object that can be interacted with does not exist</exception>
+        // VSTHRD200 asks to rename this to `RunAsync`. Not applied: it is published API of this package,
+        // so renaming would be a breaking change rather than a diagnostics fix.
+#pragma warning disable VSTHRD200 // Use "Async" suffix for async methods
         public static async UniTask Run(MonkeyConfig config, bool oneStepMode = false,
             CancellationToken cancellationToken = default)
         {
@@ -136,6 +138,7 @@ namespace TestHelper.UI
                 }
             }
         }
+#pragma warning restore VSTHRD200
 
         private static void SetupOperators(MonkeyConfig config)
         {
@@ -164,6 +167,9 @@ namespace TestHelper.UI
             }
         }
 
+        // VSTHRD200 asks to rename these overloads to `RunStepAsync`. Not applied: the public one is published
+        // API of this package, and renaming only the internal one would split the pair.
+#pragma warning disable VSTHRD200 // Use "Async" suffix for async methods
         [Obsolete("Use Run(oneStepMode: true) instead")]
         public static UniTask<(bool, InstanceIdentifier)> RunStep(
             IRandom random,
@@ -190,7 +196,8 @@ namespace TestHelper.UI
             IVisualizer visualizer = null,
             CancellationToken cancellationToken = default)
         {
-            var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null).Distinct();
+            var lotteryEntries = DistinctEntries(
+                GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null));
             var (selectedObject, selectedOperator, raycastResult) = LotteryOperator(
                 lotteryEntries, random, ignoreStrategy, reachableStrategy,
                 verbose ? logger : null, visualizer: visualizer);
@@ -202,6 +209,20 @@ namespace TestHelper.UI
             await selectedOperator.OperateAsync(selectedObject, raycastResult, cancellationToken);
 
             return (true, selectedObject.GetId());
+        }
+#pragma warning restore VSTHRD200
+
+        private static IEnumerable<(GameObject, IOperator)> DistinctEntries(
+            IEnumerable<(GameObject, IOperator)> entries)
+        {
+            var seen = new HashSet<(GameObject, IOperator)>();
+            foreach (var entry in entries)
+            {
+                if (seen.Add(entry))
+                {
+                    yield return entry;
+                }
+            }
         }
 
         internal static IEnumerable<(GameObject, IOperator)> GetLotteryEntries(
@@ -247,7 +268,7 @@ namespace TestHelper.UI
             ILogger verboseLogger = null,
             IVisualizer visualizer = null)
         {
-            var operatorList = operators.ToList();
+            var operatorList = new List<(GameObject, IOperator)>(operators);
 
             while (operatorList.Count > 0)
             {
@@ -288,7 +309,8 @@ namespace TestHelper.UI
             var comparer = EqualityComparer<T>.Default;
             for (var patternLength = 2; patternLength <= sequence.Count / 2; patternLength++)
             {
-                var pattern = sequence.Take(patternLength).ToArray();
+                var pattern = new T[patternLength];
+                sequence.CopyTo(0, pattern, 0, patternLength);
                 var patternIndex = 0;
                 for (var i = patternLength; i < sequence.Count; i++)
                 {

@@ -177,7 +177,7 @@ namespace TestHelper.UI.Visualizers
             {
                 for (var i = 0; i < RippleCount; i++)
                 {
-                    ShowRippleEffectAfterDelay(i).Forget();
+                    ShowRippleEffectAfterDelayAsync(i).Forget();
                 }
             }
             catch (Exception e)
@@ -187,7 +187,7 @@ namespace TestHelper.UI.Visualizers
 
             return;
 
-            async UniTask ShowRippleEffectAfterDelay(int i)
+            async UniTask ShowRippleEffectAfterDelayAsync(int i)
             {
                 var interval = RippleIntervalMillis * i;
                 if (interval > 0)
