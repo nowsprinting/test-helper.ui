@@ -4,7 +4,7 @@ is_global = true
 dotnet_diagnostic.CS0618.severity = error
 
 # RS0030: Do not use banned APIs
-dotnet_diagnostic.RS0030.severity = warning
+dotnet_diagnostic.RS0030.severity = suggestion
 
 # Nullable reference type warnings (this package does not use nullable annotations)
 dotnet_diagnostic.CS8597.severity = none
