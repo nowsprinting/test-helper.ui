@@ -33,14 +33,18 @@ namespace TestHelper.UI.Samples.UguiDemo
 
             if (ParentImage && ParentImage.color != Color.white)
             {
-                Color.RGBToHSV(ParentImage.color, out var h, out var s, out var v);
+                Color.RGBToHSV(ParentImage.color, out var h, out var _, out var _);
                 _background.color = Color.HSVToRGB(h, 1.0f, 0.3f);
             }
 
             var text = GetComponentInChildren<Text>();
             text.text = name;
 
+#if UNITY_2021_2_OR_NEWER
+            var width = System.MathF.Max(text.preferredWidth + 8.0f, 60.0f);
+#else
             var width = Mathf.Max(text.preferredWidth + 8.0f, 60.0f);
+#endif
             var height = text.preferredHeight + 4.0f;
             _background.rectTransform.sizeDelta = new Vector2(width, height);
 
