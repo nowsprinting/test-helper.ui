@@ -20,7 +20,7 @@
     "autoReferenced": false,
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS",
-        "UNITY_2020_3_OR_NEWER",
+        "UNITY_2021_2_OR_NEWER",
         "ENABLE_PERFORMANCE_TESTING"
     ],
     "versionDefines": [

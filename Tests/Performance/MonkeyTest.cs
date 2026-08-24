@@ -1,75 +1,47 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Collections;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Random;
+using TestHelper.UI.Operators;
 using Unity.PerformanceTesting;
-using UnityEngine.TestTools;
+using UnityEngine;
 
 namespace TestHelper.UI.Performance
 {
+    [TestFixture]
     public class MonkeyTest
     {
-        private const string MeasurePackageVersion = "0.13.3";
+        private const int GridButtonCount = 10;
 
         [Test]
-        [Performance, Version(MeasurePackageVersion)]
-        [LoadScene("../Scenes/Operators.unity")]
-        public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
+        [Performance]
+        [CreateScene(camera: true)]
+        public async Task RunStep_SeededRandom_MeasureTimeAndAllocations()
         {
-            var config = new MonkeyConfig();
-            var finder = new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
+            UiFixtureFactory.CreateGridButtons(GridButtonCount);
+            // Without a rendered frame, CanvasRenderer.depth stays -1 and GraphicRaycaster skips the buttons.
+            Canvas.ForceUpdateCanvases();
+            await UniTask.NextFrame();
 
-            Measure.Method(() =>
-                {
-                    // ReSharper disable once IteratorMethodResultIsIgnored
-                    Monkey.GetLotteryEntries(finder);
-                })
-                .WarmupCount(5)
-                .MeasurementCount(20)
-                .GC()
-                .Run();
-        }
-
-        [Test]
-        [Performance, Version(MeasurePackageVersion)]
-        [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
-        public void LotteryOperator_BingoReachableComponent()
-        {
-            var config = new MonkeyConfig();
-            var finder = new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
-            var operators = Monkey.GetLotteryEntries(finder);
-
-            Measure.Method(() =>
-                {
-                    Monkey.LotteryOperator(operators, config.Random, config.IgnoreStrategy, config.ReachableStrategy);
-                })
-                .WarmupCount(5)
-                .MeasurementCount(20)
-                .GC()
-                .Run();
-        }
-
-        [UnityTest]
-        [Performance, Version(MeasurePackageVersion)]
-        [LoadScene("../Scenes/Operators.unity")]
-        public IEnumerator RunStep_finish()
-        {
-            var config = new MonkeyConfig();
-            var finder = new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
-
-            using (Measure.Frames().Scope())
+            var config = new MonkeyConfig
             {
-                yield return Monkey.RunStep(
-                        config.Random,
-                        config.Logger,
-                        finder,
-                        config.IgnoreStrategy,
-                        config.ReachableStrategy)
-                    .ToCoroutine();
-            }
+                Random = new RandomWrapper(0), // pin seed for branch comparison
+                // Only the click operator is registered; UguiClickAndHoldOperator's hold time would dominate the
+                // measurement, hiding the cost of the lottery and reachability paths this test is meant to sample.
+                OperatorPool = new OperatorPool().Register<UguiClickOperator>()
+            };
+            var finder = new InteractableComponentsFinder(config.IsInteractable, config.OperatorPool);
+
+            var (didAction, _) = await Monkey.RunStep(
+                config.Random, config.Logger, finder, config.IgnoreStrategy, config.ReachableStrategy);
+            Assume.That(didAction, Is.True); // the generated buttons are actually operable
+
+            await PerformanceMeasurement.MeasureAsync(() => Monkey.RunStep(
+                config.Random, config.Logger, finder, config.IgnoreStrategy, config.ReachableStrategy));
         }
     }
 }
