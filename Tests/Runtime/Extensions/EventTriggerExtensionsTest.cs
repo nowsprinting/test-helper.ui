@@ -1,12 +1,17 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.TestTools.Constraints;
+// UnityEngine.TestTools.Constraints is imported for the AllocatingGCMemory extension method, which brings a
+// second `Is` into scope. Aliased to NUnit's so that the existing assertions in this file keep resolving to it.
+using Is = NUnit.Framework.Is;
 
 namespace TestHelper.UI.Extensions
 {
@@ -76,6 +81,40 @@ namespace TestHelper.UI.Extensions
             var actual = (bool)genericMethod.Invoke(eventTrigger, new object[] { eventTrigger });
 
             Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanHandle_DoesNotAllocateGCMemory()
+        {
+            var eventTrigger = new GameObject().AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerClick,
+                callback = new EventTrigger.TriggerEvent()
+            });
+            Assume.That(eventTrigger.CanHandle<IPointerClickHandler>(), Is.True); // also warms up the measured path
+
+            // Not a lambda with an expression body: a value-returning one binds to the ActualValueDelegate<T>
+            // overload of Assert.That, and the constraint then rejects it as "not a TestDelegate".
+            Assert.That(() => { _ = eventTrigger.CanHandle<IPointerClickHandler>(); },
+                Is.Not.AllocatingGCMemory());
+        }
+
+        [Test]
+        [CreateScene]
+        public void HasActiveTrigger_DoesNotAllocateGCMemory()
+        {
+            var eventTrigger = new GameObject().AddComponent<EventTrigger>();
+            eventTrigger.triggers.Add(new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerClick,
+                callback = new EventTrigger.TriggerEvent()
+            });
+            Assume.That(eventTrigger.HasActiveTrigger(), Is.True); // also warms up the measured path
+
+            Assert.That(() => { _ = eventTrigger.HasActiveTrigger(); },
+                Is.Not.AllocatingGCMemory());
         }
     }
 }
