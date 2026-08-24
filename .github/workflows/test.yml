@@ -106,9 +106,10 @@ jobs:
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
         if: ${{ matrix.inputHandler != '0' }}
 
-      - name: Install codecoverage package
+      - name: Install code-coverage and performance-testing package
         run: |
           openupm add -f com.unity.testtools.codecoverage
+          openupm add -f com.unity.test-framework.performance
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
         if: ${{ matrix.octocov }}
 
@@ -133,7 +134,7 @@ jobs:
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
           checkName: test (${{ matrix.unityVersion }}, ${{ matrix.testMode }}, ${{ matrix.inputHandler }})
           projectPath: ${{ env.CREATED_PROJECT_PATH }}
-          customParameters: -retry 5 -testCategory "!IgnoreCI" -testHelperScreenshotDirectory /github/workspace/artifacts/Screenshots
+          customParameters: -retry 5 -testCategory "!IgnoreCI" -testHelperScreenshotDirectory /github/workspace/artifacts/Screenshots -perfTestResults /github/workspace/artifacts/PerformanceTestResults.json
           # Note: `/github/workspace/artifacts` is the artifacts path inside the game-ci container
           coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:${{ env.assembly_filters }}
           # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
