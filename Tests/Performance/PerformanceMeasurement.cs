@@ -67,7 +67,11 @@ namespace TestHelper.UI.Performance
             var delta = GC.GetTotalMemory(false) - before;
             GC.KeepAlive(probe);
 
-            Assume.That(delta, Is.GreaterThanOrEqualTo(CounterProbeSize),
+            // Not GetTotalMemory(true): forcing a collection also reclaims unrelated garbage, which lands the
+            // delta just below the probe size (995,328 of 1,000,000 observed) and fails a working counter.
+            // Half the probe size is the threshold because this only has to separate a live counter from a
+            // dead one, and a dead one reports a flat 0.
+            Assume.That(delta, Is.GreaterThan(CounterProbeSize / 2),
                 "The allocation counter does not move on this runtime, so GC.Alloc samples would all read 0.");
         }
     }
