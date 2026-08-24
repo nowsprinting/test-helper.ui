@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System.Collections.Generic;
-using System.Linq;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.GameObjectMatchers;
@@ -61,9 +60,12 @@ namespace TestHelper.UI.Strategies
             var currentTransform = gameObject.transform;
             while (currentTransform != null)
             {
-                if (_ignoreMatchers.Any(matcher => matcher.IsMatch(currentTransform.gameObject)))
+                foreach (var matcher in _ignoreMatchers)
                 {
-                    return true;
+                    if (matcher.IsMatch(currentTransform.gameObject))
+                    {
+                        return true;
+                    }
                 }
 
                 currentTransform = currentTransform.parent;

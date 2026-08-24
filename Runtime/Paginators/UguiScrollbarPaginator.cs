@@ -1,11 +1,16 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.UI;
+// System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
+#if UNITY_2021_2_OR_NEWER
+using MathF = System.MathF;
+#else
+using MathF = UnityEngine.Mathf;
+#endif
 
 namespace TestHelper.UI.Paginators
 {
@@ -48,7 +53,7 @@ namespace TestHelper.UI.Paginators
 
             var currentValue = _scrollbar.value;
             var scrollAmount = CalculateNormalizedScrollAmount();
-            var newValue = Mathf.Min(currentValue + scrollAmount, 1f);
+            var newValue = MathF.Min(currentValue + scrollAmount, 1f);
 
             _scrollbar.value = newValue;
             await UniTask.Yield(cancellationToken);

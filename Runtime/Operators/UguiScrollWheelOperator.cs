@@ -13,6 +13,12 @@ using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+// System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
+#if UNITY_2021_2_OR_NEWER
+using MathF = System.MathF;
+#else
+using MathF = UnityEngine.Mathf;
+#endif
 
 namespace TestHelper.UI.Operators
 {
@@ -199,7 +205,7 @@ namespace TestHelper.UI.Operators
             var destination = flipped.normalized * distance;
 
             // Call the common implementation
-            await OperateAsyncCore(gameObject, destination, scrollSpeed, raycastResult, cancellationToken);
+            await OperateCoreAsync(gameObject, destination, scrollSpeed, raycastResult, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -211,10 +217,10 @@ namespace TestHelper.UI.Operators
         public UniTask OperateAsync(GameObject gameObject, Vector2 destination, int scrollSpeed = 0,
             RaycastResult raycastResult = default, CancellationToken cancellationToken = default)
         {
-            return OperateAsyncCore(gameObject, destination, scrollSpeed, raycastResult, cancellationToken, true);
+            return OperateCoreAsync(gameObject, destination, scrollSpeed, raycastResult, cancellationToken, true);
         }
 
-        private async UniTask OperateAsyncCore(GameObject gameObject, Vector2 destination, int scrollSpeed,
+        private async UniTask OperateCoreAsync(GameObject gameObject, Vector2 destination, int scrollSpeed,
             RaycastResult raycastResult, CancellationToken cancellationToken, bool logDestination = false)
         {
             if (raycastResult.gameObject == null)
@@ -249,7 +255,7 @@ namespace TestHelper.UI.Operators
             while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
             {
                 var frameSpeed = scrollSpeed * Time.deltaTime;
-                var scrollDelta = direction * Mathf.Min(frameSpeed, remainingDistance);
+                var scrollDelta = direction * MathF.Min(frameSpeed, remainingDistance);
                 pointerEventData.scrollDelta = scrollDelta;
 
                 ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.scrollHandler);

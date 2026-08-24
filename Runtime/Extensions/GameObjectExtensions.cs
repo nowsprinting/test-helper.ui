@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
 using UnityEngine;
@@ -69,7 +68,13 @@ namespace TestHelper.UI.Extensions
         {
             isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
 
-            return gameObject.GetComponents<Component>().Where(x => isComponentInteractable.Invoke(x));
+            foreach (var component in gameObject.GetComponents<Component>())
+            {
+                if (isComponentInteractable.Invoke(component))
+                {
+                    yield return component;
+                }
+            }
         }
 
         /// <summary>
@@ -119,8 +124,13 @@ namespace TestHelper.UI.Extensions
         /// <seealso cref="EventTriggerExtensions.CanHandle{T}"/>
         public static bool HasEventHandlers<T>(this GameObject gameObject) where T : IEventSystemHandler
         {
-            foreach (var component in gameObject.GetComponents<MonoBehaviour>().Where(x => x.isActiveAndEnabled))
+            foreach (var component in gameObject.GetComponents<MonoBehaviour>())
             {
+                if (!component.isActiveAndEnabled)
+                {
+                    continue;
+                }
+
                 if (component is EventTrigger eventTrigger)
                 {
                     if (eventTrigger.CanHandle<T>())
@@ -146,7 +156,13 @@ namespace TestHelper.UI.Extensions
         public static IEnumerable<IOperator> SelectOperators(this GameObject gameObject,
             IEnumerable<IOperator> operators)
         {
-            return operators.Where(iOperator => iOperator.CanOperate(gameObject));
+            foreach (var iOperator in operators)
+            {
+                if (iOperator.CanOperate(gameObject))
+                {
+                    yield return iOperator;
+                }
+            }
         }
 
         /// <summary>
@@ -158,7 +174,13 @@ namespace TestHelper.UI.Extensions
         public static IEnumerable<T> SelectOperators<T>(this GameObject gameObject, IEnumerable<IOperator> operators)
             where T : IOperator
         {
-            return operators.OfType<T>().Where(iOperator => iOperator.CanOperate(gameObject));
+            foreach (var iOperator in operators)
+            {
+                if (iOperator is T typedOperator && typedOperator.CanOperate(gameObject))
+                {
+                    yield return typedOperator;
+                }
+            }
         }
     }
 }

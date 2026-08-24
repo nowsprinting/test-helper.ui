@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
@@ -146,9 +145,12 @@ namespace TestHelper.UI.Strategies
             var current = gameObject.transform;
             while (current != null)
             {
-                if (_nonBlockingMatchers.Any(matcher => matcher.IsMatch(current.gameObject)))
+                foreach (var matcher in _nonBlockingMatchers)
                 {
-                    return true;
+                    if (matcher.IsMatch(current.gameObject))
+                    {
+                        return true;
+                    }
                 }
 
                 current = current.parent;

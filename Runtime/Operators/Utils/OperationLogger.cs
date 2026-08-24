@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Collections.Generic;
@@ -57,6 +57,9 @@ namespace TestHelper.UI.Operators.Utils
         /// Output log message with a screenshot.
         /// Call this before the operation, after the shown effects.
         /// </summary>
+        // VSTHRD200 asks to rename this to `LogAsync`. Not applied: it is published API of this package,
+        // so renaming would be a breaking change rather than a diagnostics fix.
+#pragma warning disable VSTHRD200 // Use "Async" suffix for async methods
         public async UniTask Log()
         {
             if (_screenshotOptions != null)
@@ -82,6 +85,7 @@ namespace TestHelper.UI.Operators.Utils
 
             _logger.Log(BuildMessage());
         }
+#pragma warning restore VSTHRD200
 
         internal string BuildMessage()
         {

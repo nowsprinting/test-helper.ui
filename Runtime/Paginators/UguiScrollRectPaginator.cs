@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -6,6 +6,12 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+// System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
+#if UNITY_2021_2_OR_NEWER
+using MathF = System.MathF;
+#else
+using MathF = UnityEngine.Mathf;
+#endif
 
 namespace TestHelper.UI.Paginators
 {
@@ -62,7 +68,7 @@ namespace TestHelper.UI.Paginators
                 {
                     // Move horizontally
                     var horizontalAmount = CalculateHorizontalScrollAmount();
-                    var newX = Mathf.Min(currentPosition.x + horizontalAmount, 1f);
+                    var newX = MathF.Min(currentPosition.x + horizontalAmount, 1f);
                     _scrollRect.normalizedPosition = new Vector2(newX, currentPosition.y);
                     _isHorizontalAtEnd = newX >= 1f - float.Epsilon;
                 }
@@ -70,7 +76,7 @@ namespace TestHelper.UI.Paginators
                 {
                     // Horizontal direction is at the end, so return to the left and move vertically
                     var verticalAmount = CalculateVerticalScrollAmount();
-                    var newY = Mathf.Max(currentPosition.y - verticalAmount, 0f);
+                    var newY = MathF.Max(currentPosition.y - verticalAmount, 0f);
                     _scrollRect.normalizedPosition = new Vector2(0f, newY);
                     _isHorizontalAtEnd = false;
                 }
@@ -79,14 +85,14 @@ namespace TestHelper.UI.Paginators
             {
                 // Horizontal direction only
                 var horizontalAmount = CalculateHorizontalScrollAmount();
-                var newX = Mathf.Min(currentPosition.x + horizontalAmount, 1f);
+                var newX = MathF.Min(currentPosition.x + horizontalAmount, 1f);
                 _scrollRect.normalizedPosition = new Vector2(newX, currentPosition.y);
             }
             else if (_scrollRect.vertical)
             {
                 // Vertical direction only
                 var verticalAmount = CalculateVerticalScrollAmount();
-                var newY = Mathf.Max(currentPosition.y - verticalAmount, 0f);
+                var newY = MathF.Max(currentPosition.y - verticalAmount, 0f);
                 _scrollRect.normalizedPosition = new Vector2(currentPosition.x, newY);
             }
             else

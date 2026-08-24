@@ -1,7 +1,6 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Linq;
 using UnityEngine.EventSystems;
 
 namespace TestHelper.UI.Extensions
@@ -16,12 +15,22 @@ namespace TestHelper.UI.Extensions
         /// <seealso cref="EventTriggerExtensions.HasActiveTrigger"/>
         public static bool HasActiveHandler(this IEventSystemHandler handler)
         {
-            return handler.GetType().GetInterfaces()
-                .Where(x => typeof(IEventSystemHandler).IsAssignableFrom(x) && x != typeof(IEventSystemHandler))
-                .Any(x =>
-                    x != typeof(IDropHandler) &&
-                    x != typeof(IUpdateSelectedHandler) &&
-                    x != typeof(IDeselectHandler));
+            foreach (var type in handler.GetType().GetInterfaces())
+            {
+                if (!typeof(IEventSystemHandler).IsAssignableFrom(type) || type == typeof(IEventSystemHandler))
+                {
+                    continue;
+                }
+
+                if (type != typeof(IDropHandler) &&
+                    type != typeof(IUpdateSelectedHandler) &&
+                    type != typeof(IDeselectHandler))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

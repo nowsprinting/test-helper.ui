@@ -1,7 +1,6 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Linq;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
 using UnityEngine;
@@ -68,8 +67,15 @@ namespace TestHelper.UI.Strategies
 
         private static float GetCanvasScale(GameObject gameObject)
         {
-            var canvas = gameObject.GetComponentsInParent<Canvas>().FirstOrDefault(x => x.isRootCanvas);
-            return canvas == null ? 1f : canvas.scaleFactor;
+            foreach (var canvas in gameObject.GetComponentsInParent<Canvas>())
+            {
+                if (canvas.isRootCanvas)
+                {
+                    return canvas.scaleFactor;
+                }
+            }
+
+            return 1f;
         }
     }
 }

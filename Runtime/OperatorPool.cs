@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
 using TestHelper.Random;
 using TestHelper.UI.Operators;
@@ -74,9 +73,15 @@ namespace TestHelper.UI
         /// Rents all registered operator types from the pool or creates new ones.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IOperator> RentAll()
+        public IReadOnlyList<IOperator> RentAll()
         {
-            return _registrations.Keys.Select(Rent);
+            var operators = new List<IOperator>(_registrations.Count);
+            foreach (var type in _registrations.Keys)
+            {
+                operators.Add(Rent(type));
+            }
+
+            return operators;
         }
 
         /// <summary>
@@ -122,15 +127,20 @@ namespace TestHelper.UI
                 return (IOperator)Activator.CreateInstance(type, ConvertRegisteredArgs(args));
             }
 
-            var constructor = type.GetConstructors().FirstOrDefault();
-            if (constructor == null)
+            var constructors = type.GetConstructors();
+            if (constructors.Length == 0)
             {
                 throw new InvalidOperationException($"{type.Name} has no public constructor.");
             }
 
-            var parameters = constructor.GetParameters();
-            var resolvedArgs = parameters.Select(ResolveArgument).ToArray();
-            return (IOperator)constructor.Invoke(resolvedArgs);
+            var parameters = constructors[0].GetParameters();
+            var resolvedArgs = new object[parameters.Length];
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                resolvedArgs[i] = ResolveArgument(parameters[i]);
+            }
+
+            return (IOperator)constructors[0].Invoke(resolvedArgs);
         }
 
         /// <summary>

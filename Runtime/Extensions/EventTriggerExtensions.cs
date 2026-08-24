@@ -1,8 +1,7 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
-using System.Linq;
 using UnityEngine.EventSystems;
 
 namespace TestHelper.UI.Extensions
@@ -59,7 +58,15 @@ namespace TestHelper.UI.Extensions
 
         private static bool CanExecuteEventTriggerType(this EventTrigger eventTrigger, EventTriggerType type)
         {
-            return eventTrigger.triggers.Any(x => x.eventID == type && x.callback != null);
+            foreach (var entry in eventTrigger.triggers)
+            {
+                if (entry.eventID == type && entry.callback != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -73,7 +80,15 @@ namespace TestHelper.UI.Extensions
         /// <seealso cref="IEventSystemHandlerExtensions.HasActiveHandler"/>
         public static bool HasActiveTrigger(this EventTrigger eventTrigger)
         {
-            return eventTrigger.triggers.Any(x => !x.eventID.IsPassive() && x.callback != null);
+            foreach (var entry in eventTrigger.triggers)
+            {
+                if (!entry.eventID.IsPassive() && entry.callback != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
