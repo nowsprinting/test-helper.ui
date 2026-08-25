@@ -27,7 +27,7 @@ dotnet_diagnostic.UNT0023.severity = warning
 # UNT0030: Calling Destroy or DestroyImmediate on a Transform
 dotnet_diagnostic.UNT0030.severity = warning
 
-# VSTHRD003: Avoid awaiting foreign Tasks; Not fot Unity
+# VSTHRD003: Avoid awaiting foreign Tasks; Not for Unity
 dotnet_diagnostic.VSTHRD003.severity = none
 
 # IDISP017: Prefer using
