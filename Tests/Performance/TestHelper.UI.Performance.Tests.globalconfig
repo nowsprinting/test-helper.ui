@@ -6,6 +6,14 @@ dotnet_diagnostic.CS0618.severity = error
 # RS0030: Do not use banned APIs
 dotnet_diagnostic.RS0030.severity = suggestion
 
+# VSTHRD003: Avoid awaiting foreign Tasks; Not fot Unity
+dotnet_diagnostic.VSTHRD003.severity = none
+
+# IDISP017: Prefer using
+# The IDE's suggested fix is a `using var` declaration, which requires C# 8.0; this package
+# supports Unity 2019.4 (C# 7.3), so manual Dispose() calls stay as-is.
+dotnet_diagnostic.IDISP017.severity = none
+
 # Nullable reference type warnings (this package does not use nullable annotations)
 dotnet_diagnostic.CS8597.severity = none
 dotnet_diagnostic.CS8600.severity = none
@@ -61,8 +69,8 @@ dotnet_diagnostic.CS8824.severity = none
 dotnet_diagnostic.CS8825.severity = none
 dotnet_diagnostic.CS8847.severity = none
 
-# NUnit2045: Use Assert.Multiple
-dotnet_diagnostic.NUnit2045.severity = none
-
 # VSTHRD200: Use "Async" suffix for async methods
 dotnet_diagnostic.VSTHRD200.severity = none
+
+# NUnit2045: Use Assert.Multiple
+dotnet_diagnostic.NUnit2045.severity = none

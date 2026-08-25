@@ -6,6 +6,29 @@ dotnet_diagnostic.CS0618.severity = error
 # RS0030: Do not use banned APIs
 dotnet_diagnostic.RS0030.severity = error
 
+# RCS1174: Remove redundant async/await
+dotnet_diagnostic.RCS1174.severity = warning
+
+# RCS1198: Avoid unnecessary boxing of value type
+dotnet_diagnostic.RCS1198.severity = warning
+
+# UNT0009: Missing static constructor with InitializeOnLoad attribute
+dotnet_diagnostic.UNT0009.severity = warning
+
+# UNT0023: Coalescing assignment on Unity objects
+dotnet_diagnostic.UNT0023.severity = warning
+
+# UNT0030: Calling Destroy or DestroyImmediate on a Transform
+dotnet_diagnostic.UNT0030.severity = warning
+
+# VSTHRD003: Avoid awaiting foreign Tasks; Not fot Unity
+dotnet_diagnostic.VSTHRD003.severity = none
+
+# IDISP017: Prefer using
+# The IDE's suggested fix is a `using var` declaration, which requires C# 8.0; this package
+# supports Unity 2019.4 (C# 7.3), so manual Dispose() calls stay as-is.
+dotnet_diagnostic.IDISP017.severity = none
+
 # Nullable reference type warnings (this package does not use nullable annotations)
 dotnet_diagnostic.CS8597.severity = none
 dotnet_diagnostic.CS8600.severity = none
