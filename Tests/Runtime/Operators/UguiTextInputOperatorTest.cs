@@ -152,8 +152,14 @@ namespace TestHelper.UI.Operators
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<TMP_InputField>();
-            inputField.onValidateInput += (_, _, addedChar) =>
+            // TMP_InputField.onValidateInput requires all 3 parameters; only addedChar is used here.
+            // Discard parameters (`_, _`) require C# 9, unavailable under this package's C# 7.3 target.
+            // ReSharper disable UnusedParameter.Local
+#pragma warning disable RCS1163 // Unused parameter
+            inputField.onValidateInput += (text, index, addedChar) =>
                 addedChar != 'N' ? addedChar : '\0';
+#pragma warning restore RCS1163
+            // ReSharper restore UnusedParameter.Local
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
             await _sut.OperateAsync(gameObject);
