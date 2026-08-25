@@ -114,7 +114,7 @@ namespace TestHelper.UI
                     {
                         // No interactive component found
                         var message = new StringBuilder(
-                            $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
+                            $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent.ToString()} seconds");
                         await TakeScreenshotAsync(config.Screenshots, message);
                         throw new TimeoutException(message.ToString());
                     }
@@ -237,7 +237,7 @@ namespace TestHelper.UI
                 if (verboseLogger != null)
                 {
                     lotteryEntries.Append(
-                        $"{gameObject.name}({gameObject.GetId()}):{component.GetType().Name}:{@operator.GetType().Name}, ");
+                        $"{gameObject.name}({gameObject.GetId().ToString()}):{component.GetType().Name}:{@operator.GetType().Name}, ");
                 }
 
                 yield return (gameObject, @operator);

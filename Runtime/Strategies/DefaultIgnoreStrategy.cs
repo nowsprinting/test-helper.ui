@@ -44,7 +44,7 @@ namespace TestHelper.UI.Strategies
                             IsMatchedOrChildOfIgnoreMatchersMatched(gameObject);
             if (isIgnored && verboseLogger != null)
             {
-                verboseLogger.Log($"Ignored {gameObject.name}({gameObject.GetId()}).");
+                verboseLogger.Log($"Ignored {gameObject.name}({gameObject.GetId().ToString()}).");
             }
 
             return isIgnored;
