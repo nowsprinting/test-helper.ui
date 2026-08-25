@@ -1,6 +1,7 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.UI.TestDoubles;
@@ -99,63 +100,63 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
-        public void OperateAsync_InputField_SetsRandomText()
+        public async Task OperateAsync_InputField_SetsRandomText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<InputField>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject);
+            await _sut.OperateAsync(gameObject);
 
             Assert.That(inputField.text, Is.EqualTo("RANDOM"));
         }
 
         [Test]
-        public void OperateAsync_InputFieldWithText_SetsSpecifiedText()
+        public async Task OperateAsync_InputFieldWithText_SetsSpecifiedText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<InputField>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject, "SPECIFIED");
+            await _sut.OperateAsync(gameObject, "SPECIFIED");
 
             Assert.That(inputField.text, Is.EqualTo("SPECIFIED"));
         }
 
         [Test]
-        public void OperateAsync_TmpInputField_SetsRandomText()
+        public async Task OperateAsync_TmpInputField_SetsRandomText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<TMP_InputField>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject);
+            await _sut.OperateAsync(gameObject);
 
             Assert.That(inputField.text, Is.EqualTo("RANDOM"));
         }
 
         [Test]
-        public void OperateAsync_TmpInputFieldWithText_SetsSpecifiedText()
+        public async Task OperateAsync_TmpInputFieldWithText_SetsSpecifiedText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<TMP_InputField>();
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject, "SPECIFIED");
+            await _sut.OperateAsync(gameObject, "SPECIFIED");
 
             Assert.That(inputField.text, Is.EqualTo("SPECIFIED"));
         }
 
         [Test]
-        public void OperateAsync_TmpInputFieldWithValidator_SetsValidatedText()
+        public async Task OperateAsync_TmpInputFieldWithValidator_SetsValidatedText()
         {
             var gameObject = new GameObject();
             var inputField = gameObject.AddComponent<TMP_InputField>();
-            inputField.onValidateInput += (string text, int index, char addedChar) =>
+            inputField.onValidateInput += (_, _, addedChar) =>
                 addedChar != 'N' ? addedChar : '\0';
 
             Assume.That(_sut.CanOperate(gameObject), Is.True);
-            _sut.OperateAsync(gameObject);
+            await _sut.OperateAsync(gameObject);
 
             Assert.That(inputField.text, Is.EqualTo("RADOM"));
         }

@@ -1,14 +1,12 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace TestHelper.UI.Operators.Utils
 {
-    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP017:Prefer using")]
     public class SimulatedPointerEventDataTest
     {
         [SetUp]

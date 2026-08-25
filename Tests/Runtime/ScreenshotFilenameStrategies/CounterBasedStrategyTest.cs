@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace TestHelper.UI.ScreenshotFilenameStrategies
         [Test]
         public void DefaultFilenamePrefix()
         {
-            var strategy = new CounterBasedStrategy(null);
+            var strategy = new CounterBasedStrategy();
 
             var actual = Enumerable.Repeat(0, 5).Select(_ => strategy.GetFilename()).ToList();
             var expected = new List<string>

@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace TestHelper.UI.TestComponents
         public Button NextButton { get; private set; }
 
         [field: SerializeField]
-        public bool EnabledOnLoad { get; set; } = false;
+        public bool EnabledOnLoad { get; set; }
 
         private Button _button;
 

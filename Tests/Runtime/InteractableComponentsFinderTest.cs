@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023-2025 Koji Hasegawa.
+﻿// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using UnityEngine.UI;
 namespace TestHelper.UI
 {
     [TestFixture]
-    public class InteractableComponentsFinderTest
+    public static class InteractableComponentsFinderTest
     {
         /// <summary>
         /// InteractableComponentsFinder test cases using 3D objects
@@ -91,7 +91,7 @@ namespace TestHelper.UI
         }
 
         [TestFixture]
-        public class UI
+        public static class UI
         {
             private static readonly string[] s_reachableUiObjects =
             {

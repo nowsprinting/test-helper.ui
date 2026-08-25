@@ -19,7 +19,7 @@ using Cysharp.Threading.Tasks;
 namespace TestHelper.UI.Strategies
 {
     [TestFixture]
-    public class DefaultReachableStrategyTest
+    public static class DefaultReachableStrategyTest
     {
         [TestFixture(RenderMode.ScreenSpaceOverlay)]
         [TestFixture(RenderMode.ScreenSpaceCamera)]

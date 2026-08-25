@@ -43,7 +43,7 @@ namespace TestHelper.UI.Visualizers
 
             // Create reference images and screen points
             _referenceObjects.Clear();
-            var anchoredPositions = new Vector2[]
+            var anchoredPositions = new[]
             {
                 new Vector2(-200, -100),
                 new Vector2(-200, 100),

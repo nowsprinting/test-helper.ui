@@ -1,7 +1,6 @@
-// Copyright (c) 2023 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using TestHelper.UI;
 using TestHelper.UI.Hints;
 using UnityEditor;
 using UnityEngine;
