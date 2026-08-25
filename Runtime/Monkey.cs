@@ -19,6 +19,7 @@ using UnityEngine.EventSystems;
 using TestHelper.UI.Extensions;
 #if UNITY_6000_4_OR_NEWER
 using InstanceIdentifier = UnityEngine.EntityId;
+
 #else
 using InstanceIdentifier = System.Int32;
 #endif

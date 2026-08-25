@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Exceptions;
@@ -47,7 +48,8 @@ namespace TestHelper.UI
             if (timeoutSeconds < MinTimeoutSeconds)
             {
                 throw new ArgumentException(
-                    $"Must be greater than or equal to {MinTimeoutSeconds.ToString()}.", nameof(timeoutSeconds));
+                    $"Must be greater than or equal to {MinTimeoutSeconds.ToString(CultureInfo.InvariantCulture)}.",
+                    nameof(timeoutSeconds));
             }
 
             _timeoutSeconds = timeoutSeconds;
