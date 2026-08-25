@@ -6,6 +6,12 @@ dotnet_diagnostic.CS0618.severity = error
 # RS0030: Do not use banned APIs
 dotnet_diagnostic.RS0030.severity = error
 
+# Microsoft.CodeAnalysis.NetAnalyzers categories
+dotnet_analyzer_diagnostic.category-Design.severity = warning
+dotnet_analyzer_diagnostic.category-Maintainability.severity = warning
+dotnet_analyzer_diagnostic.category-Naming.severity = warning
+dotnet_analyzer_diagnostic.category-Performance.severity = warning
+
 # RCS1174: Remove redundant async/await
 dotnet_diagnostic.RCS1174.severity = warning
 
