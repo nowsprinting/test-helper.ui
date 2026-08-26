@@ -96,7 +96,7 @@ namespace TestHelper.UI.Strategies
                 message.Append(" Raycast hit other objects: [");
                 foreach (var result in _results)
                 {
-                    message.Append($"{result.gameObject.name}({result.gameObject.GetId()})");
+                    message.Append($"{result.gameObject.name}({result.gameObject.GetId().ToString()})");
                     message.Append(", ");
                 }
 
@@ -164,12 +164,13 @@ namespace TestHelper.UI.Strategies
             var x = (int)position.x;
             var y = (int)position.y;
             var builder = new StringBuilder();
-            builder.Append($"Not reachable to {gameObject.name}({gameObject.GetId()}), position=({x},{y})");
+            builder.Append(
+                $"Not reachable to {gameObject.name}({gameObject.GetId().ToString()}), position=({x.ToString()},{y.ToString()})");
 
             var camera = gameObject.GetAssociatedCamera();
             if (camera != null)
             {
-                builder.Append($", camera={camera.name}({camera.GetId()})");
+                builder.Append($", camera={camera.name}({camera.GetId().ToString()})");
             }
 
             builder.Append(".");

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023-2025 Koji Hasegawa.
+﻿// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -558,7 +558,7 @@ namespace TestHelper.UI
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
                 var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
+                _ = Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Is.EqualTo("Lottery entries are empty or all of not reachable."));
@@ -578,7 +578,7 @@ namespace TestHelper.UI
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
                 var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
+                _ = Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
                 Assert.That(spyLogger.Messages[0], Does.Match(@"Ignored Cube\([^)]+\)."));
@@ -598,7 +598,7 @@ namespace TestHelper.UI
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
                 var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
+                _ = Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
                 Assert.That(spyLogger.Messages[0],
@@ -629,8 +629,10 @@ namespace TestHelper.UI
             [TearDown]
             public async Task TearDown()
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(IndicatorLifetime)); // game-time wait (same basis as FadeOutBehaviour)
-                await UniTask.DelayFrame(1); // one extra frame to ensure FadeOutBehaviour.Update() calls OnFadeOutCompleted
+                await UniTask.Delay(
+                    TimeSpan.FromSeconds(IndicatorLifetime)); // game-time wait (same basis as FadeOutBehaviour)
+                await UniTask
+                    .DelayFrame(1); // one extra frame to ensure FadeOutBehaviour.Update() calls OnFadeOutCompleted
             }
 
             [Test]
@@ -663,7 +665,7 @@ namespace TestHelper.UI
                 var blocker = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 blocker.transform.position = new Vector3(0, 1, -7);
                 blocker.GetComponent<MeshRenderer>().materials[0].color = Color.gray;
-                Physics.SyncTransforms(); // sync collider positions before PhysicsRaycaster queries
+                Physics.SyncTransforms();    // sync collider positions before PhysicsRaycaster queries
                 await UniTask.DelayFrame(5); // warm up for physics raycaster
 
                 var operators = new List<(GameObject, IOperator)> { (cube, new UguiClickOperator()), };

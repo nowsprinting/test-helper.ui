@@ -6,10 +6,6 @@ using TestHelper.Attributes;
 using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.UI;
-#if !UNITY_2023_1_OR_NEWER
-using System.Linq;
-using Cysharp.Threading.Tasks;
-#endif
 
 namespace TestHelper.UI.Extensions
 {

@@ -100,7 +100,7 @@ namespace TestHelper.UI.Operators.Utils
             }
             else
             {
-                builder.Append($"({_gameObject.GetId()})");
+                builder.Append($"({_gameObject.GetId().ToString()})");
             }
 
             if (Properties.Count > 0)

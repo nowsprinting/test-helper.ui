@@ -36,7 +36,7 @@ namespace TestHelper.UI.Operators.Utils
         public void Acquire_AfterReleaseFirstId_ReusesReleasedId()
         {
             var id0 = FingerPool.Instance.Acquire();
-            var id1 = FingerPool.Instance.Acquire();
+            FingerPool.Instance.Acquire(); // 1
             FingerPool.Instance.Release(id0);
 
             var actual = FingerPool.Instance.Acquire();
@@ -47,9 +47,9 @@ namespace TestHelper.UI.Operators.Utils
         [Test]
         public void Acquire_AfterReleaseMiddleId_ReusesReleasedId()
         {
-            var id0 = FingerPool.Instance.Acquire();
+            FingerPool.Instance.Acquire(); // 0
             var id1 = FingerPool.Instance.Acquire();
-            var id2 = FingerPool.Instance.Acquire();
+            FingerPool.Instance.Acquire(); // 2
             FingerPool.Instance.Release(id1);
 
             var actual = FingerPool.Instance.Acquire();
@@ -60,7 +60,7 @@ namespace TestHelper.UI.Operators.Utils
         [Test]
         public void Release_NotAcquiredId_DoesNotAffectPool()
         {
-            var id0 = FingerPool.Instance.Acquire();
+            FingerPool.Instance.Acquire();    // 0
             FingerPool.Instance.Release(999); // no error should occur
 
             var actual = FingerPool.Instance.Acquire();
@@ -71,7 +71,7 @@ namespace TestHelper.UI.Operators.Utils
         [Test]
         public void Acquire_AfterReleaseLastId_ReusesSameId()
         {
-            var id0 = FingerPool.Instance.Acquire();
+            FingerPool.Instance.Acquire(); // 0
             var id1 = FingerPool.Instance.Acquire();
             FingerPool.Instance.Release(id1);
 

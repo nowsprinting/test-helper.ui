@@ -61,8 +61,8 @@ dotnet_diagnostic.CS8824.severity = none
 dotnet_diagnostic.CS8825.severity = none
 dotnet_diagnostic.CS8847.severity = none
 
-# NUnit2045: Use Assert.Multiple
-dotnet_diagnostic.NUnit2045.severity = none
-
 # VSTHRD200: Use "Async" suffix for async methods
 dotnet_diagnostic.VSTHRD200.severity = none
+
+# NUnit2045: Use Assert.Multiple
+dotnet_diagnostic.NUnit2045.severity = none

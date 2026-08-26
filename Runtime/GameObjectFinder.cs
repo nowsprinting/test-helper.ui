@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Exceptions;
@@ -47,7 +48,8 @@ namespace TestHelper.UI
             if (timeoutSeconds < MinTimeoutSeconds)
             {
                 throw new ArgumentException(
-                    $"Must be greater than or equal to {MinTimeoutSeconds}.", nameof(timeoutSeconds));
+                    $"Must be greater than or equal to {MinTimeoutSeconds.ToString(CultureInfo.InvariantCulture)}.",
+                    nameof(timeoutSeconds));
             }
 
             _timeoutSeconds = timeoutSeconds;
@@ -325,12 +327,12 @@ namespace TestHelper.UI
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
-        public async UniTask<GameObjectFinderResult> FindByNameAsync(string name, bool reachable = true,
+        public UniTask<GameObjectFinderResult> FindByNameAsync(string name, bool reachable = true,
             bool interactable = false, IPaginator paginator = null, double timeoutSeconds = 0,
             CancellationToken cancellationToken = default)
         {
             var matcher = new NameMatcher(name);
-            return await FindByMatcherAsync(matcher, reachable, interactable, paginator, timeoutSeconds,
+            return FindByMatcherAsync(matcher, reachable, interactable, paginator, timeoutSeconds,
                 cancellationToken);
         }
 
@@ -346,12 +348,12 @@ namespace TestHelper.UI
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
-        public async UniTask<GameObjectFinderResult> FindByPathAsync(string path, bool reachable = true,
+        public UniTask<GameObjectFinderResult> FindByPathAsync(string path, bool reachable = true,
             bool interactable = false, IPaginator paginator = null, double timeoutSeconds = 0,
             CancellationToken cancellationToken = default)
         {
             var matcher = new PathMatcher(path);
-            return await FindByMatcherAsync(matcher, reachable, interactable, paginator, timeoutSeconds,
+            return FindByMatcherAsync(matcher, reachable, interactable, paginator, timeoutSeconds,
                 cancellationToken);
         }
     }

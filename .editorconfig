@@ -147,9 +147,6 @@ dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
 file_header_template = Copyright (c) 2023-${CurrentDate.Year} Koji Hasegawa.\nThis software is released under the MIT License.
 
-# RS0016: Only enable if API files are present
-dotnet_public_api_analyzer.require_api_files = true
-
 # IDE0055: Fix formatting
 # Workaround for https://github.com/dotnet/roslyn/issues/70570
 dotnet_diagnostic.IDE0055.severity = warning
@@ -180,6 +177,8 @@ csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
 csharp_new_line_between_query_expression_clauses = true
+
+# Attributes are not on the same line
 csharp_place_type_attribute_on_same_line = false
 csharp_place_method_attribute_on_same_line = false
 csharp_place_accessorholder_attribute_on_same_line = false
@@ -263,6 +262,24 @@ resharper_csharp_keep_existing_initializer_arrangement = true
 
 # Some values of the enum are not processed inside 'switch' statement and are handled via default section
 resharper_switch_statement_handles_some_known_enum_values_with_default_highlighting = warning
+
+# Must call where another overload of the same method accepts a CancellationToken if a suitable token is already available in the current scope
+resharper_method_supports_cancellation_highlighting = warning
+
+# Must use the 'is' operator instead of Type.IsInstanceOfType, which performs the type check through reflection at run time
+resharper_can_simplify_is_instance_of_type_highlighting = warning
+
+# Must use the 'is' operator instead of Type.IsAssignableFrom against a known type, which performs the type check through reflection at run time
+resharper_can_simplify_is_assignable_from_highlighting = warning
+
+# Must declare a non-mutating struct as readonly so that the compiler stops emitting defensive copies when its members are invoked through readonly references
+resharper_struct_can_be_made_read_only_highlighting = warning
+
+# Type and member is never used (for coding agents)
+resharper_unused_type_local_highlighting = warning
+resharper_unused_type_global_highlighting = warning
+resharper_unused_member_global_highlighting = warning
+resharper_unused_member_local_highlighting = warning
 
 # Suppress C#8.0+ syntax sugar (for under Unity 2020.2 compatibility)
 # See: https://www.jetbrains.com/help/resharper/Reference__Code_Inspections_CSHARP.html
