@@ -12,7 +12,8 @@ using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.TestTools;
 #if !UNITY_2023_1_OR_NEWER
-using System.Linq;
+// Unity 2023.1 or newer provides the awaiter for AsyncOperation;
+// on older versions it comes from UniTask.
 using Cysharp.Threading.Tasks;
 #endif
 

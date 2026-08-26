@@ -24,10 +24,6 @@ using Is = TestHelper.Constraints.Is;
 using System.IO;
 #endif
 
-#if !UNITY_2023_1_OR_NEWER
-using Cysharp.Threading.Tasks;
-#endif
-
 namespace TestHelper.UI
 {
     [TestFixture]
