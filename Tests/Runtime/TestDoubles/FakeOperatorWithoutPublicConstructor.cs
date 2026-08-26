@@ -13,6 +13,9 @@ using UnityEngine.EventSystems;
 namespace TestHelper.UI.TestDoubles
 {
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+    // Intentionally has no public constructor: this fake verifies that OperatorPool rejects
+    // registering an IOperator type without one, so it must stay non-instantiable directly.
+    [SuppressMessage("ReSharper", "ClassCannotBeInstantiated")]
     public class FakeOperatorWithoutPublicConstructor : IOperator
     {
         public ILogger Logger { get; set; }

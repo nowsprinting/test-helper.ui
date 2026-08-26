@@ -558,7 +558,7 @@ namespace TestHelper.UI
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
                 var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
+                _ = Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Is.EqualTo("Lottery entries are empty or all of not reachable."));
@@ -578,7 +578,7 @@ namespace TestHelper.UI
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
                 var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
+                _ = Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
                 Assert.That(spyLogger.Messages[0], Does.Match(@"Ignored Cube\([^)]+\)."));
@@ -598,7 +598,7 @@ namespace TestHelper.UI
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
                 var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
+                _ = Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
                 Assert.That(spyLogger.Messages[0],
