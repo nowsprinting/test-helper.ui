@@ -6,6 +6,7 @@ using TestHelper.UI.Operators;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace -- namespace mirrors the package's own scheme, not the Assets/Samples/<name>/<version> import path Unity generates locally
 namespace TestHelper.UI.Samples.UguiDemo
 {
     public enum OperatorType
@@ -71,11 +72,11 @@ namespace TestHelper.UI.Samples.UguiDemo
             _button = GetComponent<Button>();
             _button.onClick.AddListener(() =>
             {
-                DoOperate().Forget();
+                DoOperateAsync().Forget();
             });
         }
 
-        private async UniTask DoOperate()
+        private async UniTask DoOperateAsync()
         {
             if (OperationTarget == null)
             {

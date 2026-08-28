@@ -8,6 +8,7 @@ using TestHelper.UI.GameObjectMatchers;
 using TestHelper.UI.Operators;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace -- namespace mirrors the package's own scheme, not the Assets/Samples/<name>/<version> import path Unity generates locally
 namespace TestHelper.UI.Samples.UguiDemo
 {
     [TestFixture]

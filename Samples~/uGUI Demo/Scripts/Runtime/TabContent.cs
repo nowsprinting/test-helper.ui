@@ -1,10 +1,9 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace -- namespace mirrors the package's own scheme, not the Assets/Samples/<name>/<version> import path Unity generates locally
 namespace TestHelper.UI.Samples.UguiDemo
 {
     public class TabContent : MonoBehaviour

@@ -9,6 +9,7 @@ using TestHelper.UI.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace -- namespace mirrors the package's own scheme, not the Assets/Samples/<name>/<version> import path Unity generates locally
 namespace TestHelper.UI.Samples.UguiDemo
 {
     [RequireComponent(typeof(Button))]
@@ -29,11 +30,11 @@ namespace TestHelper.UI.Samples.UguiDemo
             _button = GetComponent<Button>();
             _button.onClick.AddListener(() =>
             {
-                DoFind().Forget();
+                DoFindAsync().Forget();
             });
         }
 
-        private async UniTask DoFind()
+        private async UniTask DoFindAsync()
         {
             if (OperationTargets.Count == 0)
             {
@@ -44,7 +45,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             try
             {
                 _button.interactable = false;
-                await UniTask.WhenAll(OperationTargets.Select(FindByPath));
+                await UniTask.WhenAll(OperationTargets.Select(FindByPathAsync));
             }
             finally
             {
@@ -52,7 +53,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             }
         }
 
-        private async UniTask FindByPath(GameObject target)
+        private async UniTask FindByPathAsync(GameObject target)
         {
             try
             {
