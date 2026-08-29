@@ -71,7 +71,7 @@ namespace TestHelper.UI.Samples.UguiDemo
                     // Boxes OperatorType to build the log message; only reachable for an unimplemented
                     // operator type (RightClick, Hover, Pinch), not worth a hand-rolled enum-to-string switch.
 #pragma warning disable RCS1198
-                    Debug.LogError($"Unsupported ClickType: {OperatorType}");
+                    Debug.LogError($"Unsupported OperatorType: {OperatorType}");
 #pragma warning restore RCS1198
                     break;
             }
