@@ -89,7 +89,11 @@ namespace TestHelper.UI.Operators
         /// <remarks>
         /// This method does not use a <c>raycastResult</c>.
         /// </remarks>
-        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+        // ParameterNameMismatchWhenOverrideOrImplement asks to rename the parameter to "text" to match
+        // ITextInputOperator.OperateAsync. Not applied: this overload intentionally does not use the raycast
+        // result, and naming it "_" signals that per convention.
+        [SuppressMessage("Naming", "CA1725:Parameter names should match base declaration")]
+        [SuppressMessage("ReSharper", "ParameterNameMismatchWhenOverrideOrImplement")]
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult _ = default,
             CancellationToken cancellationToken = default)
         {
@@ -97,7 +101,7 @@ namespace TestHelper.UI.Operators
             if (gameObject.TryGetEnabledComponent<InputFieldAnnotation>(out var annotation))
             {
                 // Overwrite rule if annotation is attached.
-                randomStringParams = __ => new RandomStringParameters(
+                randomStringParams = _ => new RandomStringParameters(
                     (int)annotation.minimumLength,
                     (int)annotation.maximumLength,
                     annotation.charactersKind);
