@@ -70,6 +70,7 @@ namespace TestHelper.UI.Strategies
 
         private static float GetCanvasScale(GameObject gameObject)
         {
+            s_canvasBuffer.Clear();
             gameObject.GetComponentsInParent(false, s_canvasBuffer);
             foreach (var canvas in s_canvasBuffer)
             {

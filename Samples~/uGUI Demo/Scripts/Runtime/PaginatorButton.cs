@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -48,6 +48,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             if (ScrollContentIncludesOperationTargets)
             {
                 _targets.Clear();
+                _buttonsBuffer.Clear();
                 ScrollContentIncludesOperationTargets.GetComponentsInChildren(_buttonsBuffer);
                 foreach (var current in _buttonsBuffer)
                 {
@@ -102,10 +103,11 @@ namespace TestHelper.UI.Samples.UguiDemo
             popup.transform.position = position;
         }
 
+        private static readonly Regex s_reasonRegex = new Regex(".*is found, but (.+)\\.$");
+
         private static string GetReason(string message)
         {
-            var regex = new Regex(".*is found, but (.+)\\.$");
-            return regex.Match(message).Groups[1].Value;
+            return s_reasonRegex.Match(message).Groups[1].Value;
         }
     }
 }
