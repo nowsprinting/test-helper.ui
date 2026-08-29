@@ -178,10 +178,7 @@ namespace TestHelper.UI
                 loadedScene.GetRootGameObjects(rootGameObjects);
                 foreach (var rootGameObject in rootGameObjects)
                 {
-                    foreach (var found in FindGameObjectRecursive(rootGameObject, matcher))
-                    {
-                        foundObjects.Add(found);
-                    }
+                    foundObjects.AddRange(FindGameObjectRecursive(rootGameObject, matcher));
                 }
             }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -10,6 +10,7 @@ using TestHelper.UI.Paginators;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace -- namespace mirrors the package's own scheme, not the Assets/Samples/<name>/<version> import path Unity generates locally
 namespace TestHelper.UI.Samples.UguiDemo
 {
     [RequireComponent(typeof(Button))]
@@ -25,6 +26,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         private Button _button;
 
         private readonly GameObjectFinder _finder = new GameObjectFinder(0.2f);
+        private readonly List<Button> _buttonsBuffer = new List<Button>();
         private UguiScrollRectPaginator _paginator;
         private GameObject _popupPrefab;
 
@@ -40,13 +42,15 @@ namespace TestHelper.UI.Samples.UguiDemo
             _button = GetComponent<Button>();
             _button.onClick.AddListener(() =>
             {
-                DoFind().Forget();
+                DoFindAsync().Forget();
             });
 
             if (ScrollContentIncludesOperationTargets)
             {
                 _targets.Clear();
-                foreach (var current in ScrollContentIncludesOperationTargets.GetComponentsInChildren<Button>())
+                _buttonsBuffer.Clear();
+                ScrollContentIncludesOperationTargets.GetComponentsInChildren(_buttonsBuffer);
+                foreach (var current in _buttonsBuffer)
                 {
                     _targets.Add(current.gameObject);
                 }
@@ -62,7 +66,7 @@ namespace TestHelper.UI.Samples.UguiDemo
             _button.GetComponentInChildren<Text>().text = $"Find \"{nextName}\"";
         }
 
-        private async UniTask DoFind()
+        private async UniTask DoFindAsync()
         {
             if (_targets.Count == 0)
             {
@@ -78,12 +82,12 @@ namespace TestHelper.UI.Samples.UguiDemo
 
                 var path = target.transform.GetPath();
                 await _finder.FindByPathAsync(path, paginator: _paginator);
-                Popup(target, target.transform.position, "found");
+                Popup(target.transform.position, "found");
             }
             catch (TimeoutException e)
             {
                 Debug.Log(e);
-                Popup(target, target.transform.position, GetReason(e.Message));
+                Popup(target.transform.position, GetReason(e.Message));
             }
             finally
             {
@@ -92,17 +96,18 @@ namespace TestHelper.UI.Samples.UguiDemo
             }
         }
 
-        private void Popup(GameObject target, Vector2 position, string eventName)
+        private void Popup(Vector2 position, string eventName)
         {
             var popup = Instantiate(_popupPrefab, _content.transform);
             popup.name = eventName;
             popup.transform.position = position;
         }
 
+        private static readonly Regex s_reasonRegex = new Regex(".*is found, but (.+)\\.$");
+
         private static string GetReason(string message)
         {
-            var regex = new Regex(".*is found, but (.+)\\.$");
-            return regex.Match(message).Groups[1].Value;
+            return s_reasonRegex.Match(message).Groups[1].Value;
         }
     }
 }

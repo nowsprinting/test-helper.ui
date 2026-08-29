@@ -6,6 +6,18 @@ dotnet_diagnostic.CS0618.severity = error
 # RS0030: Do not use banned APIs
 dotnet_diagnostic.RS0030.severity = error
 
+# Microsoft.CodeAnalysis.NetAnalyzers categories
+dotnet_analyzer_diagnostic.category-Design.severity = warning
+dotnet_analyzer_diagnostic.category-Maintainability.severity = warning
+dotnet_analyzer_diagnostic.category-Naming.severity = warning
+dotnet_analyzer_diagnostic.category-Performance.severity = warning
+
+# CA1016: Mark assemblies with assembly version; Not for Unity
+dotnet_diagnostic.CA1016.severity = none
+
+# CA1051: Do not declare visible instance fields; Not for Unity
+dotnet_diagnostic.CA1051.severity = none
+
 # RCS1174: Remove redundant async/await
 dotnet_diagnostic.RCS1174.severity = warning
 
@@ -21,60 +33,10 @@ dotnet_diagnostic.UNT0023.severity = warning
 # UNT0030: Calling Destroy or DestroyImmediate on a Transform
 dotnet_diagnostic.UNT0030.severity = warning
 
+# IDISP017: Prefer using
+# The IDE's suggested fix is a `using var` declaration, which requires C# 8.0; this package
+# supports Unity 2019.4 (C# 7.3), so manual Dispose() calls stay as-is.
+dotnet_diagnostic.IDISP017.severity = none
+
 # VSTHRD003: Avoid awaiting foreign Tasks; Not for Unity
 dotnet_diagnostic.VSTHRD003.severity = none
-
-# Nullable reference type warnings (this package does not use nullable annotations)
-dotnet_diagnostic.CS8597.severity = none
-dotnet_diagnostic.CS8600.severity = none
-dotnet_diagnostic.CS8601.severity = none
-dotnet_diagnostic.CS8602.severity = none
-dotnet_diagnostic.CS8603.severity = none
-dotnet_diagnostic.CS8604.severity = none
-dotnet_diagnostic.CS8605.severity = none
-dotnet_diagnostic.CS8607.severity = none
-dotnet_diagnostic.CS8608.severity = none
-dotnet_diagnostic.CS8609.severity = none
-dotnet_diagnostic.CS8610.severity = none
-dotnet_diagnostic.CS8611.severity = none
-dotnet_diagnostic.CS8612.severity = none
-dotnet_diagnostic.CS8613.severity = none
-dotnet_diagnostic.CS8614.severity = none
-dotnet_diagnostic.CS8615.severity = none
-dotnet_diagnostic.CS8616.severity = none
-dotnet_diagnostic.CS8617.severity = none
-dotnet_diagnostic.CS8618.severity = none
-dotnet_diagnostic.CS8619.severity = none
-dotnet_diagnostic.CS8620.severity = none
-dotnet_diagnostic.CS8621.severity = none
-dotnet_diagnostic.CS8622.severity = none
-dotnet_diagnostic.CS8624.severity = none
-dotnet_diagnostic.CS8625.severity = none
-dotnet_diagnostic.CS8629.severity = none
-dotnet_diagnostic.CS8631.severity = none
-dotnet_diagnostic.CS8633.severity = none
-dotnet_diagnostic.CS8634.severity = none
-dotnet_diagnostic.CS8643.severity = none
-dotnet_diagnostic.CS8644.severity = none
-dotnet_diagnostic.CS8645.severity = none
-dotnet_diagnostic.CS8655.severity = none
-dotnet_diagnostic.CS8667.severity = none
-dotnet_diagnostic.CS8670.severity = none
-dotnet_diagnostic.CS8714.severity = none
-dotnet_diagnostic.CS8762.severity = none
-dotnet_diagnostic.CS8763.severity = none
-dotnet_diagnostic.CS8764.severity = none
-dotnet_diagnostic.CS8765.severity = none
-dotnet_diagnostic.CS8766.severity = none
-dotnet_diagnostic.CS8767.severity = none
-dotnet_diagnostic.CS8768.severity = none
-dotnet_diagnostic.CS8769.severity = none
-dotnet_diagnostic.CS8770.severity = none
-dotnet_diagnostic.CS8774.severity = none
-dotnet_diagnostic.CS8775.severity = none
-dotnet_diagnostic.CS8776.severity = none
-dotnet_diagnostic.CS8777.severity = none
-dotnet_diagnostic.CS8819.severity = none
-dotnet_diagnostic.CS8824.severity = none
-dotnet_diagnostic.CS8825.severity = none
-dotnet_diagnostic.CS8847.severity = none

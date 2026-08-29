@@ -9,6 +9,7 @@ using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace -- namespace mirrors the package's own scheme, not the Assets/Samples/<name>/<version> import path Unity generates locally
 namespace TestHelper.UI.Samples.UguiDemo
 {
     [RequireComponent(typeof(Button))]
@@ -36,12 +37,12 @@ namespace TestHelper.UI.Samples.UguiDemo
         private void Awake()
         {
             _button = GetComponent<Button>();
-            _button.onClick.AddListener(() => RunMonkeyTests().Forget());
+            _button.onClick.AddListener(() => RunMonkeyTestsAsync().Forget());
             _buttonText = _button.GetComponentInChildren<Text>();
             _originalButtonText = _buttonText.text;
         }
 
-        private async UniTask RunMonkeyTests()
+        private async UniTask RunMonkeyTestsAsync()
         {
             var config = new MonkeyConfig()
             {

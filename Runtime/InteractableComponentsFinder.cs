@@ -138,7 +138,7 @@ namespace TestHelper.UI
             }
         }
 
-        private static IEnumerable<MonoBehaviour> FindMonoBehaviours()
+        private static MonoBehaviour[] FindMonoBehaviours()
         {
 #if UNITY_6000_4_OR_NEWER
             return Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);

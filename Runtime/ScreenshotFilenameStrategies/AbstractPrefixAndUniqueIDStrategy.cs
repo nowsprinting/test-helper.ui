@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Runtime.CompilerServices;
@@ -12,7 +12,11 @@ namespace TestHelper.UI.ScreenshotFilenameStrategies
     /// An abstract class for screenshot filename strategies. This class generates a file path from a directory path
     /// and a file name prefix and an unique identifier.
     /// </summary>
+    // InconsistentNaming asks to drop the "Abstract" prefix. Not applied: it is published API of this package,
+    // so renaming would be a breaking change rather than a diagnostics fix.
+#pragma warning disable THP3001
     public abstract class AbstractPrefixAndUniqueIDStrategy : IScreenshotFilenameStrategy
+#pragma warning restore THP3001
     {
         private readonly string _filenamePrefix;
         private readonly string _callerMemberName;

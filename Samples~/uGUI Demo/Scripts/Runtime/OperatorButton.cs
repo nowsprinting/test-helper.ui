@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using Cysharp.Threading.Tasks;
@@ -6,6 +6,7 @@ using TestHelper.UI.Operators;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace -- namespace mirrors the package's own scheme, not the Assets/Samples/<name>/<version> import path Unity generates locally
 namespace TestHelper.UI.Samples.UguiDemo
 {
     public enum OperatorType
@@ -37,6 +38,9 @@ namespace TestHelper.UI.Samples.UguiDemo
 
         private void Awake()
         {
+            // This switch triggers resharper_switch_statement_handles_some_known_enum_values_with_default_highlighting
+            // (RightClick, Hover, Pinch fall through to default). Not suppressed: their IOperator
+            // implementations are planned for the near future, so the warning should stay visible as a reminder.
             switch (OperatorType)
             {
                 case OperatorType.SingleClick:
@@ -64,18 +68,22 @@ namespace TestHelper.UI.Samples.UguiDemo
                     _operator = new UguiTextInputOperator();
                     break;
                 default:
-                    Debug.LogError($"Unsupported ClickType: {OperatorType}");
+                    // Boxes OperatorType to build the log message; only reachable for an unimplemented
+                    // operator type (RightClick, Hover, Pinch), not worth a hand-rolled enum-to-string switch.
+#pragma warning disable RCS1198
+                    Debug.LogError($"Unsupported OperatorType: {OperatorType}");
+#pragma warning restore RCS1198
                     break;
             }
 
             _button = GetComponent<Button>();
             _button.onClick.AddListener(() =>
             {
-                DoOperate().Forget();
+                DoOperateAsync().Forget();
             });
         }
 
-        private async UniTask DoOperate()
+        private async UniTask DoOperateAsync()
         {
             if (OperationTarget == null)
             {
