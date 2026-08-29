@@ -9,7 +9,11 @@ using UnityEngine.Assertions;
 
 namespace TestHelper.UI.Random
 {
+    // CA1711 asks to rename the "Impl" suffix to "Core" or drop it. Not applied: it is published API of this
+    // package, so renaming would be a breaking change rather than a diagnostics fix.
+#pragma warning disable CA1711
     public class RandomStringImpl : IRandomString
+#pragma warning restore CA1711
     {
         internal const string CharsASCIIDigits = "0123456789";
         internal const string CharsASCIILowers = "abcdefghijklmnopqrstuvwxyz";
