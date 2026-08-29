@@ -19,6 +19,7 @@ namespace TestHelper.UI.Extensions
     public class EventTriggerExtensionsTest
     {
         [Test]
+        [CreateScene]
         public void CanHandle_NoTrigger_ReturnsFalse()
         {
             var eventTrigger = new GameObject().AddComponent<EventTrigger>();
@@ -29,6 +30,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void CanHandle_NoCallback_ReturnsFalse()
         {
             var eventTrigger = new GameObject().AddComponent<EventTrigger>();
@@ -65,6 +67,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [TestCaseSource(nameof(CanHandle_TestCases))]
+        [CreateScene]
         public void CanHandle_ReturnsTrue(Type handlerType, EventTriggerType eventTriggerType)
         {
             var eventTrigger = new GameObject().AddComponent<EventTrigger>();

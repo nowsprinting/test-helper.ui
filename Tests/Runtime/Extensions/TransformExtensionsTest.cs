@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using NUnit.Framework;
+using TestHelper.Attributes;
 using UnityEngine;
 
 namespace TestHelper.UI.Extensions
@@ -18,6 +19,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void GetPath_NestedObject_GotPathStringSeparatedBySlashes()
         {
             var grandchild = CreateThreeGenerationObjects();
@@ -26,6 +28,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void GetPath_RootObject_GotStringStartingWithSlash()
         {
             var solo = new GameObject("Solo");
@@ -46,6 +49,7 @@ namespace TestHelper.UI.Extensions
         [TestCase("**/Gran?child")]
         [TestCase("**/*")]
         [TestCase("**")]
+        [CreateScene]
         public void MatchPath_Match(string glob)
         {
             var grandchild = CreateThreeGenerationObjects();
@@ -57,6 +61,7 @@ namespace TestHelper.UI.Extensions
         [TestCase("/Parent/**/Child/Grandchild")]
         [TestCase("*/Grandchild")]
         [TestCase("**/Granddaughter")]
+        [CreateScene]
         public void MatchPath_NotMatch(string glob)
         {
             var grandchild = CreateThreeGenerationObjects();
@@ -67,6 +72,7 @@ namespace TestHelper.UI.Extensions
         [TestCase("/Parent/Child/Grandchild (1)")]
         [TestCase("/Parent/Child/Grandchild (?)")]
         [TestCase("/Parent/Child/Grandchild*")]
+        [CreateScene]
         public void MatchPath_WithParenthesis_Match(string glob)
         {
             var grandchild = CreateThreeGenerationObjects();

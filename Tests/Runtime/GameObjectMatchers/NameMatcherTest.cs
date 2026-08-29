@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using NUnit.Framework;
+using TestHelper.Attributes;
 using UnityEngine;
 
 namespace TestHelper.UI.GameObjectMatchers
@@ -18,6 +19,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchName_ReturnsFalse()
         {
             var sut = new NameMatcher(name: "Button");
@@ -26,6 +28,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_MatchName_ReturnsTrue()
         {
             var sut = new NameMatcher(name: "Button");

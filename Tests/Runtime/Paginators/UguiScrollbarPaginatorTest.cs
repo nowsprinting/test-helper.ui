@@ -135,26 +135,13 @@ namespace TestHelper.UI.Paginators
             Assert.That(scrollbar.value, Is.EqualTo(scrollbar.size).Within(0.05f));
         }
 
-        [Test]
+        [TestCase(0f)]
+        [TestCase(0.5f)]
         [LoadScene(TestScene)]
-        public async Task HasNextPage_AtStart_ReturnsTrue()
+        public async Task HasNextPage_NotAtEnd_ReturnsTrue(float value)
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
-            scrollbar.value = 0f;
-            await Task.Yield();
-
-            var sut = new UguiScrollbarPaginator(scrollbar);
-            var actual = sut.HasNextPage();
-
-            Assert.That(actual, Is.True);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public async Task HasNextPage_AtMiddle_ReturnsTrue()
-        {
-            var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
-            scrollbar.value = 0.5f;
+            scrollbar.value = value;
             await Task.Yield();
 
             var sut = new UguiScrollbarPaginator(scrollbar);

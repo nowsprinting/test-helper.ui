@@ -144,6 +144,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponentInParent_NotActive_ReturnsFalse()
         {
             var gameObject = new GameObject("Button", typeof(Button));
@@ -154,6 +155,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponentInParent_NotActiveParent_ReturnsFalse()
         {
             var parent = new GameObject("Parent", typeof(Button));
@@ -166,6 +168,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponentInParent_NotEnabled_ReturnsFalse()
         {
             var gameObject = new GameObject();
@@ -177,6 +180,7 @@ namespace TestHelper.UI.Extensions
         }
 
         [Test]
+        [CreateScene]
         public void TryGetEnabledComponentInParent_NotEnabledInParent_ReturnsFalse()
         {
             var parent = new GameObject("Parent");

@@ -204,7 +204,6 @@ namespace TestHelper.UI
         }
 
         [Test]
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public void Rent_PoolConstructedWithVisualizer_InjectsVisualizerIntoOperator()
         {
             var visualizer = new DefaultDebugVisualizer();
@@ -214,6 +213,8 @@ namespace TestHelper.UI
             var instance = pool.Rent<FakeOperator>();
 
             Assert.That(instance.Visualizer, Is.SameAs(visualizer));
+
+            visualizer.Dispose();
         }
 
         [Test]
@@ -253,7 +254,6 @@ namespace TestHelper.UI
         }
 
         [Test]
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public void Rent_PoolConstructedWithDependencies_InjectsDependenciesIntoOperator()
         {
             var logger = new SpyLogger();
@@ -279,6 +279,8 @@ namespace TestHelper.UI
             Assert.That(instance.GetScreenPoint, Is.SameAs(getScreenPoint));
             Assert.That(instance.ReachableStrategy, Is.SameAs(reachableStrategy));
             Assert.That(((SpyRandom)instance.Random).ForkedFrom, Is.SameAs(random)); // forked instance
+            
+            visualizer.Dispose();
         }
 
         [Test]

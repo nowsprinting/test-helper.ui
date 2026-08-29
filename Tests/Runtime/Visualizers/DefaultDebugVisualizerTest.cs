@@ -78,6 +78,8 @@ namespace TestHelper.UI.Visualizers
                 _sut.ShowNotReachableIndicator(screenPoint, reference);
             }
 
+            AssertShowsNotReachableIndicator();
+
             await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
@@ -98,6 +100,8 @@ namespace TestHelper.UI.Visualizers
                 _sut.ShowNotReachableIndicator(screenPoint, reference);
             }
 
+            AssertShowsNotReachableIndicator();
+
             await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
         }
 
@@ -109,12 +113,16 @@ namespace TestHelper.UI.Visualizers
             var screenPoint = RectTransformUtility.WorldToScreenPoint(null, _referenceObjects[0].transform.position);
             _sut.ShowNotReachableIndicator(screenPoint);
 
-            var indicator = GameObject.Find("Indicator");
-            var image = indicator.GetComponent<Image>();
-            Assert.That(image.sprite.name, Is.EqualTo("eye_slash"));
-            Assert.That(image.raycastTarget, Is.False);
+            AssertShowsNotReachableIndicator();
 
             await UniTask.Delay(TimeSpan.FromSeconds(_sut.IndicatorLifetime)); // wait for end of life
+        }
+
+        private static void AssertShowsNotReachableIndicator()
+        {
+            var indicator = GameObject.Find("Indicator");
+            Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
+            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
         }
 
         [Test]

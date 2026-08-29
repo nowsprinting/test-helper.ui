@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using UnityEngine;
 
 namespace TestHelper.UI.GameObjectMatchers
@@ -19,6 +20,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchPath_ReturnsFalse()
         {
             var sut = new PathMatcher("/Path/To/Not/Button");
@@ -29,6 +31,7 @@ namespace TestHelper.UI.GameObjectMatchers
         [TestCase("/Path/To/Button")]
         [TestCase("/Path/*/Button")]
         [TestCase("/Path/**")]
+        [CreateScene]
         public void IsMatch_MatchPath_ReturnsTrue(string path)
         {
             var sut = new PathMatcher(path);

@@ -53,14 +53,6 @@ namespace TestHelper.UI.Operators
             Assert.That(sut, Is.Not.Null);
         }
 
-        [Test]
-        public void Constructor_NullLogger_ObjectCreatedSuccessfully()
-        {
-            var sut = new UguiDoubleClickOperator();
-
-            Assert.That(sut, Is.Not.Null);
-        }
-
         #endregion
 
         #region CanOperate Tests

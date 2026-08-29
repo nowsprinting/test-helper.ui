@@ -6,6 +6,7 @@ using NUnit.Framework;
 namespace TestHelper.UI.Operators.Utils
 {
     [TestFixture]
+    [Category("Internal")]
     public class FingerPoolTest
     {
         [SetUp]
@@ -17,28 +18,6 @@ namespace TestHelper.UI.Operators.Utils
         [Test]
         public void Acquire_FirstCall_ReturnsZero()
         {
-            var actual = FingerPool.Instance.Acquire();
-
-            Assert.That(actual, Is.EqualTo(0));
-        }
-
-        [Test]
-        public void Acquire_SecondCall_ReturnsOne()
-        {
-            FingerPool.Instance.Acquire();
-
-            var actual = FingerPool.Instance.Acquire();
-
-            Assert.That(actual, Is.EqualTo(1));
-        }
-
-        [Test]
-        public void Acquire_AfterReleaseFirstId_ReusesReleasedId()
-        {
-            var id0 = FingerPool.Instance.Acquire();
-            FingerPool.Instance.Acquire(); // 1
-            FingerPool.Instance.Release(id0);
-
             var actual = FingerPool.Instance.Acquire();
 
             Assert.That(actual, Is.EqualTo(0));

@@ -18,10 +18,8 @@ namespace TestHelper.UI.Hints
 
         [TestCase("Left Cube", -1f, 0, 0)]
         [TestCase("Right Cube", 2f, 0, 0)]
-        [TestCase("Left Cube", -1f, 0, 0)]
-        [TestCase("Right Cube", 2f, 0, 0)]
         [LoadScene(TestScene)]
-        public void Get(string targetName, float x, float y, float z)
+        public void GetWorldPoint_TargetPosition_ReturnsWorldPoint(string targetName, float x, float y, float z)
         {
             var camera = Camera.main;
             var target = SceneManager

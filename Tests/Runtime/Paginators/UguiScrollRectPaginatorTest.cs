@@ -200,25 +200,13 @@ namespace TestHelper.UI.Paginators
             Assert.That(scrollRect.normalizedPosition, Is.EqualTo(new Vector2(0f, 1f)));
         }
 
-        [Test]
+        [TestCase(0f)]
+        [TestCase(0.5f)]
         [LoadScene(TestScene)]
-        public void HasNextPage_HorizontalScrollAtStart_ReturnsTrue()
+        public void HasNextPage_HorizontalScrollNotAtEnd_ReturnsTrue(float x)
         {
             var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
-            scrollRect.normalizedPosition = new Vector2(0f, 0f);
-            var sut = new UguiScrollRectPaginator(scrollRect);
-
-            var actual = sut.HasNextPage();
-
-            Assert.That(actual, Is.True);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void HasNextPage_HorizontalScrollAtMiddle_ReturnsTrue()
-        {
-            var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
-            scrollRect.normalizedPosition = new Vector2(0.5f, 0f);
+            scrollRect.normalizedPosition = new Vector2(x, 0f);
             var sut = new UguiScrollRectPaginator(scrollRect);
 
             var actual = sut.HasNextPage();
@@ -239,25 +227,13 @@ namespace TestHelper.UI.Paginators
             Assert.That(actual, Is.False);
         }
 
-        [Test]
+        [TestCase(1f)]
+        [TestCase(0.5f)]
         [LoadScene(TestScene)]
-        public void HasNextPage_VerticalScrollAtStart_ReturnsTrue()
+        public void HasNextPage_VerticalScrollNotAtEnd_ReturnsTrue(float y)
         {
             var scrollRect = _verticalScrollView.GetComponent<ScrollRect>();
-            scrollRect.normalizedPosition = new Vector2(0f, 1f);
-            var sut = new UguiScrollRectPaginator(scrollRect);
-
-            var actual = sut.HasNextPage();
-
-            Assert.That(actual, Is.True);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void HasNextPage_VerticalScrollAtMiddle_ReturnsTrue()
-        {
-            var scrollRect = _verticalScrollView.GetComponent<ScrollRect>();
-            scrollRect.normalizedPosition = new Vector2(0f, 0.5f);
+            scrollRect.normalizedPosition = new Vector2(0f, y);
             var sut = new UguiScrollRectPaginator(scrollRect);
 
             var actual = sut.HasNextPage();
@@ -278,38 +254,14 @@ namespace TestHelper.UI.Paginators
             Assert.That(actual, Is.False);
         }
 
-        [Test]
+        [TestCase(0f, 1f)]
+        [TestCase(1f, 0.5f)]
+        [TestCase(0.5f, 0f)]
         [LoadScene(TestScene)]
-        public void HasNextPage_BothScrollAtStart_ReturnsTrue()
+        public void HasNextPage_BothScrollNotBothAtEnd_ReturnsTrue(float x, float y)
         {
             var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
-            scrollRect.normalizedPosition = new Vector2(0f, 1f);
-            var sut = new UguiScrollRectPaginator(scrollRect);
-
-            var actual = sut.HasNextPage();
-
-            Assert.That(actual, Is.True);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void HasNextPage_BothScrollHorizontalAtEnd_ReturnsTrue()
-        {
-            var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
-            scrollRect.normalizedPosition = new Vector2(1f, 0.5f);
-            var sut = new UguiScrollRectPaginator(scrollRect);
-
-            var actual = sut.HasNextPage();
-
-            Assert.That(actual, Is.True);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void HasNextPage_BothScrollVerticalAtEnd_ReturnsTrue()
-        {
-            var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
-            scrollRect.normalizedPosition = new Vector2(0.5f, 0f);
+            scrollRect.normalizedPosition = new Vector2(x, y);
             var sut = new UguiScrollRectPaginator(scrollRect);
 
             var actual = sut.HasNextPage();
@@ -346,7 +298,7 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public void HasNextPage_FloatingPointPrecisionAtEnd_ReturnsFalse()
+        public void HasNextPage_HorizontalFloatingPointPrecisionAtEnd_ReturnsFalse()
         {
             var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
             scrollRect.normalizedPosition = new Vector2(1.0f - float.Epsilon, 0f);
@@ -359,7 +311,7 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public void HasNextPage_FloatingPointPrecisionAtStart_ReturnsTrue()
+        public void HasNextPage_VerticalFloatingPointPrecisionAtEnd_ReturnsFalse()
         {
             var scrollRect = _verticalScrollView.GetComponent<ScrollRect>();
             scrollRect.normalizedPosition = new Vector2(0f, 0.0f + float.Epsilon);
