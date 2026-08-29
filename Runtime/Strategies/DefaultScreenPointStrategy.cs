@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Collections.Generic;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
 using UnityEngine;
@@ -65,9 +66,12 @@ namespace TestHelper.UI.Strategies
             return TransformPositionStrategy.GetScreenPoint(gameObject);
         }
 
+        private static readonly List<Canvas> s_canvasBuffer = new List<Canvas>();
+
         private static float GetCanvasScale(GameObject gameObject)
         {
-            foreach (var canvas in gameObject.GetComponentsInParent<Canvas>())
+            gameObject.GetComponentsInParent(false, s_canvasBuffer);
+            foreach (var canvas in s_canvasBuffer)
             {
                 if (canvas.isRootCanvas)
                 {

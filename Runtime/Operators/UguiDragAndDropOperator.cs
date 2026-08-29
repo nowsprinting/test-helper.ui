@@ -152,10 +152,7 @@ namespace TestHelper.UI.Operators
             }
 
             var dropHandlers = new List<Component>();
-            foreach (var handler in InteractableComponentsFinder.FindEventHandlers<IDropHandler>())
-            {
-                dropHandlers.Add(handler);
-            }
+            dropHandlers.AddRange(InteractableComponentsFinder.FindEventHandlers<IDropHandler>());
 
             var dropHandler = LotteryComponent(dropHandlers);
             if (dropHandler != null)
@@ -167,7 +164,7 @@ namespace TestHelper.UI.Operators
             return OperateAsync(gameObject, destination, _dragSpeed, raycastResult, cancellationToken);
         }
 
-        private static IEnumerable<DropAnnotation> FindDropAnnotations()
+        private static DropAnnotation[] FindDropAnnotations()
         {
 #if UNITY_6000_4_OR_NEWER
             return Object.FindObjectsByType<DropAnnotation>(FindObjectsInactive.Exclude);

@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using UnityEngine;
@@ -8,7 +8,7 @@ using UnityEngine.UI;
 // ReSharper disable once CheckNamespace -- namespace mirrors the package's own scheme, not the Assets/Samples/<name>/<version> import path Unity generates locally
 namespace TestHelper.UI.Samples.UguiDemo
 {
-    public abstract class AbstractSpyEventHandler : MonoBehaviour,
+    public abstract class SpyEventHandler : MonoBehaviour,
         IUpdateSelectedHandler,
         ISelectHandler,
         IDeselectHandler,
