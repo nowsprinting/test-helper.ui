@@ -101,7 +101,8 @@ namespace TestHelper.UI.Operators
             if (gameObject.TryGetEnabledComponent<InputFieldAnnotation>(out var annotation))
             {
                 // Overwrite rule if annotation is attached.
-                randomStringParams = _ => new RandomStringParameters(
+                // ReSharper disable once UnusedParameter.Local
+                randomStringParams = __ => new RandomStringParameters(
                     (int)annotation.minimumLength,
                     (int)annotation.maximumLength,
                     annotation.charactersKind);
