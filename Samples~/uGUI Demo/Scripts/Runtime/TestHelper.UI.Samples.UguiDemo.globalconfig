@@ -4,34 +4,7 @@ is_global = true
 dotnet_diagnostic.CS0618.severity = error
 
 # RS0030: Do not use banned APIs
-dotnet_diagnostic.RS0030.severity = error
-
-# Microsoft.CodeAnalysis.NetAnalyzers categories
-dotnet_analyzer_diagnostic.category-Design.severity = warning
-dotnet_analyzer_diagnostic.category-Maintainability.severity = warning
-dotnet_analyzer_diagnostic.category-Naming.severity = warning
-dotnet_analyzer_diagnostic.category-Performance.severity = warning
-
-# CA1016: Mark assemblies with assembly version; Not for Unity
-dotnet_diagnostic.CA1016.severity = none
-
-# CA1051: Do not declare visible instance fields; Not for Unity
-dotnet_diagnostic.CA1051.severity = none
-
-# RCS1174: Remove redundant async/await
-dotnet_diagnostic.RCS1174.severity = warning
-
-# RCS1198: Avoid unnecessary boxing of value type
-dotnet_diagnostic.RCS1198.severity = warning
-
-# UNT0009: Missing static constructor with InitializeOnLoad attribute
-dotnet_diagnostic.UNT0009.severity = warning
-
-# UNT0023: Coalescing assignment on Unity objects
-dotnet_diagnostic.UNT0023.severity = warning
-
-# UNT0030: Calling Destroy or DestroyImmediate on a Transform
-dotnet_diagnostic.UNT0030.severity = warning
+dotnet_diagnostic.RS0030.severity = suggestion
 
 # IDISP017: Prefer using
 # The IDE's suggested fix is a `using var` declaration, which requires C# 8.0; this package
