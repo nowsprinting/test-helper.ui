@@ -11,6 +11,14 @@ namespace TestHelper.UI.GameObjectMatchers
     public class NameMatcherTest
     {
         [Test]
+        [Category("Acceptance")]
+        public void ComponentType_ReturnsTransform()
+        {
+            var sut = new NameMatcher("Button");
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Transform)));
+        }
+
+        [Test]
         public void ToString_ReturnsWithName()
         {
             var sut = new NameMatcher("Button");

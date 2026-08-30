@@ -12,6 +12,14 @@ namespace TestHelper.UI.GameObjectMatchers
     public class PathMatcherTest
     {
         [Test]
+        [Category("Acceptance")]
+        public void ComponentType_ReturnsTransform()
+        {
+            var sut = new PathMatcher("/Path/To/Button");
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Transform)));
+        }
+
+        [Test]
         public void ToString_ReturnsWithPath()
         {
             var sut = new PathMatcher("/Path/To/Button");
