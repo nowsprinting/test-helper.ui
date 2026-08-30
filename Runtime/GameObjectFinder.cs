@@ -117,12 +117,14 @@ namespace TestHelper.UI
         private static List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher)
         {
             var componentType = matcher.ComponentType;
-            if (componentType == typeof(Component) || !typeof(Component).IsAssignableFrom(componentType))
+            if (componentType == null || componentType == typeof(Component) ||
+                !typeof(Component).IsAssignableFrom(componentType))
             {
                 // Transform yields exactly one hit per GameObject, so remap types the native query
-                // handles poorly: typeof(Component) returns every component instance in the scene,
-                // and FindObjectsByType rejects non-Object-derived types (e.g., interfaces).
-                // matcher.IsMatch still applies the matcher's own criteria either way.
+                // handles poorly: null (a custom matcher without a hint), typeof(Component) (returns
+                // every component instance in the scene), and non-Object-derived types such as
+                // interfaces (rejected by FindObjectsByType). matcher.IsMatch still applies the
+                // matcher's own criteria either way.
                 componentType = typeof(Transform);
             }
 

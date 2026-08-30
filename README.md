@@ -563,7 +563,7 @@ The custom matcher can be specified as an argument to the `GameObjectFinder.Find
 
 A matcher must implement the following members:
 
-- `ComponentType` property to return the component type that `GameObjectFinder` uses to collect candidate `GameObjects` before evaluating `IsMatch`. Return `typeof(Transform)` if the matcher has no component criterion
+- `ComponentType` property to return the component type that `GameObjectFinder` uses to collect candidate `GameObjects` before evaluating `IsMatch`. Return `typeof(Transform)` if the matcher has no component criterion. An interface or other non-`Component` type is also allowed; `GameObjectFinder` then falls back to `typeof(Transform)` for candidate collection and `IsMatch` does the filtering
 - `IsMatch` method to determine whether the specified `GameObject` matches the criteria
 
 For example, the built-in `ButtonMatcher` class's `IsMatch` method returns `true` for `GameObjects` that match the specified button element `name`, `path`, `text`, and `texture`.

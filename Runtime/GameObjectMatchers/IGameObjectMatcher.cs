@@ -13,9 +13,11 @@ namespace TestHelper.UI.GameObjectMatchers
     public interface IGameObjectMatcher
     {
         /// <summary>
-        /// The <c>Component</c> type used by <see cref="GameObjectFinder"/> to collect candidate
+        /// The component type used by <see cref="GameObjectFinder"/> to collect candidate
         /// <see cref="GameObject"/>s before evaluating <see cref="IsMatch"/>.
         /// Matchers without a component criterion return <c>typeof(Transform)</c>.
+        /// A non-<c>Component</c> type (e.g., an interface) is allowed; <see cref="GameObjectFinder"/>
+        /// then collects candidates via <c>typeof(Transform)</c> and <see cref="IsMatch"/> does the filtering.
         /// </summary>
         Type ComponentType { get; }
 
