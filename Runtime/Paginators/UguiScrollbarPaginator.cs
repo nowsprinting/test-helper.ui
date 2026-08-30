@@ -64,6 +64,13 @@ namespace TestHelper.UI.Paginators
         /// <inheritdoc />
         public bool HasNextPage()
         {
+            // A zero size means the scroll amount is zero (the state before Unity's layout calculation); judging by
+            // value alone would let NextPageAsync return true forever because the value can never advance.
+            if (_scrollbar.size <= 0f)
+            {
+                return false;
+            }
+
             // For Scrollbar, if value is less than 1.0, the next page exists
             return _scrollbar.value < 1.0f - float.Epsilon;
         }
