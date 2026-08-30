@@ -10,7 +10,7 @@ namespace TestHelper.UI.Exceptions
     /// Detected an infinite loop in monkey testing.
     /// </summary>
     [Serializable]
-    public class InfiniteLoopException : ApplicationException
+    public class InfiniteLoopException : Exception
     {
         public InfiniteLoopException() { }
 
