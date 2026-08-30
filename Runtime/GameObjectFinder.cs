@@ -20,6 +20,11 @@ namespace TestHelper.UI
     /// <summary>
     /// Find <c>GameObject</c> by name or path (glob). Wait until they appear.
     /// </summary>
+    /// <remarks>
+    /// A <see cref="GameObjectFinder"/> instance reuses internal buffers across find calls for performance.
+    /// Running multiple finds concurrently on the same instance corrupts their results; use a separate instance
+    /// per concurrent find.
+    /// </remarks>
     public class GameObjectFinder
     {
         private readonly double _timeoutSeconds;

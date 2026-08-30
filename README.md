@@ -25,6 +25,9 @@ Constructor arguments:
 - **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
 - **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 
+> [!WARNING]\
+> A `GameObjectFinder` instance reuses internal buffers across find calls for performance. Running multiple finds concurrently on the same instance corrupts their results; use a separate instance per concurrent find.
+
 
 #### Find GameObject by name
 
