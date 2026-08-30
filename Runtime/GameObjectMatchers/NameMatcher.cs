@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using UnityEngine;
 
 namespace TestHelper.UI.GameObjectMatchers
@@ -11,6 +12,9 @@ namespace TestHelper.UI.GameObjectMatchers
     public class NameMatcher : IGameObjectMatcher
     {
         private readonly string _name;
+
+        /// <inheritdoc/>
+        public Type ComponentType => null;
 
         /// <summary>
         /// Constructor with name.

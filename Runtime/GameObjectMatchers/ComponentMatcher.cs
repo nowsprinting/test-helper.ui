@@ -17,6 +17,9 @@ namespace TestHelper.UI.GameObjectMatchers
         private readonly string _name;
         private readonly string _path;
 
+        /// <inheritdoc/>
+        public Type ComponentType => null;
+
         /// <summary>
         /// Constructor.
         /// </summary>

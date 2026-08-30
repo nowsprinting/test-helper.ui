@@ -26,6 +26,9 @@ namespace TestHelper.UI.GameObjectMatchers
         private readonly string _path;
         private readonly string _text;
 
+        /// <inheritdoc/>
+        public Type ComponentType => null;
+
         /// <summary>
         /// Constructor with properties of <c>Toggle</c>.
         /// </summary>

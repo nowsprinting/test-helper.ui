@@ -27,6 +27,9 @@ namespace TestHelper.UI.GameObjectMatchers
         private readonly string _text;
         private readonly string _texture;
 
+        /// <inheritdoc/>
+        public Type ComponentType => null;
+
         /// <summary>
         /// Constructor with properties of <c>Button</c>.
         /// </summary>

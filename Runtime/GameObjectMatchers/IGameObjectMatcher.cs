@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using UnityEngine;
 
 namespace TestHelper.UI.GameObjectMatchers
@@ -11,6 +12,13 @@ namespace TestHelper.UI.GameObjectMatchers
     /// </summary>
     public interface IGameObjectMatcher
     {
+        /// <summary>
+        /// The <c>Component</c> type used by <see cref="GameObjectFinder"/> to collect candidate
+        /// <see cref="GameObject"/>s before evaluating <see cref="IsMatch"/>.
+        /// Matchers without a component criterion return <c>typeof(Transform)</c>.
+        /// </summary>
+        Type ComponentType { get; }
+
         /// <summary>
         /// Determines if a <see cref="GameObject"/> matches the implemented criteria.
         /// </summary>

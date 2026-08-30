@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using TestHelper.UI.Extensions;
 using UnityEngine;
 
@@ -12,6 +13,9 @@ namespace TestHelper.UI.GameObjectMatchers
     public class PathMatcher : IGameObjectMatcher
     {
         private readonly string _path;
+
+        /// <inheritdoc/>
+        public Type ComponentType => null;
 
         /// <summary>
         /// Constructor with hierarchy path.
