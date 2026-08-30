@@ -121,8 +121,12 @@ namespace TestHelper.UI.Visualizers
         private static void AssertShowsNotReachableIndicator()
         {
             var indicator = GameObject.Find("Indicator");
-            Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("eye_slash"));
-            Assert.That(indicator.GetComponent<Image>().raycastTarget, Is.False);
+            Assert.That(indicator, Is.Not.Null);
+
+            var image = indicator.GetComponent<Image>();
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.sprite.name, Is.EqualTo("eye_slash"));
+            Assert.That(image.raycastTarget, Is.False);
         }
 
         [Test]
