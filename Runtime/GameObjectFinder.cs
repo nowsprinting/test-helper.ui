@@ -281,6 +281,9 @@ namespace TestHelper.UI
         /// <summary>
         /// Find <c>GameObject</c> by name (wait until they appear).
         /// </summary>
+        /// <remarks>
+        /// When you can identify the component type, using <see cref="FindByMatcherAsync"/> is more advantageous in both execution speed and memory usage.
+        /// </remarks>
         /// <param name="name">Find <c>GameObject</c> name</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
@@ -301,6 +304,9 @@ namespace TestHelper.UI
         /// <summary>
         /// Find <c>GameObject</c> by path (wait until they appear).
         /// </summary>
+        /// <remarks>
+        /// When you can identify the component type, using <see cref="FindByMatcherAsync"/> is more advantageous in both execution speed and memory usage.
+        /// </remarks>
         /// <param name="path">Find <c>GameObject</c> hierarchy path separated by `/`. Can specify wildcards of glob pattern (`?`, `*`, and `**`).</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>

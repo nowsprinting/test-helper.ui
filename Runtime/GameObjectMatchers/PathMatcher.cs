@@ -10,6 +10,9 @@ namespace TestHelper.UI.GameObjectMatchers
     /// <summary>
     /// <see cref="GameObject"/> matcher that matchers by hierarchy path.
     /// </summary>
+    /// <remarks>
+    /// Using a matcher that lets you specify the component type improves both execution performance and memory usage.
+    /// </remarks>
     public class PathMatcher : IGameObjectMatcher
     {
         private readonly string _path;

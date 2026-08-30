@@ -56,6 +56,9 @@ public class MyIntegrationTest
 }
 ```
 
+> [!TIP]\
+> When you can identify the component type, using `FindByMatcherAsync` is more advantageous in both execution speed and memory usage.
+
 
 #### Find GameObject by path
 
@@ -86,6 +89,9 @@ public class MyIntegrationTest
     }
 }
 ```
+
+> [!TIP]\
+> When you can identify the component type, using `FindByMatcherAsync` is more advantageous in both execution speed and memory usage.
 
 
 #### Find GameObject by matcher
@@ -125,6 +131,9 @@ public class MyIntegrationTest
     }
 }
 ```
+
+> [!TIP]\
+> A matcher that can specify a component type is more advantageous in both execution speed and memory usage than a matcher based only on `name` or `path`.
 
 
 #### Find GameObject in pageable component

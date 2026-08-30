@@ -9,6 +9,9 @@ namespace TestHelper.UI.GameObjectMatchers
     /// <summary>
     /// <see cref="GameObject"/> matcher that matchers by name.
     /// </summary>
+    /// <remarks>
+    /// Using a matcher that lets you specify the component type improves both execution performance and memory usage.
+    /// </remarks>
     public class NameMatcher : IGameObjectMatcher
     {
         private readonly string _name;
