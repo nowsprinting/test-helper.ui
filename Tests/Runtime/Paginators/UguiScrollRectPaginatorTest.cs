@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Threading.Tasks;
@@ -198,6 +198,38 @@ namespace TestHelper.UI.Paginators
 
             Assert.That(actual, Is.False);
             Assert.That(scrollRect.normalizedPosition, Is.EqualTo(new Vector2(0f, 1f)));
+        }
+
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(true, true)]
+        [CreateScene]
+        [Category("Acceptance")]
+        public async Task NextPageAsync_ViewportSizeIsZero_ReturnsFalse(bool horizontal, bool vertical)
+        {
+            var scrollRect = CreateScrollRectWithZeroSizeViewport();
+            scrollRect.horizontal = horizontal;
+            scrollRect.vertical = vertical;
+            var sut = new UguiScrollRectPaginator(scrollRect);
+            var beforePosition = scrollRect.normalizedPosition;
+
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.False, "return value");
+            Assert.That(scrollRect.normalizedPosition, Is.EqualTo(beforePosition), "normalizedPosition");
+        }
+
+        private static ScrollRect CreateScrollRectWithZeroSizeViewport()
+        {
+            // Reproduces the state before Unity's layout calculation, where the viewport rect is still zero-size.
+            var scrollRect = new GameObject("Scroll View", typeof(RectTransform)).AddComponent<ScrollRect>();
+            ((RectTransform)scrollRect.transform).sizeDelta = Vector2.zero;
+            var content = new GameObject("Content", typeof(RectTransform)).GetComponent<RectTransform>();
+            content.SetParent(scrollRect.transform, false);
+            content.sizeDelta = new Vector2(500f, 500f);
+            scrollRect.content = content;
+            Assume.That(((RectTransform)scrollRect.transform).rect.size, Is.EqualTo(Vector2.zero));
+            return scrollRect;
         }
 
         [TestCase(0f)]
