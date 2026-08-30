@@ -136,36 +136,29 @@ namespace TestHelper.UI.Paginators
         }
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         [Category("Acceptance")]
         public async Task NextPageAsync_ScrollbarSizeIsZero_ReturnsFalse()
         {
-            var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
-            // A zero size reproduces the state before Unity's layout calculation.
-            scrollbar.size = 0f;
-            scrollbar.value = 0f;
-            await Task.Yield();
-
+            // A zero size reproduces the state before Unity's layout calculation. A script-created Scrollbar is
+            // used because a scene Scrollbar is driven by its ScrollRect, which rewrites the size every frame.
+            var scrollbar = CreateScrollbar(size: 0f, value: 0f);
             var sut = new UguiScrollbarPaginator(scrollbar);
-            var beforeValue = scrollbar.value;
 
             var actual = await sut.NextPageAsync();
 
             Assert.That(actual, Is.False, "return value");
-            Assert.That(scrollbar.value, Is.EqualTo(beforeValue), "value");
+            Assert.That(scrollbar.value, Is.EqualTo(0f), "value");
         }
 
         [Test]
-        [LoadScene(TestScene)]
+        [CreateScene]
         [Category("Acceptance")]
         public async Task NextPageAsync_ScrollbarSizeIsOne_ValueBecomesOneAndReturnsTrue()
         {
-            var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
-            scrollbar.size = 1f;
-            scrollbar.value = 0f;
-            await Task.Yield();
-
+            var scrollbar = CreateScrollbar(size: 1f, value: 0f);
             var sut = new UguiScrollbarPaginator(scrollbar);
+
             var actual = await sut.NextPageAsync();
 
             Assert.That(actual, Is.True, "return value");
@@ -174,18 +167,23 @@ namespace TestHelper.UI.Paginators
 
         [TestCase(0f)]
         [TestCase(0.5f)]
-        [LoadScene(TestScene)]
-        public async Task HasNextPage_ScrollbarSizeIsZero_ReturnsFalse(float value)
+        [CreateScene]
+        public void HasNextPage_ScrollbarSizeIsZero_ReturnsFalse(float value)
         {
-            var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
-            scrollbar.size = 0f;
-            scrollbar.value = value;
-            await Task.Yield();
-
+            var scrollbar = CreateScrollbar(size: 0f, value: value);
             var sut = new UguiScrollbarPaginator(scrollbar);
+
             var actual = sut.HasNextPage();
 
             Assert.That(actual, Is.False);
+        }
+
+        private static Scrollbar CreateScrollbar(float size, float value)
+        {
+            var scrollbar = new GameObject("Scrollbar", typeof(RectTransform)).AddComponent<Scrollbar>();
+            scrollbar.size = size;
+            scrollbar.value = value;
+            return scrollbar;
         }
 
         [TestCase(0f)]
