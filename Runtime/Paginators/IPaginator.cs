@@ -17,6 +17,9 @@ namespace TestHelper.UI.Paginators
     ///     <item>A paginator must have a constructor with one or more parameters</item>
     ///     <item>The first parameter of the constructor is a pageable or scrollable component to be controlled</item>
     ///     <item>The type of the first parameter must be a subclass of <c>MonoBehaviour</c></item>
+    ///     <item><see cref="NextPageAsync"/> must eventually return false: callers loop on the return value, so
+    ///     when the page position cannot advance (e.g., the layout has not been calculated yet), it must return
+    ///     false instead of true</item>
     /// </list>
     /// <seealso cref="TestHelper.UI.Paginators.IPaginatorTest"/>
     /// </remarks>
@@ -35,7 +38,7 @@ namespace TestHelper.UI.Paginators
         /// For scroll components, advance the page by the size of the display area.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>True if page navigation was executed, false if not executed at the end</returns>
+        /// <returns>True if page navigation was executed, false if not executed because the end has been reached or the page position cannot advance</returns>
         UniTask<bool> NextPageAsync(CancellationToken cancellationToken = default);
 
         /// <summary>

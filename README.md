@@ -576,6 +576,9 @@ A paginator must implement the following methods:
 - `NextPageAsync` method to navigate to the next page
 - `HasNextPage` property to return whether there is a next page
 
+> [!IMPORTANT]\
+> `NextPageAsync` must eventually return `false`. Callers (e.g., `GameObjectFinder`) loop on the return value, so when the page position cannot advance (e.g., the layout has not been calculated yet), it must return `false` instead of `true`; otherwise the caller loops forever.
+
 In addition, the constructor must meet the following requirements:
 
 - A paginator must have a constructor with one or more parameters
