@@ -561,6 +561,11 @@ The `DefaultReachableStrategy` constructor accepts optional parameters:
 If your game title uses a custom UI framework that is not uGUI compatible and/or requires custom conditions for searching, you can implement the `IGameObjectMatcher` interface.
 The custom matcher can be specified as an argument to the `GameObjectFinder.FindByMatcherAsync` method.
 
+A matcher must implement the following members:
+
+- `ComponentType` property to return the component type that `GameObjectFinder` uses to collect candidate `GameObjects` before evaluating `IsMatch`. Return `typeof(Transform)` if the matcher has no component criterion
+- `IsMatch` method to determine whether the specified `GameObject` matches the criteria
+
 For example, the built-in `ButtonMatcher` class's `IsMatch` method returns `true` for `GameObjects` that match the specified button element `name`, `path`, `text`, and `texture`.
 
 

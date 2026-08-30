@@ -7,13 +7,13 @@ using System.Globalization;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Exceptions;
+using TestHelper.UI.Extensions;
 using TestHelper.UI.GameObjectMatchers;
 using TestHelper.UI.Paginators;
 using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Object = UnityEngine.Object;
 
 namespace TestHelper.UI
 {
@@ -114,21 +114,16 @@ namespace TestHelper.UI
         private static List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher)
         {
             var componentType = matcher.ComponentType;
-            if (!typeof(Component).IsAssignableFrom(componentType))
+            if (componentType == typeof(Component) || !typeof(Component).IsAssignableFrom(componentType))
             {
-                // FindObjectsByType rejects non-Object-derived types (e.g., interfaces),
-                // while matcher.IsMatch can still filter by them via TryGetComponent.
+                // Transform yields exactly one hit per GameObject, so remap types the native query
+                // handles poorly: typeof(Component) returns every component instance in the scene,
+                // and FindObjectsByType rejects non-Object-derived types (e.g., interfaces).
+                // matcher.IsMatch still applies the matcher's own criteria either way.
                 componentType = typeof(Transform);
             }
 
-#if UNITY_6000_4_OR_NEWER
-            var components = Object.FindObjectsByType(componentType, FindObjectsInactive.Exclude);
-#elif UNITY_2022_3_OR_NEWER
-            var components = Object.FindObjectsByType(componentType, FindObjectsSortMode.None);
-            // Note: Supported in Unity 2020.3.4, 2021.3.18, 2022.2.5 or later.
-#else
-            var components = Object.FindObjectsOfType(componentType);
-#endif
+            var components = ObjectExtensions.FindObjectsByType(componentType);
 
             // Dedupe by GameObject: FindObjectsByType returns one hit per component instance,
             // so a GameObject holding multiple matching components would otherwise be judged
@@ -195,7 +190,12 @@ namespace TestHelper.UI
 
             while (nextPage)
             {
+                // FindByMatcher is a synchronous scene snapshot, not a blocking variant of
+                // FindByMatcherAsync; awaiting the async method here would recurse into the
+                // polling wrapper that calls this method.
+#pragma warning disable VSTHRD103
                 var (foundObject, raycastResult, reason) = FindByMatcher(matcher, reachable, interactable);
+#pragma warning restore VSTHRD103
 
                 if (foundObject != null)
                 {

@@ -94,7 +94,8 @@ namespace TestHelper.UI.GameObjectMatchers
         public void IsMatch_ComponentTypeIsInterface_ReturnsTrue()
         {
             var sut = new ComponentMatcher(componentType: typeof(IPointerClickHandler));
-            var actual = sut.IsMatch(CreateGameObject(componentType: typeof(Button))); // Button implements IPointerClickHandler
+            var actual =
+                sut.IsMatch(CreateGameObject(componentType: typeof(Button))); // Button implements IPointerClickHandler
             Assert.That(actual, Is.True);
         }
 

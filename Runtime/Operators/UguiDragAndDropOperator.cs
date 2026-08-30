@@ -15,7 +15,6 @@ using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Object = UnityEngine.Object;
 
 namespace TestHelper.UI.Operators
 {
@@ -166,14 +165,7 @@ namespace TestHelper.UI.Operators
 
         private static DropAnnotation[] FindDropAnnotations()
         {
-#if UNITY_6000_4_OR_NEWER
-            return Object.FindObjectsByType<DropAnnotation>(FindObjectsInactive.Exclude);
-#elif UNITY_2022_3_OR_NEWER
-            return Object.FindObjectsByType<DropAnnotation>(FindObjectsSortMode.None);
-            // Note: Supported in Unity 2020.3.4, 2021.3.18, 2022.2.5 or later.
-#else
-            return Object.FindObjectsOfType<DropAnnotation>();
-#endif
+            return ObjectExtensions.FindObjectsByType<DropAnnotation>();
         }
 
         internal Component LotteryComponent(IReadOnlyList<Component> components)

@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -657,51 +656,54 @@ namespace TestHelper.UI
             }
         }
 
-        [Test]
-        [Category("Acceptance")]
-        [CreateScene]
-        public async Task FindByMatcherAsync_MultipleComponentsOfSameTypeOnOneGameObject_Found()
+        [TestFixture]
+        public class Matcher
         {
-            var target = new GameObject("Target");
-            target.AddComponent<BoxCollider>();
-            target.AddComponent<BoxCollider>();
-            var sut = new GameObjectFinder(0.1d);
+            private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
 
-            var matcher = new ComponentMatcher(componentType: typeof(BoxCollider));
-            var result = await sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+            [Test]
+            [Category("Acceptance")]
+            [CreateScene]
+            public async Task FindByMatcherAsync_MultipleComponentsOfSameTypeOnOneGameObject_Found()
+            {
+                var target = new GameObject("Target");
+                target.AddComponent<BoxCollider>();
+                target.AddComponent<BoxCollider>();
 
-            Assert.That(result.GameObject, Is.EqualTo(target));
-        }
+                var matcher = new ComponentMatcher(componentType: typeof(BoxCollider));
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
 
-        [Test]
-        [Category("Acceptance")]
-        [CreateScene]
-        public async Task FindByMatcherAsync_DefaultComponentTypeOnGameObjectWithMultipleComponents_Found()
-        {
-            var target = new GameObject("Target");
-            target.AddComponent<BoxCollider>();
-            target.AddComponent<AudioSource>();
-            var sut = new GameObjectFinder(0.1d);
+                Assert.That(result.GameObject, Is.EqualTo(target));
+            }
 
-            var matcher = new ComponentMatcher(name: "Target"); // component type defaults to Component
-            var result = await sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+            [Test]
+            [Category("Acceptance")]
+            [CreateScene]
+            public async Task FindByMatcherAsync_DefaultComponentTypeOnGameObjectWithMultipleComponents_Found()
+            {
+                var target = new GameObject("Target");
+                target.AddComponent<BoxCollider>();
+                target.AddComponent<AudioSource>();
 
-            Assert.That(result.GameObject, Is.EqualTo(target));
-        }
+                var matcher = new ComponentMatcher(name: "Target"); // component type defaults to Component
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
 
-        [Test]
-        [Category("Acceptance")]
-        [CreateScene]
-        public async Task FindByMatcherAsync_ComponentTypeIsInterface_Found()
-        {
-            var target = new GameObject("Target");
-            target.AddComponent<Button>(); // Button implements IPointerClickHandler
-            var sut = new GameObjectFinder(0.1d);
+                Assert.That(result.GameObject, Is.EqualTo(target));
+            }
 
-            var matcher = new ComponentMatcher(componentType: typeof(IPointerClickHandler));
-            var result = await sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+            [Test]
+            [Category("Acceptance")]
+            [CreateScene]
+            public async Task FindByMatcherAsync_ComponentTypeIsInterface_Found()
+            {
+                var target = new GameObject("Target");
+                target.AddComponent<Button>(); // Button implements IPointerClickHandler
 
-            Assert.That(result.GameObject, Is.EqualTo(target));
+                var matcher = new ComponentMatcher(componentType: typeof(IPointerClickHandler));
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+
+                Assert.That(result.GameObject, Is.EqualTo(target));
+            }
         }
 
         [Test]
