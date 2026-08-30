@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Threading.Tasks;
@@ -133,6 +133,26 @@ namespace TestHelper.UI.Paginators
 
             // Value increase should be based on scrollbar.size
             Assert.That(scrollbar.value, Is.EqualTo(scrollbar.size).Within(0.05f));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Category("Acceptance")]
+        public async Task NextPageAsync_ScrollbarSizeIsZero_ReturnsFalse()
+        {
+            var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
+            // A zero size reproduces the state before Unity's layout calculation.
+            scrollbar.size = 0f;
+            scrollbar.value = 0f;
+            await Task.Yield();
+
+            var sut = new UguiScrollbarPaginator(scrollbar);
+            var beforeValue = scrollbar.value;
+
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.False, "return value");
+            Assert.That(scrollbar.value, Is.EqualTo(beforeValue), "value");
         }
 
         [TestCase(0f)]
