@@ -109,26 +109,9 @@ namespace TestHelper.UI.Paginators
         /// <inheritdoc />
         public bool HasNextPage()
         {
-            // End determination for bidirectional scrolling
-            if (_scrollRect.horizontal && _scrollRect.vertical)
-            {
-                // Return false only when both horizontal and vertical directions have reached the end
-                return !(IsHorizontalAtEnd() && IsVerticalAtEnd());
-            }
-
-            // For unidirectional scrolling
-            if (_scrollRect.horizontal)
-            {
-                return !IsHorizontalAtEnd();
-            }
-
-            if (_scrollRect.vertical)
-            {
-                return !IsVerticalAtEnd();
-            }
-
-            // When scrolling is disabled
-            return false;
+            // Dispatching by _scrollRect.horizontal/vertical is unnecessary: a disabled axis has a zero scroll
+            // amount, so IsHorizontalAtEnd/IsVerticalAtEnd already report it as at the end.
+            return !(IsHorizontalAtEnd() && IsVerticalAtEnd());
         }
 
         private Vector2 CalculateViewportSize()

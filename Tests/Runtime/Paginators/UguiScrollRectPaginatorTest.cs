@@ -273,18 +273,20 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task NextPageAsync_AfterResetAsyncFollowingPaginationEnd_ScrollsAndReturnsTrue()
+        public async Task NextPageAsync_AfterResetAsyncFollowingHorizontalEnd_ScrollsHorizontallyAndReturnsTrue()
         {
-            var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
-            scrollRect.normalizedPosition = new Vector2(1f, 0f);
+            var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
+            scrollRect.normalizedPosition = new Vector2(0.99f, 1f);
             var sut = new UguiScrollRectPaginator(scrollRect);
-            Assume.That(await sut.NextPageAsync(), Is.False);
+            Assume.That(await sut.NextPageAsync(), Is.True);
+            Assume.That(scrollRect.normalizedPosition.x, Is.EqualTo(1f).Within(float.Epsilon));
 
             await sut.ResetAsync();
             var actual = await sut.NextPageAsync();
 
             Assert.That(actual, Is.True, "return value");
             Assert.That(scrollRect.normalizedPosition.x, Is.GreaterThan(0f), "normalizedPosition.x");
+            Assert.That(scrollRect.normalizedPosition.y, Is.EqualTo(1f), "normalizedPosition.y");
         }
 
         private static ScrollRect CreateScrollRect(Vector2 viewportSize, Vector2 contentSize)
