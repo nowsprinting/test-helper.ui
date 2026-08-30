@@ -13,7 +13,6 @@ using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace TestHelper.UI
@@ -23,8 +22,6 @@ namespace TestHelper.UI
     /// </summary>
     public class GameObjectFinder
     {
-        private static Scene s_dontDestroyOnLoadScene;
-
         private readonly double _timeoutSeconds;
         private readonly IReachableStrategy _reachableStrategy;
         private readonly Func<Component, bool> _isInteractable;
@@ -56,56 +53,6 @@ namespace TestHelper.UI
             _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy();
             _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
             _visualizer = visualizer;
-        }
-
-        private static Scene GetDontDestroyOnLoadScene()
-        {
-            if (s_dontDestroyOnLoadScene.IsValid())
-            {
-                return s_dontDestroyOnLoadScene;
-            }
-
-            var gameObject = new GameObject("DontDestroyOnLoad Object, Created by GameObjectFinder");
-            Object.DontDestroyOnLoad(gameObject);
-            s_dontDestroyOnLoadScene = gameObject.scene;
-
-            return s_dontDestroyOnLoadScene;
-        }
-
-        private static List<Scene> GetAllScenes()
-        {
-            var scenes = new List<Scene> { GetDontDestroyOnLoadScene() };
-            for (var i = 0; i < SceneManager.sceneCount; i++)
-            {
-                var scene = SceneManager.GetSceneAt(i);
-                if (scene.isLoaded)
-                {
-                    scenes.Add(scene);
-                }
-            }
-
-            return scenes;
-        }
-
-        private static IEnumerable<GameObject> FindGameObjectRecursive(GameObject current, IGameObjectMatcher matcher)
-        {
-            if (!current.activeInHierarchy)
-            {
-                yield break;
-            }
-
-            if (matcher.IsMatch(current))
-            {
-                yield return current;
-            }
-
-            foreach (Transform childTransform in current.transform)
-            {
-                foreach (var found in FindGameObjectRecursive(childTransform.gameObject, matcher))
-                {
-                    yield return found;
-                }
-            }
         }
 
         private enum Reason
@@ -164,21 +111,36 @@ namespace TestHelper.UI
             return false;
         }
 
-        private static List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher, Scene scene)
+        private static List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher)
         {
-            var scenes = scene != default ? new List<Scene> { scene } : GetAllScenes();
-            var foundObjects = new List<GameObject>();
-            var rootGameObjects = new List<GameObject>();
-            foreach (var loadedScene in scenes)
+            var componentType = matcher.ComponentType;
+            if (!typeof(Component).IsAssignableFrom(componentType))
             {
-                // Do not rely on GetRootGameObjects clearing the buffer. It does not on Unity 6000.5,
-                // so a reused buffer keeps the previous scenes' roots and walks them again. With three
-                // or more scenes loaded, that makes a single GameObject match more than once.
-                rootGameObjects.Clear();
-                loadedScene.GetRootGameObjects(rootGameObjects);
-                foreach (var rootGameObject in rootGameObjects)
+                // FindObjectsByType rejects non-Object-derived types (e.g., interfaces),
+                // while matcher.IsMatch can still filter by them via TryGetComponent.
+                componentType = typeof(Transform);
+            }
+
+#if UNITY_6000_4_OR_NEWER
+            var components = Object.FindObjectsByType(componentType, FindObjectsInactive.Exclude);
+#elif UNITY_2022_3_OR_NEWER
+            var components = Object.FindObjectsByType(componentType, FindObjectsSortMode.None);
+            // Note: Supported in Unity 2020.3.4, 2021.3.18, 2022.2.5 or later.
+#else
+            var components = Object.FindObjectsOfType(componentType);
+#endif
+
+            // Dedupe by GameObject: FindObjectsByType returns one hit per component instance,
+            // so a GameObject holding multiple matching components would otherwise be judged
+            // as multiple matches.
+            var seenObjects = new HashSet<GameObject>();
+            var foundObjects = new List<GameObject>();
+            foreach (var component in components)
+            {
+                var gameObject = ((Component)component).gameObject;
+                if (seenObjects.Add(gameObject) && matcher.IsMatch(gameObject))
                 {
-                    foundObjects.AddRange(FindGameObjectRecursive(rootGameObject, matcher));
+                    foundObjects.Add(gameObject);
                 }
             }
 
@@ -186,9 +148,9 @@ namespace TestHelper.UI
         }
 
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
-            bool reachable, bool interactable, Scene scene = default)
+            bool reachable, bool interactable)
         {
-            var foundObjects = FindAllByMatcher(matcher, scene);
+            var foundObjects = FindAllByMatcher(matcher);
             if (foundObjects.Count == 0)
             {
                 return (null, default, Reason.NotFound);

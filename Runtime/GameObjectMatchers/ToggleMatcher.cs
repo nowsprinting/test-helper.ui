@@ -21,13 +21,12 @@ namespace TestHelper.UI.GameObjectMatchers
     /// </remarks>
     public class ToggleMatcher : IGameObjectMatcher
     {
-        private readonly Type _componentType;
         private readonly string _name;
         private readonly string _path;
         private readonly string _text;
 
         /// <inheritdoc/>
-        public Type ComponentType => null;
+        public Type ComponentType { get; }
 
         /// <summary>
         /// Constructor with properties of <c>Toggle</c>.
@@ -39,7 +38,7 @@ namespace TestHelper.UI.GameObjectMatchers
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
         public ToggleMatcher(Type componentType = null, string name = null, string path = null, string text = null)
         {
-            _componentType = componentType ?? typeof(Toggle);
+            ComponentType = componentType ?? typeof(Toggle);
             _name = name;
             _path = path;
             _text = text;
@@ -48,7 +47,7 @@ namespace TestHelper.UI.GameObjectMatchers
         /// <inheritdoc/>
         public override string ToString()
         {
-            var builder = new StringBuilder($"type={_componentType}");
+            var builder = new StringBuilder($"type={ComponentType}");
             if (_name != null)
             {
                 builder.Append($", name={_name}");
@@ -70,7 +69,7 @@ namespace TestHelper.UI.GameObjectMatchers
         /// <inheritdoc/>
         public bool IsMatch(GameObject gameObject)
         {
-            if (!gameObject.TryGetComponent(_componentType, out _))
+            if (!gameObject.TryGetComponent(ComponentType, out _))
             {
                 return false;
             }

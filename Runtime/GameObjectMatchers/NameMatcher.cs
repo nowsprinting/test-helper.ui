@@ -14,7 +14,7 @@ namespace TestHelper.UI.GameObjectMatchers
         private readonly string _name;
 
         /// <inheritdoc/>
-        public Type ComponentType => null;
+        public Type ComponentType => typeof(Transform);
 
         /// <summary>
         /// Constructor with name.

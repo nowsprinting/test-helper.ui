@@ -15,7 +15,7 @@ namespace TestHelper.UI.GameObjectMatchers
         private readonly string _path;
 
         /// <inheritdoc/>
-        public Type ComponentType => null;
+        public Type ComponentType => typeof(Transform);
 
         /// <summary>
         /// Constructor with hierarchy path.
