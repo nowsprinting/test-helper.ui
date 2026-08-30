@@ -1,6 +1,7 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using TestHelper.UI.Extensions;
 using UnityEngine;
 
@@ -9,9 +10,15 @@ namespace TestHelper.UI.GameObjectMatchers
     /// <summary>
     /// <see cref="GameObject"/> matcher that matchers by hierarchy path.
     /// </summary>
+    /// <remarks>
+    /// Using a matcher that lets you specify the component type improves both execution performance and memory usage.
+    /// </remarks>
     public class PathMatcher : IGameObjectMatcher
     {
         private readonly string _path;
+
+        /// <inheritdoc/>
+        public Type ComponentType => typeof(Transform);
 
         /// <summary>
         /// Constructor with hierarchy path.

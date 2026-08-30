@@ -25,6 +25,9 @@ Constructor arguments:
 - **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
 - **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 
+> [!WARNING]\
+> A `GameObjectFinder` instance reuses internal buffers across find calls for performance. Running multiple finds concurrently on the same instance corrupts their results; use a separate instance per concurrent find.
+
 
 #### Find GameObject by name
 
@@ -56,6 +59,9 @@ public class MyIntegrationTest
 }
 ```
 
+> [!TIP]\
+> When you can identify the component type, using `FindByMatcherAsync` is more advantageous in both execution speed and memory usage.
+
 
 #### Find GameObject by path
 
@@ -86,6 +92,9 @@ public class MyIntegrationTest
     }
 }
 ```
+
+> [!TIP]\
+> When you can identify the component type, using `FindByMatcherAsync` is more advantageous in both execution speed and memory usage.
 
 
 #### Find GameObject by matcher
@@ -125,6 +134,9 @@ public class MyIntegrationTest
     }
 }
 ```
+
+> [!TIP]\
+> A matcher that can specify a component type is more advantageous in both execution speed and memory usage than a matcher based only on `name` or `path`.
 
 
 #### Find GameObject in pageable component
@@ -560,6 +572,11 @@ The `DefaultReachableStrategy` constructor accepts optional parameters:
 
 If your game title uses a custom UI framework that is not uGUI compatible and/or requires custom conditions for searching, you can implement the `IGameObjectMatcher` interface.
 The custom matcher can be specified as an argument to the `GameObjectFinder.FindByMatcherAsync` method.
+
+A matcher must implement the following members:
+
+- `ComponentType` property to return the component type that `GameObjectFinder` uses to collect candidate `GameObjects` before evaluating `IsMatch`. Return `typeof(Transform)` if the matcher has no component criterion. An interface or other non-`Component` type is also allowed; `GameObjectFinder` then falls back to `typeof(Transform)` for candidate collection and `IsMatch` does the filtering
+- `IsMatch` method to determine whether the specified `GameObject` matches the criteria
 
 For example, the built-in `ButtonMatcher` class's `IsMatch` method returns `true` for `GameObjects` that match the specified button element `name`, `path`, `text`, and `texture`.
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace TestHelper.UI.GameObjectMatchers
@@ -13,6 +14,21 @@ namespace TestHelper.UI.GameObjectMatchers
     [TestFixture]
     public class ComponentMatcherTest
     {
+        [Test]
+        [Category("Acceptance")]
+        public void ComponentType_WithoutComponentType_ReturnsComponent()
+        {
+            var sut = new ComponentMatcher();
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Component)));
+        }
+
+        [Test]
+        public void ComponentType_WithComponentType_ReturnsSpecifiedType()
+        {
+            var sut = new ComponentMatcher(componentType: typeof(Transform));
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Transform)));
+        }
+
         [Test]
         public void ToString_WithoutArguments_ReturnsOnlyType()
         {
@@ -70,6 +86,17 @@ namespace TestHelper.UI.GameObjectMatchers
             var sut = new ComponentMatcher(path: "/Path/To/Transform");
             var actual = sut.IsMatch(CreateGameObject(path: "/Path/To/Not/Transform"));
             Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [Category("Acceptance")]
+        [CreateScene]
+        public void IsMatch_ComponentTypeIsInterface_ReturnsTrue()
+        {
+            var sut = new ComponentMatcher(componentType: typeof(IPointerClickHandler));
+            var actual =
+                sut.IsMatch(CreateGameObject(componentType: typeof(Button))); // Button implements IPointerClickHandler
+            Assert.That(actual, Is.True);
         }
 
         [Test]

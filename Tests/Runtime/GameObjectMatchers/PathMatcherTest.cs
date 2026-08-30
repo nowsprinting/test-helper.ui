@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Linq;
@@ -11,6 +11,14 @@ namespace TestHelper.UI.GameObjectMatchers
     [TestFixture]
     public class PathMatcherTest
     {
+        [Test]
+        [Category("Acceptance")]
+        public void ComponentType_ReturnsTransform()
+        {
+            var sut = new PathMatcher("/Path/To/Button");
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Transform)));
+        }
+
         [Test]
         public void ToString_ReturnsWithPath()
         {

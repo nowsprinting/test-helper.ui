@@ -9,7 +9,6 @@ using TestHelper.UI.Strategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
 
 namespace TestHelper.UI
 {
@@ -140,14 +139,7 @@ namespace TestHelper.UI
 
         private static MonoBehaviour[] FindMonoBehaviours()
         {
-#if UNITY_6000_4_OR_NEWER
-            return Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);
-#elif UNITY_2022_3_OR_NEWER
-            return Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            // Note: Supported in Unity 2020.3.4, 2021.3.18, 2022.2.5 or later.
-#else
-            return Object.FindObjectsOfType<MonoBehaviour>();
-#endif
+            return ObjectExtensions.FindObjectsByType<MonoBehaviour>();
         }
     }
 }

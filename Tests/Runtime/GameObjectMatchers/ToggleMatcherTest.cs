@@ -1,10 +1,11 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.UI.TestDoubles;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,21 @@ namespace TestHelper.UI.GameObjectMatchers
     [TestFixture]
     public class ToggleMatcherTest
     {
+        [Test]
+        [Category("Acceptance")]
+        public void ComponentType_WithoutComponentType_ReturnsToggle()
+        {
+            var sut = new ToggleMatcher();
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Toggle)));
+        }
+
+        [Test]
+        public void ComponentType_WithComponentType_ReturnsSpecifiedType()
+        {
+            var sut = new ToggleMatcher(componentType: typeof(FakeComponent));
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(FakeComponent)));
+        }
+
         [Test]
         public void ToString_WithoutArguments_ReturnsOnlyType()
         {

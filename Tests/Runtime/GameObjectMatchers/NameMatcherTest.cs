@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using NUnit.Framework;
@@ -10,6 +10,14 @@ namespace TestHelper.UI.GameObjectMatchers
     [TestFixture]
     public class NameMatcherTest
     {
+        [Test]
+        [Category("Acceptance")]
+        public void ComponentType_ReturnsTransform()
+        {
+            var sut = new NameMatcher("Button");
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Transform)));
+        }
+
         [Test]
         public void ToString_ReturnsWithName()
         {

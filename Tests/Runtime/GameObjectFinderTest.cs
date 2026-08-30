@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -17,6 +16,7 @@ using TestHelper.UI.Strategies;
 using TestHelper.UI.TestDoubles;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Is = TestHelper.Constraints.Is;
@@ -359,6 +359,19 @@ namespace TestHelper.UI
                 var result = await _sut.FindByNameAsync(target.name);
                 Assert.That(result.GameObject, Is.EqualTo(target));
             }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByNameAsync_MultipleScenesLoaded_Found()
+            {
+                var target = GameObject.Find("EventHandler");
+
+                var additiveScene = SceneManager.CreateScene("AdditiveScene");
+                SceneManager.MoveGameObjectToScene(target, additiveScene);
+
+                var result = await _sut.FindByNameAsync(target.name);
+                Assert.That(result.GameObject, Is.EqualTo(target));
+            }
         }
 
         [TestFixture]
@@ -640,6 +653,56 @@ namespace TestHelper.UI
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
                 Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("hand_slash"));
+            }
+        }
+
+        [TestFixture]
+        public class Matcher
+        {
+            private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
+
+            [Test]
+            [Category("Acceptance")]
+            [CreateScene]
+            public async Task FindByMatcherAsync_MultipleComponentsOfSameTypeOnOneGameObject_Found()
+            {
+                var target = new GameObject("Target");
+                target.AddComponent<BoxCollider>();
+                target.AddComponent<BoxCollider>();
+
+                var matcher = new ComponentMatcher(componentType: typeof(BoxCollider));
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+
+                Assert.That(result.GameObject, Is.EqualTo(target));
+            }
+
+            [Test]
+            [Category("Acceptance")]
+            [CreateScene]
+            public async Task FindByMatcherAsync_DefaultComponentTypeOnGameObjectWithMultipleComponents_Found()
+            {
+                var target = new GameObject("Target");
+                target.AddComponent<BoxCollider>();
+                target.AddComponent<AudioSource>();
+
+                var matcher = new ComponentMatcher(name: "Target"); // component type defaults to Component
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+
+                Assert.That(result.GameObject, Is.EqualTo(target));
+            }
+
+            [Test]
+            [Category("Acceptance")]
+            [CreateScene]
+            public async Task FindByMatcherAsync_ComponentTypeIsInterface_Found()
+            {
+                var target = new GameObject("Target");
+                target.AddComponent<Button>(); // Button implements IPointerClickHandler
+
+                var matcher = new ComponentMatcher(componentType: typeof(IPointerClickHandler));
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+
+                Assert.That(result.GameObject, Is.EqualTo(target));
             }
         }
 

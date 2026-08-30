@@ -1,9 +1,10 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.UI.TestDoubles;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,21 @@ namespace TestHelper.UI.GameObjectMatchers
     [TestFixture]
     public class ButtonMatcherTest
     {
+        [Test]
+        [Category("Acceptance")]
+        public void ComponentType_WithoutComponentType_ReturnsButton()
+        {
+            var sut = new ButtonMatcher();
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(Button)));
+        }
+
+        [Test]
+        public void ComponentType_WithComponentType_ReturnsSpecifiedType()
+        {
+            var sut = new ButtonMatcher(componentType: typeof(FakeComponent));
+            Assert.That(sut.ComponentType, Is.EqualTo(typeof(FakeComponent)));
+        }
+
         [Test]
         public void ToString_WithoutArguments_ReturnsOnlyType()
         {

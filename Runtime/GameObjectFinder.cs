@@ -7,28 +7,38 @@ using System.Globalization;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.UI.Exceptions;
+using TestHelper.UI.Extensions;
 using TestHelper.UI.GameObjectMatchers;
 using TestHelper.UI.Paginators;
 using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
-using Object = UnityEngine.Object;
 
 namespace TestHelper.UI
 {
     /// <summary>
     /// Find <c>GameObject</c> by name or path (glob). Wait until they appear.
     /// </summary>
+    /// <remarks>
+    /// A <see cref="GameObjectFinder"/> instance reuses internal buffers across find calls for performance.
+    /// Running multiple finds concurrently on the same instance corrupts their results; use a separate instance
+    /// per concurrent find.
+    /// </remarks>
     public class GameObjectFinder
     {
-        private static Scene s_dontDestroyOnLoadScene;
-
         private readonly double _timeoutSeconds;
         private readonly IReachableStrategy _reachableStrategy;
         private readonly Func<Component, bool> _isInteractable;
         private readonly IVisualizer _visualizer;
+
+        // Reused across find calls to avoid reallocating per poll; not safe for concurrent
+        // finds on the same instance.
+        private readonly HashSet<GameObject> _seenObjects = new HashSet<GameObject>();
+        private readonly List<GameObject> _foundObjects = new List<GameObject>();
+
+        private readonly Dictionary<GameObject, RaycastResult> _raycastResults =
+            new Dictionary<GameObject, RaycastResult>();
 
         private const double MinTimeoutSeconds = 0.01d;
         private const double MaxPollingIntervalSeconds = 1.0d;
@@ -58,56 +68,6 @@ namespace TestHelper.UI
             _visualizer = visualizer;
         }
 
-        private static Scene GetDontDestroyOnLoadScene()
-        {
-            if (s_dontDestroyOnLoadScene.IsValid())
-            {
-                return s_dontDestroyOnLoadScene;
-            }
-
-            var gameObject = new GameObject("DontDestroyOnLoad Object, Created by GameObjectFinder");
-            Object.DontDestroyOnLoad(gameObject);
-            s_dontDestroyOnLoadScene = gameObject.scene;
-
-            return s_dontDestroyOnLoadScene;
-        }
-
-        private static List<Scene> GetAllScenes()
-        {
-            var scenes = new List<Scene> { GetDontDestroyOnLoadScene() };
-            for (var i = 0; i < SceneManager.sceneCount; i++)
-            {
-                var scene = SceneManager.GetSceneAt(i);
-                if (scene.isLoaded)
-                {
-                    scenes.Add(scene);
-                }
-            }
-
-            return scenes;
-        }
-
-        private static IEnumerable<GameObject> FindGameObjectRecursive(GameObject current, IGameObjectMatcher matcher)
-        {
-            if (!current.activeInHierarchy)
-            {
-                yield break;
-            }
-
-            if (matcher.IsMatch(current))
-            {
-                yield return current;
-            }
-
-            foreach (Transform childTransform in current.transform)
-            {
-                foreach (var found in FindGameObjectRecursive(childTransform.gameObject, matcher))
-                {
-                    yield return found;
-                }
-            }
-        }
-
         private enum Reason
         {
             NotFound,
@@ -117,13 +77,15 @@ namespace TestHelper.UI
             None
         }
 
-        private bool FilterToOnlyReachable(ref List<GameObject> objects)
+        private bool FilterToOnlyReachable(ref List<GameObject> objects,
+            Dictionary<GameObject, RaycastResult> raycastResults)
         {
             for (var i = objects.Count - 1; i >= 0; i--)
             {
                 var current = objects[i];
                 if (_reachableStrategy.IsReachable(current, out var raycastResult))
                 {
+                    raycastResults.Add(current, raycastResult);
                     continue;
                 }
 
@@ -164,39 +126,55 @@ namespace TestHelper.UI
             return false;
         }
 
-        private static List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher, Scene scene)
+        private List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher)
         {
-            var scenes = scene != default ? new List<Scene> { scene } : GetAllScenes();
-            var foundObjects = new List<GameObject>();
-            var rootGameObjects = new List<GameObject>();
-            foreach (var loadedScene in scenes)
+            var componentType = matcher.ComponentType;
+            if (componentType == null || componentType == typeof(Component) ||
+                !typeof(Component).IsAssignableFrom(componentType))
             {
-                // Do not rely on GetRootGameObjects clearing the buffer. It does not on Unity 6000.5,
-                // so a reused buffer keeps the previous scenes' roots and walks them again. With three
-                // or more scenes loaded, that makes a single GameObject match more than once.
-                rootGameObjects.Clear();
-                loadedScene.GetRootGameObjects(rootGameObjects);
-                foreach (var rootGameObject in rootGameObjects)
+                // Transform yields exactly one hit per GameObject, so remap types the native query
+                // handles poorly: null (a custom matcher without a hint), typeof(Component) (returns
+                // every component instance in the scene), and non-Object-derived types such as
+                // interfaces (rejected by FindObjectsByType). matcher.IsMatch still applies the
+                // matcher's own criteria either way.
+                componentType = typeof(Transform);
+            }
+
+            var components = ObjectExtensions.FindObjectsByType(componentType);
+
+            // Dedupe by GameObject: FindObjectsByType returns one hit per component instance,
+            // so a GameObject holding multiple matching components would otherwise be judged
+            // as multiple matches.
+            _seenObjects.Clear();
+            _foundObjects.Clear();
+            foreach (var component in components)
+            {
+                var gameObject = ((Component)component).gameObject;
+                if (_seenObjects.Add(gameObject) && matcher.IsMatch(gameObject))
                 {
-                    foundObjects.AddRange(FindGameObjectRecursive(rootGameObject, matcher));
+                    _foundObjects.Add(gameObject);
                 }
             }
 
-            return foundObjects;
+            return _foundObjects;
         }
 
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
-            bool reachable, bool interactable, Scene scene = default)
+            bool reachable, bool interactable)
         {
-            var foundObjects = FindAllByMatcher(matcher, scene);
+            var foundObjects = FindAllByMatcher(matcher);
             if (foundObjects.Count == 0)
             {
                 return (null, default, Reason.NotFound);
             }
 
-            if (reachable && !FilterToOnlyReachable(ref foundObjects))
+            if (reachable)
             {
-                return (null, default, Reason.NotReachable);
+                _raycastResults.Clear();
+                if (!FilterToOnlyReachable(ref foundObjects, _raycastResults))
+                {
+                    return (null, default, Reason.NotReachable);
+                }
             }
 
             if (interactable && !FilterToOnlyInteractable(ref foundObjects))
@@ -209,13 +187,12 @@ namespace TestHelper.UI
                 return (null, default, Reason.MultipleMatching);
             }
 
+            // Reuse the raycast captured while filtering; raycasting the survivor again would
+            // repeat the most expensive step of the poll for an identical same-frame result.
+            // RaycastResult is a struct, so this indexer read copies out of _raycastResults;
+            // the caller's value survives the field being Cleared on the next find.
             var resultObject = foundObjects[0];
-            if (!reachable)
-            {
-                return (resultObject, new RaycastResult(), Reason.None);
-            }
-
-            _reachableStrategy.IsReachable(resultObject, out var raycastResult);
+            var raycastResult = reachable ? _raycastResults[resultObject] : new RaycastResult();
             return (resultObject, raycastResult, Reason.None);
         }
 
@@ -233,7 +210,12 @@ namespace TestHelper.UI
 
             while (nextPage)
             {
+                // FindByMatcher is a synchronous scene snapshot, not a blocking variant of
+                // FindByMatcherAsync; awaiting the async method here would recurse into the
+                // polling wrapper that calls this method.
+#pragma warning disable VSTHRD103
                 var (foundObject, raycastResult, reason) = FindByMatcher(matcher, reachable, interactable);
+#pragma warning restore VSTHRD103
 
                 if (foundObject != null)
                 {
@@ -316,6 +298,9 @@ namespace TestHelper.UI
         /// <summary>
         /// Find <c>GameObject</c> by name (wait until they appear).
         /// </summary>
+        /// <remarks>
+        /// When you can identify the component type, using <see cref="FindByMatcherAsync"/> is more advantageous in both execution speed and memory usage.
+        /// </remarks>
         /// <param name="name">Find <c>GameObject</c> name</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
@@ -336,6 +321,9 @@ namespace TestHelper.UI
         /// <summary>
         /// Find <c>GameObject</c> by path (wait until they appear).
         /// </summary>
+        /// <remarks>
+        /// When you can identify the component type, using <see cref="FindByMatcherAsync"/> is more advantageous in both execution speed and memory usage.
+        /// </remarks>
         /// <param name="path">Find <c>GameObject</c> hierarchy path separated by `/`. Can specify wildcards of glob pattern (`?`, `*`, and `**`).</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
