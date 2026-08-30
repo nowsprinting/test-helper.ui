@@ -64,13 +64,16 @@ namespace TestHelper.UI
             None
         }
 
-        private bool FilterToOnlyReachable(ref List<GameObject> objects)
+        private bool FilterToOnlyReachable(ref List<GameObject> objects,
+            out Dictionary<GameObject, RaycastResult> raycastResults)
         {
+            raycastResults = new Dictionary<GameObject, RaycastResult>(objects.Count);
             for (var i = objects.Count - 1; i >= 0; i--)
             {
                 var current = objects[i];
                 if (_reachableStrategy.IsReachable(current, out var raycastResult))
                 {
+                    raycastResults.Add(current, raycastResult);
                     continue;
                 }
 
@@ -151,7 +154,8 @@ namespace TestHelper.UI
                 return (null, default, Reason.NotFound);
             }
 
-            if (reachable && !FilterToOnlyReachable(ref foundObjects))
+            Dictionary<GameObject, RaycastResult> raycastResults = null;
+            if (reachable && !FilterToOnlyReachable(ref foundObjects, out raycastResults))
             {
                 return (null, default, Reason.NotReachable);
             }
@@ -166,13 +170,10 @@ namespace TestHelper.UI
                 return (null, default, Reason.MultipleMatching);
             }
 
+            // Reuse the raycast captured while filtering; raycasting the survivor again would
+            // repeat the most expensive step of the poll for an identical same-frame result.
             var resultObject = foundObjects[0];
-            if (!reachable)
-            {
-                return (resultObject, new RaycastResult(), Reason.None);
-            }
-
-            _reachableStrategy.IsReachable(resultObject, out var raycastResult);
+            var raycastResult = reachable ? raycastResults[resultObject] : new RaycastResult();
             return (resultObject, raycastResult, Reason.None);
         }
 
