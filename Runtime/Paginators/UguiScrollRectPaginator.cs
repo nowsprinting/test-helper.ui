@@ -137,14 +137,19 @@ namespace TestHelper.UI.Paginators
             return viewport?.rect.size ?? Vector2.zero;
         }
 
+        // An axis whose scroll amount is zero (viewport not laid out yet, or content fits in the viewport) is
+        // treated as at the end; judging by normalizedPosition alone would let NextPageAsync return true forever
+        // because the position can never advance.
         private bool IsHorizontalAtEnd()
         {
-            return _scrollRect.normalizedPosition.x >= 1.0f - float.Epsilon;
+            return CalculateHorizontalScrollAmount() <= 0f
+                   || _scrollRect.normalizedPosition.x >= 1.0f - float.Epsilon;
         }
 
         private bool IsVerticalAtEnd()
         {
-            return _scrollRect.normalizedPosition.y <= 0.0f + float.Epsilon;
+            return CalculateVerticalScrollAmount() <= 0f
+                   || _scrollRect.normalizedPosition.y <= 0.0f + float.Epsilon;
         }
 
         private float CalculateHorizontalScrollAmount()

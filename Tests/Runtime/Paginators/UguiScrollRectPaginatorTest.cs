@@ -207,7 +207,8 @@ namespace TestHelper.UI.Paginators
         [Category("Acceptance")]
         public async Task NextPageAsync_ViewportSizeIsZero_ReturnsFalse(bool horizontal, bool vertical)
         {
-            var scrollRect = CreateScrollRectWithZeroSizeViewport();
+            // A zero-size viewport reproduces the state before Unity's layout calculation.
+            var scrollRect = CreateScrollRect(Vector2.zero, new Vector2(500f, 500f));
             scrollRect.horizontal = horizontal;
             scrollRect.vertical = vertical;
             var sut = new UguiScrollRectPaginator(scrollRect);
@@ -219,16 +220,81 @@ namespace TestHelper.UI.Paginators
             Assert.That(scrollRect.normalizedPosition, Is.EqualTo(beforePosition), "normalizedPosition");
         }
 
-        private static ScrollRect CreateScrollRectWithZeroSizeViewport()
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(true, true)]
+        [CreateScene]
+        public async Task NextPageAsync_ContentFitsViewport_ReturnsFalse(bool horizontal, bool vertical)
         {
-            // Reproduces the state before Unity's layout calculation, where the viewport rect is still zero-size.
+            var scrollRect = CreateScrollRect(new Vector2(100f, 100f), new Vector2(50f, 50f));
+            scrollRect.horizontal = horizontal;
+            scrollRect.vertical = vertical;
+            var sut = new UguiScrollRectPaginator(scrollRect);
+            var beforePosition = scrollRect.normalizedPosition;
+
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.False, "return value");
+            Assert.That(scrollRect.normalizedPosition, Is.EqualTo(beforePosition), "normalizedPosition");
+        }
+
+        [Test]
+        [CreateScene]
+        public async Task NextPageAsync_BothScrollHorizontalContentFitsViewport_ScrollsVerticallyAndReturnsTrue()
+        {
+            var scrollRect = CreateScrollRect(new Vector2(100f, 100f), new Vector2(50f, 500f));
+            var sut = new UguiScrollRectPaginator(scrollRect);
+            var beforePosition = scrollRect.normalizedPosition;
+
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.True, "return value");
+            Assert.That(scrollRect.normalizedPosition.x, Is.EqualTo(beforePosition.x), "normalizedPosition.x");
+            Assert.That(scrollRect.normalizedPosition.y, Is.LessThan(beforePosition.y), "normalizedPosition.y");
+        }
+
+        [Test]
+        [CreateScene]
+        public async Task NextPageAsync_BothScrollHorizontalAtEndAndVerticalContentFitsViewport_ReturnsFalse()
+        {
+            var scrollRect = CreateScrollRect(new Vector2(100f, 100f), new Vector2(500f, 50f));
+            // Shift content down so that verticalNormalizedPosition reads 1 (not at end) although the axis cannot advance.
+            scrollRect.content.anchoredPosition = new Vector2(0f, -100f);
+            scrollRect.horizontalNormalizedPosition = 1f;
+            Assume.That(scrollRect.verticalNormalizedPosition, Is.EqualTo(1f));
+            var sut = new UguiScrollRectPaginator(scrollRect);
+            var beforePosition = scrollRect.normalizedPosition;
+
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.False, "return value");
+            Assert.That(scrollRect.normalizedPosition, Is.EqualTo(beforePosition), "normalizedPosition");
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task NextPageAsync_AfterResetAsyncFollowingPaginationEnd_ScrollsAndReturnsTrue()
+        {
+            var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
+            scrollRect.normalizedPosition = new Vector2(1f, 0f);
+            var sut = new UguiScrollRectPaginator(scrollRect);
+            Assume.That(await sut.NextPageAsync(), Is.False);
+
+            await sut.ResetAsync();
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.True, "return value");
+            Assert.That(scrollRect.normalizedPosition.x, Is.GreaterThan(0f), "normalizedPosition.x");
+        }
+
+        private static ScrollRect CreateScrollRect(Vector2 viewportSize, Vector2 contentSize)
+        {
             var scrollRect = new GameObject("Scroll View", typeof(RectTransform)).AddComponent<ScrollRect>();
-            ((RectTransform)scrollRect.transform).sizeDelta = Vector2.zero;
+            ((RectTransform)scrollRect.transform).sizeDelta = viewportSize;
             var content = new GameObject("Content", typeof(RectTransform)).GetComponent<RectTransform>();
             content.SetParent(scrollRect.transform, false);
-            content.sizeDelta = new Vector2(500f, 500f);
+            content.sizeDelta = contentSize;
             scrollRect.content = content;
-            Assume.That(((RectTransform)scrollRect.transform).rect.size, Is.EqualTo(Vector2.zero));
             return scrollRect;
         }
 
