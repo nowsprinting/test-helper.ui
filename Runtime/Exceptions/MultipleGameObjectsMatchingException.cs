@@ -10,7 +10,7 @@ namespace TestHelper.UI.Exceptions
     /// Detected multiple <c>GameObject</c>s matching the specified criteria.
     /// </summary>
     [Serializable]
-    public class MultipleGameObjectsMatchingException : ApplicationException
+    public class MultipleGameObjectsMatchingException : Exception
     {
         public MultipleGameObjectsMatchingException() { }
 
