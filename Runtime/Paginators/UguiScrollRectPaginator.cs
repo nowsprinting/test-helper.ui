@@ -109,26 +109,9 @@ namespace TestHelper.UI.Paginators
         /// <inheritdoc />
         public bool HasNextPage()
         {
-            // End determination for bidirectional scrolling
-            if (_scrollRect.horizontal && _scrollRect.vertical)
-            {
-                // Return false only when both horizontal and vertical directions have reached the end
-                return !(IsHorizontalAtEnd() && IsVerticalAtEnd());
-            }
-
-            // For unidirectional scrolling
-            if (_scrollRect.horizontal)
-            {
-                return !IsHorizontalAtEnd();
-            }
-
-            if (_scrollRect.vertical)
-            {
-                return !IsVerticalAtEnd();
-            }
-
-            // When scrolling is disabled
-            return false;
+            // Dispatching by _scrollRect.horizontal/vertical is unnecessary: a disabled axis has a zero scroll
+            // amount, so IsHorizontalAtEnd/IsVerticalAtEnd already report it as at the end.
+            return !(IsHorizontalAtEnd() && IsVerticalAtEnd());
         }
 
         private Vector2 CalculateViewportSize()
@@ -137,14 +120,19 @@ namespace TestHelper.UI.Paginators
             return viewport?.rect.size ?? Vector2.zero;
         }
 
+        // An axis whose scroll amount is zero (viewport not laid out yet, or content fits in the viewport) is
+        // treated as at the end; judging by normalizedPosition alone would let NextPageAsync return true forever
+        // because the position can never advance.
         private bool IsHorizontalAtEnd()
         {
-            return _scrollRect.normalizedPosition.x >= 1.0f - float.Epsilon;
+            return CalculateHorizontalScrollAmount() <= 0f
+                   || _scrollRect.normalizedPosition.x >= 1.0f - float.Epsilon;
         }
 
         private bool IsVerticalAtEnd()
         {
-            return _scrollRect.normalizedPosition.y <= 0.0f + float.Epsilon;
+            return CalculateVerticalScrollAmount() <= 0f
+                   || _scrollRect.normalizedPosition.y <= 0.0f + float.Epsilon;
         }
 
         private float CalculateHorizontalScrollAmount()

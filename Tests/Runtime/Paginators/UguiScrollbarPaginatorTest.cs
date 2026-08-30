@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Threading.Tasks;
@@ -133,6 +133,57 @@ namespace TestHelper.UI.Paginators
 
             // Value increase should be based on scrollbar.size
             Assert.That(scrollbar.value, Is.EqualTo(scrollbar.size).Within(0.05f));
+        }
+
+        [Test]
+        [CreateScene]
+        [Category("Acceptance")]
+        public async Task NextPageAsync_ScrollbarSizeIsZero_ReturnsFalse()
+        {
+            // A zero size reproduces the state before Unity's layout calculation. A script-created Scrollbar is
+            // used because a scene Scrollbar is driven by its ScrollRect, which rewrites the size every frame.
+            var scrollbar = CreateScrollbar(size: 0f, value: 0f);
+            var sut = new UguiScrollbarPaginator(scrollbar);
+
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.False, "return value");
+            Assert.That(scrollbar.value, Is.EqualTo(0f), "value");
+        }
+
+        [Test]
+        [CreateScene]
+        [Category("Acceptance")]
+        public async Task NextPageAsync_ScrollbarSizeIsOne_ValueBecomesOneAndReturnsTrue()
+        {
+            var scrollbar = CreateScrollbar(size: 1f, value: 0f);
+            var sut = new UguiScrollbarPaginator(scrollbar);
+
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.True, "return value");
+            Assert.That(scrollbar.value, Is.EqualTo(1f), "value");
+        }
+
+        [TestCase(0f)]
+        [TestCase(0.5f)]
+        [CreateScene]
+        public void HasNextPage_ScrollbarSizeIsZero_ReturnsFalse(float value)
+        {
+            var scrollbar = CreateScrollbar(size: 0f, value: value);
+            var sut = new UguiScrollbarPaginator(scrollbar);
+
+            var actual = sut.HasNextPage();
+
+            Assert.That(actual, Is.False);
+        }
+
+        private static Scrollbar CreateScrollbar(float size, float value)
+        {
+            var scrollbar = new GameObject("Scrollbar", typeof(RectTransform)).AddComponent<Scrollbar>();
+            scrollbar.size = size;
+            scrollbar.value = value;
+            return scrollbar;
         }
 
         [TestCase(0f)]
