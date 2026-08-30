@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,6 +46,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchComponentType_ReturnsFalse()
         {
             var sut = new ComponentMatcher(componentType: typeof(Button)); // UnityEngine.UI.Button
@@ -53,6 +55,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchName_ReturnsFalse()
         {
             var sut = new ComponentMatcher(name: "transform");
@@ -61,6 +64,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchPath_ReturnsFalse()
         {
             var sut = new ComponentMatcher(path: "/Path/To/Transform");
@@ -69,6 +73,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_MatchAllProperties_ReturnsTrue()
         {
             var sut = new ComponentMatcher(

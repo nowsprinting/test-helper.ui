@@ -12,7 +12,7 @@ namespace TestHelper.UI.Random
     public class RandomStringTest
     {
         [Test]
-        public void NextDigits()
+        public void Next_DigitsKind_ReturnsDigitsWithinLength()
         {
             // Property-based testing
             for (var i = 0; i < 1000; i++)
@@ -26,7 +26,7 @@ namespace TestHelper.UI.Random
         }
 
         [Test]
-        public void NextAlphanumeric()
+        public void Next_AlphanumericKind_ReturnsAlphanumericWithinLength()
         {
             // Property-based testing
             for (var i = 0; i < 1000; i++)
@@ -40,7 +40,7 @@ namespace TestHelper.UI.Random
         }
 
         [Test]
-        public void NextPrintable()
+        public void Next_PrintableKind_ReturnsPrintableWithinLength()
         {
             // Property-based testing
             for (var i = 0; i < 1000; i++)

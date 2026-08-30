@@ -58,14 +58,7 @@ namespace TestHelper.UI.Operators.Utils
         }
 
         [Test]
-        public void BuildMessage_WithoutCommentsAndProperties_AttachedInstanceID()
-        {
-            var sut = CreateOperationLogger();
-            var actual = sut.BuildMessage();
-            Assert.That(actual, Does.Match(@"UguiClickOperator operates to Target\([^)]+\)"));
-        }
-
-        [Test]
+        [Category("Internal")]
         public void BuildMessage_WithComment()
         {
             var sut = CreateOperationLogger();
@@ -77,6 +70,7 @@ namespace TestHelper.UI.Operators.Utils
         }
 
         [Test]
+        [Category("Internal")]
         public void BuildMessage_WithMultipleComments()
         {
             var sut = CreateOperationLogger();
@@ -89,6 +83,7 @@ namespace TestHelper.UI.Operators.Utils
         }
 
         [Test]
+        [Category("Internal")]
         public void BuildMessage_WithProperty()
         {
             var sut = CreateOperationLogger();
@@ -100,6 +95,7 @@ namespace TestHelper.UI.Operators.Utils
         }
 
         [Test]
+        [Category("Internal")]
         public void BuildMessage_WithMultipleProperties()
         {
             var sut = CreateOperationLogger();

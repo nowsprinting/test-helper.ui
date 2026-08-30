@@ -42,7 +42,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene(TestScene)]
-            public void FindInteractiveObjects_findAllInteractiveObjects()
+            public void FindInteractableComponents_ReturnsAllInteractableComponents()
             {
                 var actual = new InteractableComponentsFinder(operators: new OperatorPool())
                     .FindInteractableComponents()
@@ -80,7 +80,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene(TestScene)]
-            public void FindInteractiveObjects_findAllInteractiveObjects()
+            public void FindInteractableComponents_ReturnsAllInteractableComponents()
             {
                 var actual = new InteractableComponentsFinder(operators: new OperatorPool())
                     .FindInteractableComponents()
@@ -134,7 +134,7 @@ namespace TestHelper.UI
 
                 [Test]
                 [LoadScene(TestScene)]
-                public void FindInteractiveObjects_findAllInteractiveObjects()
+                public void FindInteractableComponents_ReturnsAllInteractableComponents()
                 {
                     var actual = new InteractableComponentsFinder(operators: new OperatorPool())
                         .FindInteractableComponents()
@@ -154,7 +154,7 @@ namespace TestHelper.UI
 
                 [Test]
                 [LoadScene(TestScene)]
-                public void FindInteractiveObjects_findAllInteractiveObjects()
+                public void FindInteractableComponents_ReturnsAllInteractableComponents()
                 {
                     var actual = new InteractableComponentsFinder(operators: new OperatorPool())
                         .FindInteractableComponents()
@@ -174,7 +174,7 @@ namespace TestHelper.UI
 
                 [Test]
                 [LoadScene(TestScene)]
-                public void FindInteractiveObjects_findAllInteractiveObjects()
+                public void FindInteractableComponents_ReturnsAllInteractableComponents()
                 {
                     var actual = new InteractableComponentsFinder(operators: new OperatorPool())
                         .FindInteractableComponents()
@@ -190,7 +190,7 @@ namespace TestHelper.UI
         {
             [Test]
             [CreateScene(unloadOthers: true)]
-            public void FindEventHandlers_HitEventHandler()
+            public void FindEventHandlers_AttachedIPointerClickHandler_ReturnsComponent()
             {
                 var button = new GameObject().AddComponent<Button>();
                 var expected = new[] { button };
@@ -202,7 +202,7 @@ namespace TestHelper.UI
 
             [Test]
             [CreateScene(unloadOthers: true)]
-            public void FindEventHandlers_HitEventTrigger()
+            public void FindEventHandlers_AttachedEventTrigger_ReturnsComponent()
             {
                 var eventTrigger = new GameObject().AddComponent<EventTrigger>();
                 eventTrigger.triggers.Add(new EventTrigger.Entry

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -27,7 +26,6 @@ using Is = TestHelper.Constraints.Is;
 namespace TestHelper.UI
 {
     [TestFixture]
-    [SuppressMessage("ReSharper", "MethodSupportsCancellation")]
     public class MonkeyTest
     {
         private const string TestScene = "../Scenes/Operators.unity";
@@ -48,6 +46,7 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene(TestScene)]
+        [Category("Internal")]
         public async Task RunStep_finish()
         {
             var config = new MonkeyConfig();
@@ -63,6 +62,7 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene(TestScene)]
+        [Category("Internal")]
         public async Task RunStep_noInteractiveComponent_DoNoAction()
         {
             // Make to no interactable objects
@@ -133,8 +133,9 @@ namespace TestHelper.UI
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                var task = Monkey.Run(config, cancellationToken: cancellationTokenSource.Token);
-                await UniTask.Delay(1000, DelayType.DeltaTime);
+                var cancellationToken = cancellationTokenSource.Token;
+                var task = Monkey.Run(config, cancellationToken: cancellationToken);
+                await UniTask.Delay(1000, DelayType.DeltaTime, cancellationToken: cancellationToken);
 
                 cancellationTokenSource.Cancel();
                 await UniTask.NextFrame();
@@ -235,6 +236,7 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene(TestScene)]
+        [Category("Internal")]
         public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
             var lotteryEntries = Monkey.GetLotteryEntries(_interactableComponentsFinder);
@@ -264,6 +266,7 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene(TestScene)]
+        [Category("Internal")]
         public void GetLotteryEntries_NoOperators_ReturnsEmpty()
         {
             var notHasOperatorFinder = new InteractableComponentsFinder(operators: new OperatorPool());
@@ -273,6 +276,7 @@ namespace TestHelper.UI
         }
 
         [Test]
+        [Category("Internal")]
         public void LotteryOperator_NothingOperators_ReturnNull()
         {
             var operators = Enumerable.Empty<(GameObject, IOperator)>();
@@ -286,6 +290,7 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+        [Category("Internal")]
         public void LotteryOperator_IgnoredObjectOnly_ReturnNull()
         {
             var cube = GameObject.Find("Cube");
@@ -304,6 +309,7 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+        [Category("Internal")]
         public void LotteryOperator_NotReachableObjectOnly_ReturnNull()
         {
             var cube = GameObject.Find("Cube");
@@ -321,6 +327,7 @@ namespace TestHelper.UI
 
         [Test]
         [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+        [Category("Internal")]
         public void LotteryOperator_BingoReachableComponent_ReturnOperator()
         {
             var cube = GameObject.Find("Cube");
@@ -382,17 +389,11 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene(TestScene)]
-            public async Task RunStep_withScreenshots_takeScreenshotsAndSaveToDefaultPath()
+            public async Task Run_OneStepMode_WithScreenshots_TakeScreenshotsAndSaveToDefaultPath()
             {
                 var config = CreateMonkeyConfig(new ScreenshotOptions());
-                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
 
-                await Monkey.RunStep(
-                    config.Random,
-                    config.Logger,
-                    interactableComponentsFinder,
-                    config.IgnoreStrategy,
-                    config.ReachableStrategy);
+                await Monkey.Run(config, oneStepMode: true);
 
                 Assert.That(_path, Does.Exist);
                 Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold));
@@ -400,7 +401,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene(TestScene)]
-            public async Task RunStep_withScreenshots_specifyPath_takeScreenshotsAndSaveToSpecifiedPath()
+            public async Task Run_OneStepMode_WithScreenshots_SpecifyPath_TakeScreenshotsAndSaveToSpecifiedPath()
             {
                 var relativeDirectory = Path.Combine(Application.temporaryCachePath,
                     TestContext.CurrentContext.Test.ClassName);
@@ -418,14 +419,8 @@ namespace TestHelper.UI
                     Directory = relativeDirectory,
                     FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                 });
-                var interactableComponentsFinder = CreateInteractableComponentsFinder(config);
 
-                await Monkey.RunStep(
-                    config.Random,
-                    config.Logger,
-                    interactableComponentsFinder,
-                    config.IgnoreStrategy,
-                    config.ReachableStrategy);
+                await Monkey.Run(config, oneStepMode: true);
 
                 Assert.That(path, Does.Exist);
                 Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
@@ -501,6 +496,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene(TestScene)]
+            [Category("Internal")]
             public void GetLotteryEntries_NotOutputLog()
             {
                 var lotteryEntries = Monkey.GetLotteryEntries(CreateInteractableComponentsFinder());
@@ -511,6 +507,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene(TestScene)]
+            [Category("Internal")]
             public void GetLotteryEntries_LogLotteryEntries()
             {
                 GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
@@ -539,6 +536,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")] // no interactable objects
+            [Category("Internal")]
             public void GetLotteryEntries_NoInteractableObject_LogNoLotteryEntries()
             {
                 var spyLogger = new SpyLogger();
@@ -551,6 +549,7 @@ namespace TestHelper.UI
             }
 
             [Test]
+            [Category("Internal")]
             public void LotteryOperator_NothingOperators_LogNotLottery()
             {
                 var operators = Enumerable.Empty<(GameObject, IOperator)>();
@@ -566,6 +565,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+            [Category("Internal")]
             public void LotteryOperator_IgnoredObjectOnly_LogNotLottery()
             {
                 var cube = GameObject.Find("Cube");
@@ -587,6 +587,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+            [Category("Internal")]
             public void LotteryOperator_NotReachableObjectOnly_LogNotLottery()
             {
                 var cube = GameObject.Find("Cube");
@@ -637,6 +638,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+            [Category("Internal")]
             public async Task LotteryOperator_IgnoredObjectOnly_IgnoredIndicatorIsShown()
             {
                 var cube = GameObject.Find("Cube");
@@ -657,6 +659,7 @@ namespace TestHelper.UI
 
             [Test]
             [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
+            [Category("Internal")]
             public async Task LotteryOperator_NotReachableObjectOnly_NotReachableIndicatorIsShown()
             {
                 var cube = GameObject.Find("Cube");
@@ -714,6 +717,7 @@ namespace TestHelper.UI
             [TestCase("1, 2, 3, 1, 2")] // not looping yet
             [TestCase("1, 2, 2, 2, 2")] // not looping yet
             [TestCase("2, 2, 2, 2, 3")] // precondition is (1, 2, 2, 2, 2), add "3" and remove "1" (buffer overflow)
+            [Category("Internal")]
             public void DetectInfiniteLoop_NotRepeatingSequence_ReturnsFalse(string commaSeparatedSequence)
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {
@@ -725,6 +729,7 @@ namespace TestHelper.UI
             [TestCase("1, 2, 1, 2")]
             [TestCase("1, 2, 3, 1, 2, 3")]
             [TestCase("1, 2, 3, 1, 2, 3, 1")] // one loop and unfinished loop
+            [Category("Internal")]
             public void DetectInfiniteLoop_RepeatingSequence_ReturnsTrue(string commaSeparatedSequence)
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {

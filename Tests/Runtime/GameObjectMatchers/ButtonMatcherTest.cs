@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,6 +54,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchComponentType_ReturnsFalse()
         {
             var sut = new ButtonMatcher();              // UnityEngine.UI.Button
@@ -61,6 +63,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchName_ReturnsFalse()
         {
             var sut = new ButtonMatcher(name: "button");
@@ -69,6 +72,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchPath_ReturnsFalse()
         {
             var sut = new ButtonMatcher(path: "/Path/To/Button");
@@ -77,6 +81,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchText_ReturnsFalse()
         {
             var sut = new ButtonMatcher(text: "Click Me");
@@ -85,6 +90,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchTmpText_ReturnsFalse()
         {
             var sut = new ButtonMatcher(text: "Click Me");
@@ -93,6 +99,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchTexture_ReturnsFalse()
         {
             var sut = new ButtonMatcher(texture: "not_builtin_sprite");
@@ -101,6 +108,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchTexture_ImageWithDestroyedSprite_ReturnsFalse()
         {
             var sut = new ButtonMatcher(texture: "dummy");
@@ -109,6 +117,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_NotMatchTexture_ImageWithoutSprite_ReturnsFalse()
         {
             var sut = new ButtonMatcher(texture: "dummy");
@@ -117,6 +126,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_MatchAllProperties_ReturnsTrue()
         {
             var sut = new ButtonMatcher(
@@ -134,6 +144,7 @@ namespace TestHelper.UI.GameObjectMatchers
         }
 
         [Test]
+        [CreateScene]
         public void IsMatch_MatchAllPropertiesWithTmpText_ReturnsTrue()
         {
             var sut = new ButtonMatcher(

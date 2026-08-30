@@ -51,7 +51,7 @@ namespace TestHelper.UI.Strategies
             [TestCase("ActiveText")]
             [TestCase("Dialog")] // Child objects do not block raycast
             [LoadScene(TestScenePath)]
-            public async Task IsReachable_Reachable(string target)
+            public async Task IsReachable_TargetOnScreenAndUnblocked_Reachable(string target)
             {
                 var result = await _finder.FindByNameAsync(target, reachable: false);
                 Assert.That(new DefaultReachableStrategy().IsReachable(result.GameObject, out _), Is.True);
@@ -60,7 +60,7 @@ namespace TestHelper.UI.Strategies
             [TestCase("OutOfSight")]
             [TestCase("BehindTheWall")]
             [LoadScene(TestScenePath)]
-            public async Task IsReachable_NotReachable(string target)
+            public async Task IsReachable_TargetOffScreenOrBlocked_NotReachable(string target)
             {
                 var result = await _finder.FindByNameAsync(target, reachable: false);
                 Assert.That(new DefaultReachableStrategy().IsReachable(result.GameObject, out _), Is.False);
@@ -142,7 +142,7 @@ namespace TestHelper.UI.Strategies
             }
 
             [TestCase("NotInteractable")]
-            public async Task IsReachable_Reachable(string target)
+            public async Task IsReachable_TargetOnScreenAndUnblocked_Reachable(string target)
             {
                 var result = await _finder.FindByNameAsync(target, reachable: false);
                 Assert.That(new DefaultReachableStrategy().IsReachable(result.GameObject, out _), Is.True);
@@ -150,7 +150,7 @@ namespace TestHelper.UI.Strategies
 
             [TestCase("OutOfSight")]
             [TestCase("BehindTheWall")]
-            public async Task IsReachable_NotReachable(string target)
+            public async Task IsReachable_TargetOffScreenOrBlocked_NotReachable(string target)
             {
                 var result = await _finder.FindByNameAsync(target, reachable: false);
                 Assert.That(new DefaultReachableStrategy().IsReachable(result.GameObject, out _), Is.False);

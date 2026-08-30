@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -233,8 +232,7 @@ namespace TestHelper.UI.Operators
 
         [Test]
         [CreateScene]
-        [SuppressMessage("ReSharper", "MethodSupportsCancellation")]
-        public async Task OperateAsync_Cancel()
+        public async Task OperateAsync_Cancel_DoesNotInvokePointerUp()
         {
             var gameObject = new GameObject("ClickAndHoldTarget", typeof(StubLogErrorWhenOnPointerUp));
 

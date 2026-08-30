@@ -644,10 +644,9 @@ namespace TestHelper.UI
         }
 
         [Test]
-        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void Constructor_TimeoutSecondsUnderThreshold_ThrowsArgumentException()
         {
-            Assert.That(() => { new GameObjectFinder(0.009d); }, Throws.TypeOf<ArgumentException>()
+            Assert.That(() => _ = new GameObjectFinder(0.009d), Throws.TypeOf<ArgumentException>()
                 .And.Message.EqualTo("Must be greater than or equal to 0.01.\nParameter name: timeoutSeconds"));
         }
     }

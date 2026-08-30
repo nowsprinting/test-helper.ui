@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.UI.Operators;
@@ -10,6 +9,10 @@ using TestHelper.UI.Strategies;
 using TestHelper.UI.TestDoubles;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
+using UnityEngine.TestTools.Constraints;
+// UnityEngine.TestTools.Constraints is imported for the AllocatingGCMemory extension method, which brings a
+// second `Is` into scope. Aliased to NUnit's so that the existing assertions in this file keep resolving to it.
+using Is = NUnit.Framework.Is;
 
 namespace TestHelper.UI
 {
@@ -111,6 +114,17 @@ namespace TestHelper.UI
         }
 
         [Test]
+        public void Rent_AfterReturn_DoesNotAllocateGCMemory()
+        {
+            var pool = new OperatorPool();
+            pool.Register<UguiClickOperator>();
+            var instance = pool.Rent<UguiClickOperator>();
+            pool.Return(instance);
+
+            Assert.That(() => { pool.Rent<UguiClickOperator>(); }, Is.Not.AllocatingGCMemory());
+        }
+
+        [Test]
         public void Rent_AfterReturn_UnregisteredType_NotRequireRegistration_ReturnsSameInstance()
         {
             var pool = new OperatorPool(requireRegistration: false);
@@ -204,7 +218,6 @@ namespace TestHelper.UI
         }
 
         [Test]
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public void Rent_PoolConstructedWithVisualizer_InjectsVisualizerIntoOperator()
         {
             var visualizer = new DefaultDebugVisualizer();
@@ -214,6 +227,8 @@ namespace TestHelper.UI
             var instance = pool.Rent<FakeOperator>();
 
             Assert.That(instance.Visualizer, Is.SameAs(visualizer));
+
+            visualizer.Dispose();
         }
 
         [Test]
@@ -253,7 +268,6 @@ namespace TestHelper.UI
         }
 
         [Test]
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public void Rent_PoolConstructedWithDependencies_InjectsDependenciesIntoOperator()
         {
             var logger = new SpyLogger();
@@ -279,6 +293,8 @@ namespace TestHelper.UI
             Assert.That(instance.GetScreenPoint, Is.SameAs(getScreenPoint));
             Assert.That(instance.ReachableStrategy, Is.SameAs(reachableStrategy));
             Assert.That(((SpyRandom)instance.Random).ForkedFrom, Is.SameAs(random)); // forked instance
+            
+            visualizer.Dispose();
         }
 
         [Test]

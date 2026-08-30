@@ -11,7 +11,7 @@ namespace TestHelper.UI.ScreenshotFilenameStrategies
     public class CounterBasedStrategyTest
     {
         [Test]
-        public void FilenamePrefixSpecified()
+        public void GetFilename_PrefixSpecified_ReturnsSequentialFilenamesWithPrefix()
         {
             var strategy = new CounterBasedStrategy("prefix");
 
@@ -29,18 +29,18 @@ namespace TestHelper.UI.ScreenshotFilenameStrategies
 
 
         [Test]
-        public void DefaultFilenamePrefix()
+        public void GetFilename_NoPrefixSpecified_ReturnsSequentialFilenamesWithCallerMemberName()
         {
             var strategy = new CounterBasedStrategy();
 
             var actual = Enumerable.Repeat(0, 5).Select(_ => strategy.GetFilename()).ToList();
             var expected = new List<string>
             {
-                $"{nameof(DefaultFilenamePrefix)}_0001.png",
-                $"{nameof(DefaultFilenamePrefix)}_0002.png",
-                $"{nameof(DefaultFilenamePrefix)}_0003.png",
-                $"{nameof(DefaultFilenamePrefix)}_0004.png",
-                $"{nameof(DefaultFilenamePrefix)}_0005.png"
+                $"{nameof(GetFilename_NoPrefixSpecified_ReturnsSequentialFilenamesWithCallerMemberName)}_0001.png",
+                $"{nameof(GetFilename_NoPrefixSpecified_ReturnsSequentialFilenamesWithCallerMemberName)}_0002.png",
+                $"{nameof(GetFilename_NoPrefixSpecified_ReturnsSequentialFilenamesWithCallerMemberName)}_0003.png",
+                $"{nameof(GetFilename_NoPrefixSpecified_ReturnsSequentialFilenamesWithCallerMemberName)}_0004.png",
+                $"{nameof(GetFilename_NoPrefixSpecified_ReturnsSequentialFilenamesWithCallerMemberName)}_0005.png"
             };
             Assert.That(actual, Is.EqualTo(expected));
         }
