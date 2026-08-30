@@ -27,6 +27,14 @@ namespace TestHelper.UI
         private readonly Func<Component, bool> _isInteractable;
         private readonly IVisualizer _visualizer;
 
+        // Reused across find calls to avoid reallocating per poll; not safe for concurrent
+        // finds on the same instance.
+        private readonly HashSet<GameObject> _seenObjects = new HashSet<GameObject>();
+        private readonly List<GameObject> _foundObjects = new List<GameObject>();
+
+        private readonly Dictionary<GameObject, RaycastResult> _raycastResults =
+            new Dictionary<GameObject, RaycastResult>();
+
         private const double MinTimeoutSeconds = 0.01d;
         private const double MaxPollingIntervalSeconds = 1.0d;
 
@@ -65,9 +73,8 @@ namespace TestHelper.UI
         }
 
         private bool FilterToOnlyReachable(ref List<GameObject> objects,
-            out Dictionary<GameObject, RaycastResult> raycastResults)
+            Dictionary<GameObject, RaycastResult> raycastResults)
         {
-            raycastResults = new Dictionary<GameObject, RaycastResult>(objects.Count);
             for (var i = objects.Count - 1; i >= 0; i--)
             {
                 var current = objects[i];
@@ -114,7 +121,7 @@ namespace TestHelper.UI
             return false;
         }
 
-        private static List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher)
+        private List<GameObject> FindAllByMatcher(IGameObjectMatcher matcher)
         {
             var componentType = matcher.ComponentType;
             if (componentType == null || componentType == typeof(Component) ||
@@ -133,18 +140,18 @@ namespace TestHelper.UI
             // Dedupe by GameObject: FindObjectsByType returns one hit per component instance,
             // so a GameObject holding multiple matching components would otherwise be judged
             // as multiple matches.
-            var seenObjects = new HashSet<GameObject>();
-            var foundObjects = new List<GameObject>();
+            _seenObjects.Clear();
+            _foundObjects.Clear();
             foreach (var component in components)
             {
                 var gameObject = ((Component)component).gameObject;
-                if (seenObjects.Add(gameObject) && matcher.IsMatch(gameObject))
+                if (_seenObjects.Add(gameObject) && matcher.IsMatch(gameObject))
                 {
-                    foundObjects.Add(gameObject);
+                    _foundObjects.Add(gameObject);
                 }
             }
 
-            return foundObjects;
+            return _foundObjects;
         }
 
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
@@ -156,10 +163,13 @@ namespace TestHelper.UI
                 return (null, default, Reason.NotFound);
             }
 
-            Dictionary<GameObject, RaycastResult> raycastResults = null;
-            if (reachable && !FilterToOnlyReachable(ref foundObjects, out raycastResults))
+            if (reachable)
             {
-                return (null, default, Reason.NotReachable);
+                _raycastResults.Clear();
+                if (!FilterToOnlyReachable(ref foundObjects, _raycastResults))
+                {
+                    return (null, default, Reason.NotReachable);
+                }
             }
 
             if (interactable && !FilterToOnlyInteractable(ref foundObjects))
@@ -174,8 +184,10 @@ namespace TestHelper.UI
 
             // Reuse the raycast captured while filtering; raycasting the survivor again would
             // repeat the most expensive step of the poll for an identical same-frame result.
+            // RaycastResult is a struct, so this indexer read copies out of _raycastResults;
+            // the caller's value survives the field being Cleared on the next find.
             var resultObject = foundObjects[0];
-            var raycastResult = reachable ? raycastResults[resultObject] : new RaycastResult();
+            var raycastResult = reachable ? _raycastResults[resultObject] : new RaycastResult();
             return (resultObject, raycastResult, Reason.None);
         }
 
