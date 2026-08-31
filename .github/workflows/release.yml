@@ -56,13 +56,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # After tagged, openupm.com gets the tag and automatically publishes the UPM package.
-
-      - uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,message,job,pullRequest
-          mention: here
-          if_mention: failure
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
