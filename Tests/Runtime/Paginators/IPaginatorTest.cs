@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -6,6 +6,9 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
+#if UNITY_6000_4_OR_NEWER
+using UnityEngine.Assemblies;
+#endif
 
 namespace TestHelper.UI.Paginators
 {
@@ -15,7 +18,11 @@ namespace TestHelper.UI.Paginators
         private static Type[] GetPaginators()
         {
             var interfaceType = typeof(IPaginator);
+#if UNITY_6000_4_OR_NEWER
+            return CurrentAssemblies.GetLoadedAssemblies()
+#else
             return AppDomain.CurrentDomain.GetAssemblies()
+#endif
                 .SelectMany(assembly =>
                 {
                     try

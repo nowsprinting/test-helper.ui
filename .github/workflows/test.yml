@@ -43,9 +43,9 @@ jobs:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.41f2
           - 2022.3.62f3 # Non-Enterprise LTS
-          - 6000.0.77f1
-          - 6000.3.18f1
-          - &latest_unity_version 6000.5.0f1
+          - 6000.0.82f1
+          - 6000.3.23f1
+          - &latest_unity_version 6000.6.0f1
         testMode:
           - All # run tests in editor
         inputHandler:
@@ -128,7 +128,7 @@ jobs:
         run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_ENV"
 
       - name: Run tests
-        uses: game-ci/unity-test-runner@0ff419b913a3630032cbe0de48a0099b5a9f0ed9 # v4
+        uses: game-ci/unity-test-runner@f7d28f891263d875d47ef34370e9e8dd6087e1ef  # v5.0.0-beta.1
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
