@@ -18,7 +18,7 @@ defaults:
 
 jobs:
   check-bump-version:
-    if: github.event.repository.fork == false # Skip on forked repo
+    if: github.repository_owner == 'nowsprinting' # Skip on forked repo
     runs-on: ubuntu-slim
     timeout-minutes: 5
     permissions:
