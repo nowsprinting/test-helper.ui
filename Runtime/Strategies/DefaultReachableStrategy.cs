@@ -177,7 +177,7 @@ namespace TestHelper.UI.Strategies
             var blocker = miss.gameObject;
             if (blocker == null || // nothing hit
                 IsSameOrChildObject(blocker, target.transform) || // an ancestor: alpha hit test etc., not geometry
-                !ScreenRectUtility.TryGetScreenRect(blocker, out var blockerRect)) // 3D object
+                !ScreenRectUtility.TryGetRaycastRect(blocker, out var blockerRect)) // 3D object
             {
                 return false;
             }

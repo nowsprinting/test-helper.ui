@@ -3,6 +3,7 @@
 
 using TestHelper.UI.Extensions;
 using UnityEngine;
+using UnityEngine.UI;
 // System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
 #if UNITY_2021_2_OR_NEWER
 using MathF = System.MathF;
@@ -36,7 +37,50 @@ namespace TestHelper.UI.Strategies.Utilities
                 return false;
             }
 
-            rectTransform.GetWorldCorners(s_corners);
+            rect = ProjectLocalRect(gameObject, rectTransform, rectTransform.rect);
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the screen-space area in which <c>GraphicRaycaster</c> treats <paramref name="gameObject"/> as hit:
+        /// its <c>RectTransform</c> bounds adjusted by <c>Graphic.raycastPadding</c> (positive values shrink, negative expand).
+        /// </summary>
+        /// <param name="gameObject">Target <c>GameObject</c></param>
+        /// <param name="rect">Screen-space hit area; unspecified when the method returns false</param>
+        /// <returns>False if <paramref name="gameObject"/> has no <c>RectTransform</c></returns>
+        internal static bool TryGetRaycastRect(GameObject gameObject, out Rect rect)
+        {
+            var rectTransform = gameObject.transform as RectTransform;
+            if (rectTransform == null)
+            {
+                rect = default;
+                return false;
+            }
+
+            var localRect = rectTransform.rect;
+#if UNITY_2020_1_OR_NEWER
+            // Graphic.raycastPadding exists on Unity 2020.1 or newer; older versions hit-test the plain rect.
+            if (gameObject.TryGetComponent<Graphic>(out var graphic))
+            {
+                var padding = graphic.raycastPadding; // x=left, y=bottom, z=right, w=top
+                localRect = Rect.MinMaxRect(
+                    localRect.xMin + padding.x,
+                    localRect.yMin + padding.y,
+                    localRect.xMax - padding.z,
+                    localRect.yMax - padding.w);
+            }
+#endif
+            rect = ProjectLocalRect(gameObject, rectTransform, localRect);
+            return true;
+        }
+
+        private static Rect ProjectLocalRect(GameObject gameObject, RectTransform rectTransform, Rect localRect)
+        {
+            s_corners[0] = rectTransform.TransformPoint(localRect.xMin, localRect.yMin, 0);
+            s_corners[1] = rectTransform.TransformPoint(localRect.xMin, localRect.yMax, 0);
+            s_corners[2] = rectTransform.TransformPoint(localRect.xMax, localRect.yMax, 0);
+            s_corners[3] = rectTransform.TransformPoint(localRect.xMax, localRect.yMin, 0);
+
             var camera = gameObject.GetAssociatedCamera();
             var min = new Vector2(float.MaxValue, float.MaxValue);
             var max = new Vector2(float.MinValue, float.MinValue);
@@ -47,8 +91,7 @@ namespace TestHelper.UI.Strategies.Utilities
                 max = Vector2.Max(max, point);
             }
 
-            rect = Rect.MinMaxRect(min.x, min.y, max.x, max.y);
-            return true;
+            return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
         }
 
         /// <summary>
