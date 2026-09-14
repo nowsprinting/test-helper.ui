@@ -11,6 +11,7 @@ using TestHelper.RuntimeInternals;
 using TestHelper.UI.Exceptions;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.GameObjectMatchers;
+using TestHelper.UI.Operators;
 using TestHelper.UI.Paginators;
 using TestHelper.UI.Strategies;
 using TestHelper.UI.TestDoubles;
@@ -254,6 +255,33 @@ namespace TestHelper.UI
 
                 var result = await task;
                 Assert.That(result.GameObject.name, Is.EqualTo(BehindTheWall));
+            }
+
+            [Test]
+            [Category("Integration")]
+            [Category("Acceptance")]
+            [LoadScene(TestScenePath)]
+            public async Task FindByNameAsync_PartiallyBlocked_Found()
+            {
+                var result = await _sut.FindByNameAsync("PartiallyBehindTheWall", reachable: true);
+
+                Assert.That(result.GameObject.name, Is.EqualTo("PartiallyBehindTheWall"));
+            }
+
+            [Test]
+            [Category("Integration")]
+            [Category("Acceptance")]
+            [LoadScene(TestScenePath)]
+            public async Task FindAndClick_PartiallyBlocked_ClickIsReceivedByTarget()
+            {
+                var spyTarget = GameObject.Find("PartiallyBehindTheWall").AddComponent<SpyOnPointerClickHandler>();
+                var spyBlocker = GameObject.Find("SmallWall").AddComponent<SpyOnPointerClickHandler>();
+
+                var result = await _sut.FindByNameAsync("PartiallyBehindTheWall", reachable: true);
+                await new UguiClickOperator().OperateAsync(result.GameObject, result.RaycastResult);
+
+                Assert.That(spyTarget.WasClicked, Is.True, "target clicked");
+                Assert.That(spyBlocker.WasClicked, Is.False, "blocker not clicked");
             }
         }
 
@@ -653,6 +681,25 @@ namespace TestHelper.UI
                 var indicator = GameObject.Find("Indicator"); // exist multiple, so only one
                 Assert.That(indicator, Is.Not.Null);
                 Assert.That(indicator.GetComponent<Image>().sprite.name, Is.EqualTo("hand_slash"));
+            }
+
+            [Test]
+            [Category("Integration")]
+            [LoadScene(TestScenePath)]
+            public async Task FindWithVisualizer_PartiallyBlocked_NotReachableIndicatorIsNotShown()
+            {
+                await _sut.FindByNameAsync("PartiallyBehindTheWall", reachable: true);
+
+                try
+                {
+                    var matcher = new ComponentMatcher(typeof(FadeOutBehaviour));
+                    await _sut.FindByMatcherAsync(matcher, reachable: false);
+                    Assert.Fail("Indicator should not be shown.");
+                }
+                catch (TimeoutException)
+                {
+                    // pass
+                }
             }
         }
 
