@@ -152,22 +152,9 @@ namespace TestHelper.UI.Strategies
             {
                 // A miss outside the visible rect (pivot off-screen or under a mask) says nothing about blockers
                 // inside it, so the rect is tried as-is instead of subtracting whatever that miss hit.
-                if (rect.Contains(miss.screenPosition))
+                if (rect.Contains(miss.screenPosition) && !TrySubtractBlocker(target, miss, ref rect))
                 {
-                    var blocker = miss.gameObject;
-                    if (blocker == null || // nothing hit
-                        IsSameOrChildObject(blocker,
-                            target.transform) || // an ancestor: alpha hit test etc., not geometry
-                        !ScreenRectUtility.TryGetScreenRect(blocker, out var blockerRect)) // 3D object
-                    {
-                        return false;
-                    }
-
-                    rect = ScreenRectUtility.LargestRemainder(rect, blockerRect);
-                    if (rect.width < 1f || rect.height < 1f)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
 
                 if (Raycast(target, rect.center, verboseLogger, out result))
@@ -181,7 +168,25 @@ namespace TestHelper.UI.Strategies
             return false;
         }
 
-        private bool TryGetVisibleScreenRect(GameObject target, out Rect rect)
+        /// <summary>
+        /// Removes the screen rect of the object hit by <paramref name="miss"/> from <paramref name="rect"/>.
+        /// </summary>
+        /// <returns>False if the miss cannot be explained by geometry or nothing is left to try</returns>
+        private static bool TrySubtractBlocker(GameObject target, RaycastResult miss, ref Rect rect)
+        {
+            var blocker = miss.gameObject;
+            if (blocker == null || // nothing hit
+                IsSameOrChildObject(blocker, target.transform) || // an ancestor: alpha hit test etc., not geometry
+                !ScreenRectUtility.TryGetScreenRect(blocker, out var blockerRect)) // 3D object
+            {
+                return false;
+            }
+
+            rect = ScreenRectUtility.LargestRemainder(rect, blockerRect);
+            return rect.width >= 1f && rect.height >= 1f;
+        }
+
+        private static bool TryGetVisibleScreenRect(GameObject target, out Rect rect)
         {
             if (!ScreenRectUtility.TryGetScreenRect(target, out rect))
             {
