@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using TestHelper.UI.Extensions;
 using UnityEngine;
 
 namespace TestHelper.UI.Strategies.Utilities
@@ -10,6 +11,8 @@ namespace TestHelper.UI.Strategies.Utilities
     /// </summary>
     internal static class ScreenRectUtility
     {
+        private static readonly Vector3[] s_corners = new Vector3[4];
+
         /// <summary>
         /// Returns the axis-aligned screen-space bounds of the <c>RectTransform</c> of <paramref name="gameObject"/>,
         /// projected through its associated camera.
@@ -19,8 +22,26 @@ namespace TestHelper.UI.Strategies.Utilities
         /// <returns>False if <paramref name="gameObject"/> has no <c>RectTransform</c></returns>
         internal static bool TryGetScreenRect(GameObject gameObject, out Rect rect)
         {
-            rect = default;
-            return false;
+            var rectTransform = gameObject.transform as RectTransform;
+            if (rectTransform == null)
+            {
+                rect = default;
+                return false;
+            }
+
+            rectTransform.GetWorldCorners(s_corners);
+            var camera = gameObject.GetAssociatedCamera();
+            var min = new Vector2(float.MaxValue, float.MaxValue);
+            var max = new Vector2(float.MinValue, float.MinValue);
+            foreach (var corner in s_corners)
+            {
+                var point = RectTransformUtility.WorldToScreenPoint(camera, corner);
+                min = Vector2.Min(min, point);
+                max = Vector2.Max(max, point);
+            }
+
+            rect = Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+            return true;
         }
 
         /// <summary>
@@ -29,7 +50,11 @@ namespace TestHelper.UI.Strategies.Utilities
         /// </summary>
         internal static Rect Intersect(Rect a, Rect b)
         {
-            return default;
+            return Rect.MinMaxRect(
+                Mathf.Max(a.xMin, b.xMin),
+                Mathf.Max(a.yMin, b.yMin),
+                Mathf.Min(a.xMax, b.xMax),
+                Mathf.Min(a.yMax, b.yMax));
         }
 
         /// <summary>
@@ -40,7 +65,28 @@ namespace TestHelper.UI.Strategies.Utilities
         /// </summary>
         internal static Rect LargestRemainder(Rect rect, Rect blocker)
         {
-            return default;
+            var best = new Rect(rect.x, rect.y, 0, 0);
+            var bestArea = 0f;
+
+            // Strips are built from the rect's own bounds; using float.MinValue/MaxValue as open bounds
+            // loses the blocker edge to floating-point rounding when Rect converts min/max to x/width.
+            void Consider(float xMin, float yMin, float xMax, float yMax)
+            {
+                var width = xMax - xMin;
+                var height = yMax - yMin;
+                var area = Mathf.Max(0, width) * Mathf.Max(0, height);
+                if (area > bestArea)
+                {
+                    best = Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+                    bestArea = area;
+                }
+            }
+
+            Consider(rect.xMin, rect.yMin, Mathf.Min(rect.xMax, blocker.xMin), rect.yMax); // left
+            Consider(Mathf.Max(rect.xMin, blocker.xMax), rect.yMin, rect.xMax, rect.yMax); // right
+            Consider(rect.xMin, rect.yMin, rect.xMax, Mathf.Min(rect.yMax, blocker.yMin)); // bottom
+            Consider(rect.xMin, Mathf.Max(rect.yMin, blocker.yMax), rect.xMax, rect.yMax); // top
+            return best;
         }
     }
 }

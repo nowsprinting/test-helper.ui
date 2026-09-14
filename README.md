@@ -373,7 +373,7 @@ Configurations in `MonkeyConfig`:
 - **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 - **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` or any of its ancestors has an enabled `IgnoreAnnotation` attached, or matches any of the configured ignore matchers (including their children).
 - **GetScreenPoint**: Function to get the screen point from `GameObject` used in the operators. The default implementation returns the pivot position of the `GameObject` in screen space.
-- **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
+- **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if a raycast (`EventSystem.RaycastAll`) at the pivot position hits the `GameObject`. If that point is blocked, it retries at up to 4 points inside the visible rect of the `RectTransform` that avoid the blocking object.
 - **OperatorPool**: An `OperatorPool` instance that manages `IOperator` creation and reuse. The default registers `UguiClickOperator` and `UguiTextInputOperator`. See [OperatorPool](#operatorpool) section below for details.
 
 Operators used by the Monkey must be registered in the `MonkeyConfig.OperatorPool` beforehand.
@@ -469,6 +469,7 @@ Please note that this will be included in the release build due to the way it wo
 #### Control ReachableStrategy
 
 You can control the `DefaultReachableStrategy` behavior by attaching the annotation components to the `GameObject`.
+The annotations decide the first raycast point; the fallback described in [IReachableStrategy interface](#ireachablestrategy-interface) only runs when that point misses.
 
 ##### NonBlockingAnnotation
 
@@ -557,7 +558,16 @@ If you want to ignore it for other conditions, you must replace it.
 #### IReachableStrategy interface
 
 `IsReachable` method returns whether the `GameObject` is reachable from the user or not.
-`DefaultReachableStrategy.IsReachable` method returns true if it can raycast from `Camera.main` to the pivot position of `GameObject`.
+`DefaultReachableStrategy.IsReachable` method returns true if a raycast (`EventSystem.RaycastAll`, the same path used by the input module) at the pivot position of `GameObject` hits it or one of its children.
+The pivot (or the point given by annotations) is always tried first, and when it hits, it becomes the operating point.
+
+If the first raycast is blocked, the strategy retries inside the visible rect of the `RectTransform` (its corners projected to screen, clipped by the screen and by ancestor `RectMask2D`/`Mask` rects):
+
+1. If the first point lies outside the visible rect (off-screen or masked), the center of the visible rect is tried next.
+2. Each miss subtracts the blocking object's screen rect from the remaining rect, and the next raycast targets the center of the largest remaining strip.
+3. At most 5 raycasts are made in total. The search stops early when nothing was hit, the blocker is an ancestor of the target, or the blocker is not a `RectTransform` (e.g., a 3D object).
+
+Any fallback hit is a real hit on the target, so this adds no false positives. The hit point becomes the operating point (`RaycastResult.screenPosition`). If every attempt fails, the first (pivot) miss is reported in verbose logs and the visualizer.
 
 You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).
 
@@ -686,6 +696,9 @@ If the following message is printed, other object is hiding the pivot position o
 ```
 Not reachable to BehindButton(-2324), position=(320,240). Raycast hit other objects: [BlockScreen, FrontButton]
 ```
+
+When the object is only partially hidden, `DefaultReachableStrategy` retries automatically at unblocked points inside its visible rect (one message is printed per miss).
+The solutions below apply when the object is fully hidden or off-screen.
 
 Solutions will be considered in the following order of priority:
 
