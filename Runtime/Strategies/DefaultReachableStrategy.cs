@@ -7,8 +7,10 @@ using System.Text;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Extensions;
 using TestHelper.UI.GameObjectMatchers;
+using TestHelper.UI.Strategies.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace TestHelper.UI.Strategies
 {
@@ -17,6 +19,12 @@ namespace TestHelper.UI.Strategies
     /// </summary>
     public class DefaultReachableStrategy : IReachableStrategy
     {
+        // Total raycasts per IsReachable call, including the first one at the pivot.
+        private const int MaxRaycastCount = 5;
+
+        private readonly List<RectMask2D> _rectMasks = new List<RectMask2D>();
+        private readonly List<Mask> _masks = new List<Mask>();
+
         private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly ILogger _verboseLogger;
         private readonly List<IGameObjectMatcher> _nonBlockingMatchers;
@@ -107,6 +115,25 @@ namespace TestHelper.UI.Strategies
 
             raycastResult = _results[0];
             return isSameOrChildObject;
+        }
+
+        private bool Raycast(GameObject target, Vector2 screenPoint, ILogger verboseLogger, out RaycastResult result)
+        {
+            result = default;
+            return false;
+        }
+
+        private bool TryReachAroundBlockers(GameObject target, RaycastResult firstMiss, ILogger verboseLogger,
+            out RaycastResult result)
+        {
+            result = default;
+            return false;
+        }
+
+        private bool TryGetVisibleScreenRect(GameObject target, out Rect rect)
+        {
+            rect = default;
+            return false;
         }
 
         private PointerEventData GetCachedPointerEventData()
