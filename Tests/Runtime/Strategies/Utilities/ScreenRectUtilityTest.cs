@@ -115,11 +115,15 @@ namespace TestHelper.UI.Strategies.Utilities
             Assert.That(actual, Is.EqualTo(new Rect(0, 40, 100, 60)));
         }
 
-        [Test]
-        public void LargestRemainder_LeftAndRightStripsTie_ReturnsLeftStrip()
+        private static readonly TestCaseData[] s_leftStripTieCases =
         {
-            var blocker = new Rect(40, 0, 20, 100); // left 40x100, right 40x100
+            new TestCaseData(new Rect(40, 0, 20, 100)).SetName("{m}(LeftAndRight)"), // left 40x100, right 40x100
+            new TestCaseData(new Rect(40, 40, 20, 20)).SetName("{m}(AllStrips)"), // every strip has area 4000
+        };
 
+        [TestCaseSource(nameof(s_leftStripTieCases))]
+        public void LargestRemainder_LeftStripTiesWithOthers_ReturnsLeftStrip(Rect blocker)
+        {
             var actual = ScreenRectUtility.LargestRemainder(s_rect, blocker);
 
             Assert.That(actual, Is.EqualTo(new Rect(0, 0, 40, 100)));
@@ -133,16 +137,6 @@ namespace TestHelper.UI.Strategies.Utilities
             var actual = ScreenRectUtility.LargestRemainder(s_rect, blocker);
 
             Assert.That(actual, Is.EqualTo(new Rect(0, 0, 100, 40)));
-        }
-
-        [Test]
-        public void LargestRemainder_AllStripsTie_ReturnsLeftStrip()
-        {
-            var blocker = new Rect(40, 40, 20, 20); // every strip has area 4000
-
-            var actual = ScreenRectUtility.LargestRemainder(s_rect, blocker);
-
-            Assert.That(actual, Is.EqualTo(new Rect(0, 0, 40, 100)));
         }
 
         [Test]
