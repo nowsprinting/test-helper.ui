@@ -80,7 +80,7 @@ namespace TestHelper.UI.Operators
             }
 
             // Show visual effect
-            Visualizer?.ShowPointerOperationEffect(gameObject);
+            Visualizer?.ShowPointerOperationEffect(raycastResult.screenPosition);
 
             // Output log before the operation, after the shown effects
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);

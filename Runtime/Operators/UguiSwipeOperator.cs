@@ -188,7 +188,7 @@ namespace TestHelper.UI.Operators
             }
 
             // Show visual effect
-            Visualizer?.ShowPointerOperationEffect(gameObject);
+            Visualizer?.ShowPointerOperationEffect(raycastResult.screenPosition);
 
             // Log direction and distance
             var operationLogger = new OperationLogger(gameObject, this, Logger, ScreenshotOptions);

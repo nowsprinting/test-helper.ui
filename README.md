@@ -22,7 +22,7 @@ Required Unity 2019 LTS or later.
 Constructor arguments:
 
 - **timeoutSeconds**: Seconds to wait until `GameObject` appears. The default is 1 second.
-- **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
+- **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if a raycast (`EventSystem.RaycastAll`) at the pivot position hits the `GameObject`. If that point is blocked, it retries at up to 4 points inside the visible rect of the `RectTransform` that avoid the blocking object.
 - **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 
 > [!WARNING]\
@@ -184,6 +184,17 @@ public class MyIntegrationTest
 }
 ```
 
+> [!TIP]\
+> How `DefaultReachableStrategy` decides "reachable":
+> the pivot position (or the point given by [annotation components](#control-reachablestrategy)) is always raycast first with `EventSystem.RaycastAll`, the same path the input module uses, and when it hits the `GameObject` or one of its children, that point becomes the operating point.
+> If the first raycast is blocked, it retries inside the visible rect of the `RectTransform` (its corners projected to screen, clipped by the screen and by ancestor `RectMask2D`/`Mask` rects):
+>
+> 1. If the first point lies outside the visible rect (off-screen or masked), the center of the visible rect is tried next.
+> 2. Each miss subtracts the blocking object's screen rect from the remaining rect, and the next raycast targets the center of the largest remaining strip.
+> 3. At most 5 raycasts are made in total. The search stops early when nothing was hit, the blocker is an ancestor of the target, or the blocker is not a `RectTransform` (e.g., a 3D object).
+>
+> Any fallback hit is a real hit on the target, so this adds no false positives. The hit point becomes the operating point (`RaycastResult.screenPosition`). If every attempt fails, the first (pivot) miss is reported in verbose logs and the visualizer.
+
 
 
 ### Operate GameObject
@@ -234,13 +245,13 @@ public class MyIntegrationTest
 }
 ```
 
-> [!TIP]  
+> [!TIP]\
 > You can set the `Logger` and `ScreenshotOptions` instance via the constructor arguments or properties if needed.
 
-> [!TIP]  
+> [!TIP]\
 > All operators implement an overload method that takes only a `GameObject` for monkey testing.
 
-> [!TIP]  
+> [!TIP]\
 > If a flick operation is required, create a `UguiSwipeOperator` instance with arguments, for example, `swipeSpeed: 2000, swipeDistance: 80f`.
 
 
@@ -306,7 +317,7 @@ pool.Register<UguiClickOperator>();
 var op = config.OperatorPool.Rent<UguiClickOperator>(); // get an instance with injected logger, screenshot options, visualizer, and forked random instance
 ```
 
-> [!NOTE]  
+> [!NOTE]\
 > For `IRandom` arguments, a forked instance is injected.
 
 
@@ -373,7 +384,7 @@ Configurations in `MonkeyConfig`:
 - **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 - **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` or any of its ancestors has an enabled `IgnoreAnnotation` attached, or matches any of the configured ignore matchers (including their children).
 - **GetScreenPoint**: Function to get the screen point from `GameObject` used in the operators. The default implementation returns the pivot position of the `GameObject` in screen space.
-- **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
+- **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if a raycast (`EventSystem.RaycastAll`) at the pivot position hits the `GameObject`. If that point is blocked, it retries at up to 4 points inside the visible rect of the `RectTransform` that avoid the blocking object.
 - **OperatorPool**: An `OperatorPool` instance that manages `IOperator` creation and reuse. The default registers `UguiClickOperator` and `UguiTextInputOperator`. See [OperatorPool](#operatorpool) section below for details.
 
 Operators used by the Monkey must be registered in the `MonkeyConfig.OperatorPool` beforehand.
@@ -460,7 +471,7 @@ classDiagram
 Use the `TestHelper.UI.Annotations` assembly by adding it to the Assembly Definition References.
 Please note that this will be included in the release build due to the way it works.
 
-> [!TIP]  
+> [!TIP]\
 > Even if the annotations assembly is removed from the release build, the link to the annotation component will remain Scenes and Prefabs in the asset bundle built.
 > Therefore, a warning log will be output during instantiate.
 > To avoid this, annotations assembly are included in release builds.
@@ -469,6 +480,7 @@ Please note that this will be included in the release build due to the way it wo
 #### Control ReachableStrategy
 
 You can control the `DefaultReachableStrategy` behavior by attaching the annotation components to the `GameObject`.
+The annotations decide the first raycast point; the fallback described in [IReachableStrategy interface](#ireachablestrategy-interface) only runs when that point misses.
 
 ##### NonBlockingAnnotation
 
@@ -547,24 +559,16 @@ You should replace this when you want to control special components that compris
 `IsIgnored` method returns whether the `GameObject` is ignored or not from `Monkey`.
 `DefaultIgnoreStrategy.IsIgnored` method returns true if the `GameObject` or any of its ancestors has an enabled `IgnoreAnnotation` component attached, or matches any of the configured ignore matchers (including their children).
 
-The `DefaultIgnoreStrategy` constructor accepts optional parameters:
-- `verboseLogger`: Logger for detailed output
-- `ignoreMatchers`: List of `IGameObjectMatcher` instances to programmatically specify GameObjects (and their children) that should be ignored, similar to `IgnoreAnnotation` but configured via code
-
 If you want to ignore it for other conditions, you must replace it.
 
 
 #### IReachableStrategy interface
 
 `IsReachable` method returns whether the `GameObject` is reachable from the user or not.
-`DefaultReachableStrategy.IsReachable` method returns true if it can raycast from `Camera.main` to the pivot position of `GameObject`.
+`DefaultReachableStrategy.IsReachable` method returns true if a raycast (`EventSystem.RaycastAll`) at the pivot position hits the `GameObject`. If that point is blocked, it retries at up to 4 points inside the visible rect of the `RectTransform` that avoid the blocking object.
+See the note in the [Operate GameObject](#operate-gameobject) section for details.
 
 You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).
-
-The `DefaultReachableStrategy` constructor accepts optional parameters:
-- `getScreenPoint`: Function to get the screen point from `GameObject`
-- `verboseLogger`: Logger for detailed output
-- `nonBlockingMatchers`: List of `IGameObjectMatcher` instances to programmatically exclude GameObjects (and their children) from blocking reachability checks, similar to `NonBlockingAnnotation` but configured via code
 
 
 
@@ -611,10 +615,10 @@ If your game title uses a custom UI framework that is not uGUI compatible, you c
 A sub-interface of the `IOperator` (e.g., `IClickOperator`) must be implemented to represent the type of operator.
 An operator must implement the `CanOperate` method to determine whether an operation, such as a click, is possible and the `OperateAsync` method to execute the operation.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]\
 > Until test-helper.monkey v0.14.0, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
 
-> [!TIP]  
+> [!TIP]\
 > All operators implement an overload method that takes only a `GameObject` for monkey testing.
 
 
@@ -625,7 +629,7 @@ The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || INCLUDE_COM_NOWSPRINT
 
 To use the feature in player builds, add `INCLUDE_COM_NOWSPRINTING_TEST_HELPER` to the scripting symbols at build time.
 
-> [!TIP]  
+> [!TIP]\
 > How to set custom scripting symbols, see below:  
 > [Manual: Custom scripting symbols](https://docs.unity3d.com/Manual/custom-scripting-symbols.html)
 
@@ -686,6 +690,10 @@ If the following message is printed, other object is hiding the pivot position o
 ```
 Not reachable to BehindButton(-2324), position=(320,240). Raycast hit other objects: [BlockScreen, FrontButton]
 ```
+
+When the object is only partially hidden, `DefaultReachableStrategy` retries automatically at unblocked points inside its visible rect (one message is printed per miss).
+This retry works only when both the target and the blocking object are uGUI elements (`RectTransform`); if either is a 2D/3D object hit through `PhysicsRaycaster`/`Physics2DRaycaster`, only the pivot position is checked.
+The solutions below apply when the object is fully hidden, off-screen, or a 2D/3D object.
 
 Solutions will be considered in the following order of priority:
 
@@ -897,7 +905,7 @@ await Monkey.Run(config);
 3. Open the Package Manager window (**Window > Package Manager**) and select **My Registries** tab (figure 2)
 4. Select **UI Test Helper** and click the **Install** button
 
-> [!NOTE]  
+> [!NOTE]\
 > Do not forget to add `com.cysharp` into scopes. These are used within this package.
 
 **Figure 1.** Scoped Registries setting in Project Settings window
@@ -943,7 +951,7 @@ Add this repository as a submodule to the Packages/ directory in your project.
 git submodule add git@github.com:nowsprinting/test-helper.ui.git Packages/com.nowsprinting.test-helper.ui
 ```
 
-> [!WARNING]  
+> [!WARNING]\
 > Required installation packages for running tests (when embedded package or adding to the `testables` in manifest.json), as follows:
 > - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later
 > - [TextMesh Pro](https://docs.unity3d.com/Packages/com.unity.textmeshpro@latest) package or [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) package v2.0.0 or later
@@ -958,7 +966,7 @@ make create_project
 UNITY_VERSION=2019.4.40f1 make -k test
 ```
 
-> [!WARNING]  
+> [!WARNING]\
 > You must select "Input Manager (Old)" or "Both" in the **Project Settings > Player > Active Input Handling** for running tests.
 
 
@@ -972,13 +980,13 @@ The release process is as follows:
 Then, will do the release process automatically by [Release](.github/workflows/release.yml) workflow.
 After tagging, [OpenUPM](https://openupm.com/) retrieves the tag and updates it.
 
-> [!CAUTION]  
+> [!CAUTION]\
 > Do **NOT** manually operation the following operations:
 > - Create a release tag
 > - Publish draft releases
 
-> [!CAUTION]  
+> [!CAUTION]\
 > You must modify the package name to publish a forked package.
 
-> [!TIP]  
+> [!TIP]\
 > If you want to specify the version number to be released, change the version number of the draft release before running the "Create release pull request" workflow.
