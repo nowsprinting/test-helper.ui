@@ -118,7 +118,7 @@ namespace TestHelper.UI.Strategies.Utilities
         private static readonly TestCaseData[] s_leftStripTieCases =
         {
             new TestCaseData(new Rect(40, 0, 20, 100)).SetName("{m}(LeftAndRight)"), // left 40x100, right 40x100
-            new TestCaseData(new Rect(40, 40, 20, 20)).SetName("{m}(AllStrips)"), // every strip has area 4000
+            new TestCaseData(new Rect(40, 40, 20, 20)).SetName("{m}(AllStrips)"),    // every strip has area 4000
         };
 
         [TestCaseSource(nameof(s_leftStripTieCases))]

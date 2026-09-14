@@ -22,9 +22,6 @@ namespace TestHelper.UI.Strategies
         // Total raycasts per IsReachable call, including the first one at the pivot.
         private const int MaxRaycastCount = 5;
 
-        private readonly List<RectMask2D> _rectMasks = new List<RectMask2D>();
-        private readonly List<Mask> _masks = new List<Mask>();
-
         private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly ILogger _verboseLogger;
         private readonly List<IGameObjectMatcher> _nonBlockingMatchers;
@@ -78,12 +75,12 @@ namespace TestHelper.UI.Strategies
                 return false;
             }
 
-            if (Raycast(gameObject, _getScreenPoint.Invoke(gameObject), verboseLogger, out var firstMiss))
+            if (Raycast(gameObject, _getScreenPoint.Invoke(gameObject), verboseLogger, out raycastResult))
             {
-                raycastResult = firstMiss;
                 return true;
             }
 
+            var firstMiss = raycastResult;
             if (TryReachAroundBlockers(gameObject, firstMiss, verboseLogger, out raycastResult))
             {
                 return true;
@@ -151,34 +148,26 @@ namespace TestHelper.UI.Strategies
             }
 
             var miss = firstMiss;
-            var raycastCount = 1;
-            if (!rect.Contains(miss.screenPosition))
+            for (var raycastCount = 1; raycastCount < MaxRaycastCount; raycastCount++)
             {
-                // A pivot off-screen or under a mask says nothing about blockers inside the visible area,
-                // so start from the visible center instead of subtracting whatever that miss hit.
-                if (Raycast(target, rect.center, verboseLogger, out result))
+                // A miss outside the visible rect (pivot off-screen or under a mask) says nothing about blockers
+                // inside it, so the rect is tried as-is instead of subtracting whatever that miss hit.
+                if (rect.Contains(miss.screenPosition))
                 {
-                    return true;
-                }
+                    var blocker = miss.gameObject;
+                    if (blocker == null || // nothing hit
+                        IsSameOrChildObject(blocker,
+                            target.transform) || // an ancestor: alpha hit test etc., not geometry
+                        !ScreenRectUtility.TryGetScreenRect(blocker, out var blockerRect)) // 3D object
+                    {
+                        return false;
+                    }
 
-                miss = result;
-                raycastCount++;
-            }
-
-            while (raycastCount < MaxRaycastCount)
-            {
-                var blocker = miss.gameObject;
-                if (blocker == null || // nothing hit
-                    IsSameOrChildObject(blocker, target.transform) || // an ancestor: alpha hit test etc., not geometry
-                    !ScreenRectUtility.TryGetScreenRect(blocker, out var blockerRect)) // 3D object
-                {
-                    return false;
-                }
-
-                rect = ScreenRectUtility.LargestRemainder(rect, blockerRect);
-                if (rect.width < 1f || rect.height < 1f)
-                {
-                    return false;
+                    rect = ScreenRectUtility.LargestRemainder(rect, blockerRect);
+                    if (rect.width < 1f || rect.height < 1f)
+                    {
+                        return false;
+                    }
                 }
 
                 if (Raycast(target, rect.center, verboseLogger, out result))
@@ -187,7 +176,6 @@ namespace TestHelper.UI.Strategies
                 }
 
                 miss = result;
-                raycastCount++;
             }
 
             return false;
@@ -203,19 +191,11 @@ namespace TestHelper.UI.Strategies
             rect = ScreenRectUtility.Intersect(rect, new Rect(0, 0, Screen.width, Screen.height));
 
             // ponytail: ignores RectMask2D padding/softness; add if a real UI needs it
-            target.GetComponentsInParent(false, _rectMasks);
-            foreach (var mask in _rectMasks)
+            for (var current = target.transform; current != null; current = current.parent)
             {
-                if (mask.isActiveAndEnabled && ScreenRectUtility.TryGetScreenRect(mask.gameObject, out var maskRect))
-                {
-                    rect = ScreenRectUtility.Intersect(rect, maskRect);
-                }
-            }
-
-            target.GetComponentsInParent(false, _masks);
-            foreach (var mask in _masks)
-            {
-                if (mask.isActiveAndEnabled && ScreenRectUtility.TryGetScreenRect(mask.gameObject, out var maskRect))
+                var clips = (current.TryGetComponent<RectMask2D>(out var rectMask) && rectMask.isActiveAndEnabled) ||
+                            (current.TryGetComponent<Mask>(out var mask) && mask.isActiveAndEnabled);
+                if (clips && ScreenRectUtility.TryGetScreenRect(current.gameObject, out var maskRect))
                 {
                     rect = ScreenRectUtility.Intersect(rect, maskRect);
                 }

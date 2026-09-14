@@ -3,6 +3,13 @@
 
 using TestHelper.UI.Extensions;
 using UnityEngine;
+// System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
+#if UNITY_2021_2_OR_NEWER
+using MathF = System.MathF;
+
+#else
+using MathF = UnityEngine.Mathf;
+#endif
 
 namespace TestHelper.UI.Strategies.Utilities
 {
@@ -51,10 +58,10 @@ namespace TestHelper.UI.Strategies.Utilities
         internal static Rect Intersect(Rect a, Rect b)
         {
             return Rect.MinMaxRect(
-                Mathf.Max(a.xMin, b.xMin),
-                Mathf.Max(a.yMin, b.yMin),
-                Mathf.Min(a.xMax, b.xMax),
-                Mathf.Min(a.yMax, b.yMax));
+                MathF.Max(a.xMin, b.xMin),
+                MathF.Max(a.yMin, b.yMin),
+                MathF.Min(a.xMax, b.xMax),
+                MathF.Min(a.yMax, b.yMax));
         }
 
         /// <summary>
@@ -74,7 +81,7 @@ namespace TestHelper.UI.Strategies.Utilities
             {
                 var width = xMax - xMin;
                 var height = yMax - yMin;
-                var area = Mathf.Max(0, width) * Mathf.Max(0, height);
+                var area = MathF.Max(0, width) * MathF.Max(0, height);
                 if (area > bestArea)
                 {
                     best = Rect.MinMaxRect(xMin, yMin, xMax, yMax);
@@ -82,10 +89,10 @@ namespace TestHelper.UI.Strategies.Utilities
                 }
             }
 
-            Consider(rect.xMin, rect.yMin, Mathf.Min(rect.xMax, blocker.xMin), rect.yMax); // left
-            Consider(Mathf.Max(rect.xMin, blocker.xMax), rect.yMin, rect.xMax, rect.yMax); // right
-            Consider(rect.xMin, rect.yMin, rect.xMax, Mathf.Min(rect.yMax, blocker.yMin)); // bottom
-            Consider(rect.xMin, Mathf.Max(rect.yMin, blocker.yMax), rect.xMax, rect.yMax); // top
+            Consider(rect.xMin, rect.yMin, MathF.Min(rect.xMax, blocker.xMin), rect.yMax); // left
+            Consider(MathF.Max(rect.xMin, blocker.xMax), rect.yMin, rect.xMax, rect.yMax); // right
+            Consider(rect.xMin, rect.yMin, rect.xMax, MathF.Min(rect.yMax, blocker.yMin)); // bottom
+            Consider(rect.xMin, MathF.Max(rect.yMin, blocker.yMax), rect.xMax, rect.yMax); // top
             return best;
         }
     }
