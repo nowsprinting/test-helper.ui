@@ -232,7 +232,7 @@ namespace TestHelper.UI.Operators
             scrollSpeed = scrollSpeed > 0 ? scrollSpeed : _scrollSpeed;
 
             // Show visual effect
-            Visualizer?.ShowPointerOperationEffect(gameObject);
+            Visualizer?.ShowPointerOperationEffect(raycastResult.screenPosition);
 
             if (logDestination)
             {
