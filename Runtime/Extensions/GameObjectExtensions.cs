@@ -86,8 +86,11 @@ namespace TestHelper.UI.Extensions
         /// <returns>True if found component, active, and enabled</returns>
         public static bool TryGetEnabledComponent<T>(this GameObject gameObject, out T component)
         {
-            component = gameObject.GetComponent<T>();
-            return component != null && (!(component is Behaviour) || (component as Behaviour).isActiveAndEnabled);
+            // Not GetComponent<T>(): when the component is missing, the Editor allocates a fake-null placeholder
+            // holding an explanatory message (about 700 bytes) on every call, so a raycast filter that probes each
+            // hit's ancestors churns megabytes per query. TryGetComponent reports the miss without that object.
+            return gameObject.TryGetComponent(out component) &&
+                   (!(component is Behaviour) || (component as Behaviour).isActiveAndEnabled);
         }
 
         /// <summary>

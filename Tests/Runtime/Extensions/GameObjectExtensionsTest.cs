@@ -5,7 +5,11 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.UI.TestDoubles;
 using UnityEngine;
+using UnityEngine.TestTools.Constraints;
 using UnityEngine.UI;
+// UnityEngine.TestTools.Constraints is imported for the AllocatingGCMemory extension method, which brings a
+// second `Is` into scope. Aliased to NUnit's so that the existing assertions in this file keep resolving to it.
+using Is = NUnit.Framework.Is;
 
 namespace TestHelper.UI.Extensions
 {
@@ -103,6 +107,19 @@ namespace TestHelper.UI.Extensions
 
         [Test]
         [CreateScene]
+        public void TryGetEnabledComponent_ComponentMissing_DoesNotAllocateGCMemory()
+        {
+            var gameObject = new GameObject("Image", typeof(Image));
+            Assume.That(gameObject.TryGetEnabledComponent<Button>(out _), Is.False); // also warms up the measured path
+
+            // Not a lambda with an expression body: a value-returning one binds to the ActualValueDelegate<T>
+            // overload of Assert.That, and the constraint then rejects it as "not a TestDelegate".
+            Assert.That(() => { _ = gameObject.TryGetEnabledComponent<Button>(out _); },
+                Is.Not.AllocatingGCMemory());
+        }
+
+        [Test]
+        [CreateScene]
         public void TryGetEnabledComponentInParent_Null_ReturnsFalse()
         {
             var gameObject = new GameObject();
@@ -191,6 +208,20 @@ namespace TestHelper.UI.Extensions
 
             var actual = gameObject.TryGetEnabledComponentInParent<Button>(out var _);
             Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void TryGetEnabledComponentInParent_ComponentMissing_DoesNotAllocateGCMemory()
+        {
+            var parent = new GameObject("Parent", typeof(Image));
+            var gameObject = new GameObject("Child", typeof(Image));
+            gameObject.transform.SetParent(parent.transform);
+            Assume.That(gameObject.TryGetEnabledComponentInParent<Button>(out _),
+                Is.False); // also warms up the measured path
+
+            Assert.That(() => { _ = gameObject.TryGetEnabledComponentInParent<Button>(out _); },
+                Is.Not.AllocatingGCMemory());
         }
     }
 }

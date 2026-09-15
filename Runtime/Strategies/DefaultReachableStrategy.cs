@@ -28,6 +28,11 @@ namespace TestHelper.UI.Strategies
 
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
+        // The blocker filter is a cached delegate reading the target from a field: a lambda capturing the target
+        // parameter allocates a closure on every raycast, which defeats the zero-allocation contract of IsReachable.
+        private readonly Predicate<RaycastResult> _isIgnorableHit;
+        private GameObject _target;
+
         private PointerEventData _cachedPointerEventData;
         private int _cachedFrameCount;
 
@@ -45,6 +50,7 @@ namespace TestHelper.UI.Strategies
             _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _verboseLogger = verboseLogger;
             _nonBlockingMatchers = nonBlockingMatchers;
+            _isIgnorableHit = IsIgnorableHit;
         }
 
         ///<inheritdoc/>
@@ -100,10 +106,8 @@ namespace TestHelper.UI.Strategies
             _results.Clear();
             EventSystem.current.RaycastAll(pointerEventData, _results);
 
-            _results.RemoveAll(r =>
-                !IsSameOrChildObject(target, r.gameObject.transform) &&
-                (r.gameObject.TryGetEnabledComponentInParent<NonBlockingAnnotation>(out _) ||
-                 IsMatchedOrChildOfNonBlockingMatchersMatched(r.gameObject)));
+            _target = target;
+            _results.RemoveAll(_isIgnorableHit);
 
             if (_results.Count == 0)
             {
@@ -136,6 +140,13 @@ namespace TestHelper.UI.Strategies
 
             result = _results[0];
             return isSameOrChildObject;
+        }
+
+        private bool IsIgnorableHit(RaycastResult hit)
+        {
+            return !IsSameOrChildObject(_target, hit.gameObject.transform) &&
+                   (hit.gameObject.TryGetEnabledComponentInParent<NonBlockingAnnotation>(out _) ||
+                    IsMatchedOrChildOfNonBlockingMatchersMatched(hit.gameObject));
         }
 
         private bool TryReachAroundBlockers(GameObject target, RaycastResult firstMiss, ILogger verboseLogger,

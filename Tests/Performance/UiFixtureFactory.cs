@@ -11,7 +11,7 @@ namespace TestHelper.UI.Performance
     // without maintaining large scene assets.
     internal static class UiFixtureFactory
     {
-        public static void CreateNestedButtons(int count, int nestDepth)
+        public static void CreateNestedButtons(int count, int nestDepth, bool withImage = false)
         {
             var canvas = CreateCanvas();
             for (var i = 0; i < count; i++)
@@ -24,7 +24,7 @@ namespace TestHelper.UI.Performance
                     parent = nest.transform;
                 }
 
-                CreateButton(parent, $"Button_{i}", withImage: false);
+                CreateButton(parent, $"Button_{i}", withImage);
             }
         }
 
