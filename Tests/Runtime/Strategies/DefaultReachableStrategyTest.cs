@@ -15,7 +15,11 @@ using TestHelper.UI.TestDoubles;
 using TestHelper.UI.TestUtils;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.TestTools.Constraints;
 using UnityEngine.UI;
+// UnityEngine.TestTools.Constraints is imported for the AllocatingGCMemory extension method, which brings a
+// second `Is` into scope. Aliased to NUnit's so that the existing assertions in this file keep resolving to it.
+using Is = NUnit.Framework.Is;
 
 namespace TestHelper.UI.Strategies
 {
@@ -506,6 +510,45 @@ namespace TestHelper.UI.Strategies
                 Assert.That(actual, Is.False, "not reachable");
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1), "message count");
                 Assert.That(spyLogger.Messages[0], Does.Contain("Raycast hit other objects: [Ancestor("), "message");
+            }
+        }
+
+        [TestFixture]
+        public class Allocation
+        {
+            private const string TestScenePath = "../../Scenes/GameObjectFinderUI.unity";
+            private readonly GameObjectFinder _finder = new GameObjectFinder(0.1d);
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task IsReachable_Reachable_DoesNotAllocateGCMemory()
+            {
+                var target = (await _finder.FindByNameAsync("ActiveText", reachable: false)).GameObject;
+                var sut = new DefaultReachableStrategy();
+                Assume.That(sut.IsReachable(target, out _), Is.True); // also warms up the measured path
+
+                // Not a lambda with an expression body: a value-returning one binds to the ActualValueDelegate<T>
+                // overload of Assert.That, and the constraint then rejects it as "not a TestDelegate".
+                Assert.That(() => { _ = sut.IsReachable(target, out _); }, Is.Not.AllocatingGCMemory());
+            }
+
+            // Same blocker chain as Verbose.IsReachableWithVerbose_BlockersExceedMaxRaycastCount_..., so that every
+            // raycast of the fallback loop runs, without a logger because message formatting allocates by design.
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task IsReachable_BlockersExceedMaxRaycastCount_DoesNotAllocateGCMemory()
+            {
+                var target = CreateImage("Target", CanvasTransform, new Vector2(0, -150), new Vector2(320, 30));
+                CreateImage("Blocker1", CanvasTransform, new Vector2(-5, -150), new Vector2(20, 40));
+                CreateImage("Blocker2", CanvasTransform, new Vector2(85, -150), new Vector2(20, 40));
+                CreateImage("Blocker3", CanvasTransform, new Vector2(42, -150), new Vector2(20, 40));
+                CreateImage("Blocker4", CanvasTransform, new Vector2(22, -150), new Vector2(20, 40));
+                CreateImage("Blocker5", CanvasTransform, new Vector2(8.5f, -150), new Vector2(5, 40));
+                await WaitForRaycasterReady();
+                var sut = new DefaultReachableStrategy();
+                Assume.That(sut.IsReachable(target, out _), Is.False); // also warms up the measured path
+
+                Assert.That(() => { _ = sut.IsReachable(target, out _); }, Is.Not.AllocatingGCMemory());
             }
         }
     }
