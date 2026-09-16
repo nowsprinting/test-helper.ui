@@ -298,6 +298,35 @@ namespace TestHelper.UI.Strategies
                 Assert.That(ScreenRectTestHelper.GetScreenRect(target).Contains(raycastResult.screenPosition),
                     Is.True, "inside target");
             }
+
+            // Pivot (0,0.5) 40 px beyond the left edge; the visible part is x 0..120 and its center (60, H/2)
+            // is covered by a 40x40 blocker, so the third raycast targets a side strip.
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task IsReachable_PivotOffScreenAndVisibleCenterBlocked_Reachable()
+            {
+                var canvasRect = (RectTransform)CanvasTransform;
+                var camera = canvasRect.gameObject.GetAssociatedCamera();
+                var target = CreateImage("Target", canvasRect, Vector2.zero, new Vector2(160, 120));
+                var targetRect = (RectTransform)target.transform;
+                targetRect.pivot = new Vector2(0, 0.5f);
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect,
+                    new Vector2(-40f, Screen.height / 2f), camera, out var pivotLocalPoint);
+                targetRect.anchoredPosition = pivotLocalPoint - canvasRect.rect.center;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect,
+                    new Vector2(60f, Screen.height / 2f), camera, out var blockerLocalPoint);
+                var blocker = CreateImage("Blocker", canvasRect, blockerLocalPoint - canvasRect.rect.center,
+                    new Vector2(40, 40));
+                await WaitForRaycasterReady();
+
+                var actual = new DefaultReachableStrategy().IsReachable(target, out var raycastResult);
+
+                Assert.That(actual, Is.True, "reachable");
+                Assert.That(ScreenRectTestHelper.GetScreenRect(target).Contains(raycastResult.screenPosition),
+                    Is.True, "inside target");
+                Assert.That(ScreenRectTestHelper.GetScreenRect(blocker).Contains(raycastResult.screenPosition),
+                    Is.False, "outside blocker");
+            }
         }
 
         [TestFixture("2D")]
