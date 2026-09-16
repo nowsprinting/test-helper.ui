@@ -40,6 +40,21 @@ namespace TestHelper.UI.Strategies
             return gameObject;
         }
 
+        // Sized from screen pixels instead of canvas units so the geometry is independent of CanvasScaler and of
+        // the WorldSpace camera projection.
+        private static GameObject CreateImageAtScreenRect(string name, Rect screenRect, Vector2 pivot)
+        {
+            var canvasRect = (RectTransform)CanvasTransform;
+            var camera = canvasRect.gameObject.GetAssociatedCamera();
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenRect.min, camera, out var min);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenRect.max, camera, out var max);
+            var gameObject = CreateImage(name, canvasRect, Vector2.zero, max - min);
+            var rectTransform = (RectTransform)gameObject.transform;
+            rectTransform.pivot = pivot;
+            rectTransform.anchoredPosition = min + ((max - min) * pivot) - canvasRect.rect.center;
+            return gameObject;
+        }
+
         // Mask parent 100x30 at (0,-150); the Image is required by Mask and kept non-raycastable so it never blocks.
         private static GameObject CreateMask(Type maskType)
         {
@@ -299,29 +314,30 @@ namespace TestHelper.UI.Strategies
                     Is.True, "inside target");
             }
 
-            // Pivot (0,0.5) 40 px beyond the left edge; the visible part is x 0..120 and its center (60, H/2)
-            // is covered by a 40x40 blocker, so the third raycast targets a side strip.
+            // Target x -40..120 px with pivot (0,0.5) off-screen; the visible part is x 0..120 and its center
+            // (60, H/2) is covered by the blocker x 40..80, so the third raycast targets a side strip.
+            // Both rects are given in screen pixels so the geometry holds under every render mode.
             [Test]
             [LoadScene(TestScenePath)]
-            public async Task IsReachable_PivotOffScreenAndVisibleCenterBlocked_Reachable()
+            public async Task IsReachable_PivotOffScreenAndVisibleCenterBlocked_ReachableAtThirdRaycast()
             {
-                var canvasRect = (RectTransform)CanvasTransform;
-                var camera = canvasRect.gameObject.GetAssociatedCamera();
-                var target = CreateImage("Target", canvasRect, Vector2.zero, new Vector2(160, 120));
-                var targetRect = (RectTransform)target.transform;
-                targetRect.pivot = new Vector2(0, 0.5f);
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect,
-                    new Vector2(-40f, Screen.height / 2f), camera, out var pivotLocalPoint);
-                targetRect.anchoredPosition = pivotLocalPoint - canvasRect.rect.center;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect,
-                    new Vector2(60f, Screen.height / 2f), camera, out var blockerLocalPoint);
-                var blocker = CreateImage("Blocker", canvasRect, blockerLocalPoint - canvasRect.rect.center,
-                    new Vector2(40, 40));
+                var halfHeight = Screen.height / 2f;
+                var target = CreateImageAtScreenRect("Target",
+                    Rect.MinMaxRect(-40, halfHeight - 60, 120, halfHeight + 60),
+                    new Vector2(0, 0.5f));
+                var blocker = CreateImageAtScreenRect("Blocker",
+                    Rect.MinMaxRect(40, halfHeight - 20, 80, halfHeight + 20), new Vector2(0.5f, 0.5f));
                 await WaitForRaycasterReady();
+                var spyLogger = new SpyLogger();
+                var sut = new DefaultReachableStrategy(verboseLogger: spyLogger);
 
-                var actual = new DefaultReachableStrategy().IsReachable(target, out var raycastResult);
+                var actual = sut.IsReachable(target, out var raycastResult);
 
                 Assert.That(actual, Is.True, "reachable");
+                Assert.That(spyLogger.Messages, Has.Count.EqualTo(2), "two misses before the hit");
+                Assert.That(spyLogger.Messages[0], Does.Contain("Raycast is not hit"), "pivot off-screen");
+                Assert.That(spyLogger.Messages[1], Does.Contain("Raycast hit other objects: [Blocker("),
+                    "visible center blocked");
                 Assert.That(ScreenRectTestHelper.GetScreenRect(target).Contains(raycastResult.screenPosition),
                     Is.True, "inside target");
                 Assert.That(ScreenRectTestHelper.GetScreenRect(blocker).Contains(raycastResult.screenPosition),
