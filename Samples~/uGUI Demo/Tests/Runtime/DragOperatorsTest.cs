@@ -18,7 +18,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         private readonly GameObjectFinder _finder = new GameObjectFinder();
 
         [SetUp]
-        public async Task SetUp()
+        public async Task SetUpAsync()
         {
             var matcher = new ComponentMatcher(componentType: typeof(Dropdown), name: "TabSwitcher");
             var dropdown = await _finder.FindByMatcherAsync(matcher);
