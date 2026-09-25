@@ -250,7 +250,11 @@ namespace TestHelper.UI
                 const string BehindTheWall = "BehindTheWall";
                 var task = _sut.FindByNameAsync(BehindTheWall, timeoutSeconds: 0.5f);
 
+                // UTF4004 asks to wait for a condition instead. Not applied: the elapsed time is the subject of this
+                // test; the blocker must stay until the _sut default timeout has passed, which has no observable state.
+#pragma warning disable UTF4004
                 await UniTask.Delay(100);         // _sut timeout is 100ms
+#pragma warning restore UTF4004
                 wall.GameObject.SetActive(false); // Remove blocker
 
                 var result = await task;
