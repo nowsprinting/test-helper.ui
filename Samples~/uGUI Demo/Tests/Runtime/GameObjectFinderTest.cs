@@ -34,7 +34,11 @@ namespace TestHelper.UI.Samples.UguiDemo
             Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
             await clickOperator.OperateAsync(button.GameObject);
+            // UTF4004 asks to wait for a condition instead. Not applied: nothing is asserted afterward;
+            // this fixed wait only lets a person watching the demo see the result on screen.
+#pragma warning disable UTF4004
             await Task.Delay(200 + 1000); // wait for GameObjectFinder timeout and show popup
+#pragma warning restore UTF4004
         }
 
         [Test]
@@ -46,7 +50,11 @@ namespace TestHelper.UI.Samples.UguiDemo
             Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
             await clickOperator.OperateAsync(button.GameObject);
+            // UTF4004 asks to wait for a condition instead. Not applied: nothing is asserted afterward;
+            // this fixed wait only lets a person watching the demo see the result on screen.
+#pragma warning disable UTF4004
             await Task.Delay(1000); // wait for show popup
+#pragma warning restore UTF4004
         }
     }
 }

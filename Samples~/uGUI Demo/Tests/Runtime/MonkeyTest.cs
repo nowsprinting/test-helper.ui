@@ -39,8 +39,12 @@ namespace TestHelper.UI.Samples.UguiDemo
             var lifetimeSeconds = monkeyTestButton.LifetimeSeconds;
 
             await clickOperator.OperateAsync(button.GameObject);
+            // UTF4004 asks to wait for a condition instead. Not applied: nothing is asserted afterward;
+            // this fixed wait only lets a person watching the demo see the result on screen.
+#pragma warning disable UTF4004
             await Task.Delay(TimeSpan.FromSeconds(lifetimeSeconds)); // wait for monkey test to finish
             await Task.Delay(1000);                                  // wait for show popup
+#pragma warning restore UTF4004
         }
     }
 }
