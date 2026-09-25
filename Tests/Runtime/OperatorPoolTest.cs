@@ -293,7 +293,7 @@ namespace TestHelper.UI
             Assert.That(instance.GetScreenPoint, Is.SameAs(getScreenPoint));
             Assert.That(instance.ReachableStrategy, Is.SameAs(reachableStrategy));
             Assert.That(((SpyRandom)instance.Random).ForkedFrom, Is.SameAs(random)); // forked instance
-            
+
             visualizer.Dispose();
         }
 
