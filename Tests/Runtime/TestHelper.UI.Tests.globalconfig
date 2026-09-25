@@ -74,3 +74,6 @@ dotnet_diagnostic.VSTHRD200.severity = none
 
 # NUnit2045: Use Assert.Multiple
 dotnet_diagnostic.NUnit2045.severity = none
+
+# UTF2006: Property constraints, Ordered.By, and List.Map(...).Property lookup properties that managed code stripping can remove
+dotnet_diagnostic.UTF2006.severity = warning
