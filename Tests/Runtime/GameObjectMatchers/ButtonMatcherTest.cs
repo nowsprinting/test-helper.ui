@@ -186,24 +186,7 @@ namespace TestHelper.UI.GameObjectMatchers
 
             if (path != null)
             {
-                var enumerator = path.Split('/').Reverse().GetEnumerator();
-                enumerator.MoveNext();
-                gameObject.name = enumerator.Current ?? "null";
-                var lastGameObject = gameObject;
-                while (enumerator.MoveNext())
-                {
-                    var node = enumerator.Current;
-                    if (string.IsNullOrEmpty(node))
-                    {
-                        continue;
-                    }
-
-                    var parent = new GameObject(node);
-                    lastGameObject.transform.SetParent(parent.transform);
-                    lastGameObject = parent;
-                }
-
-                enumerator.Dispose();
+                ApplyPath(path, gameObject);
             }
 
             if (name != null)
@@ -245,6 +228,28 @@ namespace TestHelper.UI.GameObjectMatchers
             }
 
             return gameObject;
+        }
+
+        private static void ApplyPath(string path, GameObject gameObject)
+        {
+            var enumerator = path.Split('/').Reverse().GetEnumerator();
+            enumerator.MoveNext();
+            gameObject.name = enumerator.Current ?? "null";
+            var lastGameObject = gameObject;
+            while (enumerator.MoveNext())
+            {
+                var node = enumerator.Current;
+                if (string.IsNullOrEmpty(node))
+                {
+                    continue;
+                }
+
+                var parent = new GameObject(node);
+                lastGameObject.transform.SetParent(parent.transform);
+                lastGameObject = parent;
+            }
+
+            enumerator.Dispose();
         }
 
         private static Sprite CreateSprite(string name, int edgeSize = 1)

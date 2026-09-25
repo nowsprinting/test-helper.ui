@@ -23,9 +23,10 @@ namespace TestHelper.UI.Paginators
             var horizontalScrollView = GameObject.Find("Horizontal Scroll View");
             if (horizontalScrollView != null)
             {
-                _horizontalScrollbar = horizontalScrollView.transform.Find("Scrollbar Horizontal")?.gameObject;
-                if (_horizontalScrollbar != null)
+                var horizontalScrollbar = horizontalScrollView.transform.Find("Scrollbar Horizontal");
+                if (horizontalScrollbar != null)
                 {
+                    _horizontalScrollbar = horizontalScrollbar.gameObject;
                     var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
                     scrollbar.value = 0f;
                 }
@@ -34,9 +35,10 @@ namespace TestHelper.UI.Paginators
             var verticalScrollView = GameObject.Find("Vertical Scroll View");
             if (verticalScrollView != null)
             {
-                _verticalScrollbar = verticalScrollView.transform.Find("Scrollbar Vertical")?.gameObject;
-                if (_verticalScrollbar != null)
+                var verticalScrollbar = verticalScrollView.transform.Find("Scrollbar Vertical");
+                if (verticalScrollbar != null)
                 {
+                    _verticalScrollbar = verticalScrollbar.gameObject;
                     var scrollbar = _verticalScrollbar.GetComponent<Scrollbar>();
                     scrollbar.value = 0f;
                 }

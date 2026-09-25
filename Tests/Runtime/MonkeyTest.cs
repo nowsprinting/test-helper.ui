@@ -14,6 +14,7 @@ using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using TestHelper.UI.Annotations;
 using TestHelper.UI.Exceptions;
+using TestHelper.UI.Extensions;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Strategies;
 using TestHelper.UI.TestDoubles;
@@ -116,10 +117,7 @@ namespace TestHelper.UI
                 BufferLengthForDetectLooping = 0,          // disable loop detection
                 OperatorPool = _operatorPool,
             };
-            var task = Monkey.Run(config);
-            await UniTask.Delay(1000, DelayType.DeltaTime);
-
-            Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
+            await Monkey.Run(config).Timeout(TimeSpan.FromSeconds(1));
         }
 
         [Test]
@@ -135,7 +133,7 @@ namespace TestHelper.UI
             {
                 var cancellationToken = cancellationTokenSource.Token;
                 var task = Monkey.Run(config, cancellationToken: cancellationToken);
-                await UniTask.Delay(1000, DelayType.DeltaTime, cancellationToken: cancellationToken);
+                await UniTask.NextFrame();
 
                 cancellationTokenSource.Cancel();
                 await UniTask.NextFrame();
@@ -188,10 +186,7 @@ namespace TestHelper.UI
                 SecondsToErrorForNoInteractiveComponent = 0, // not detect error
             };
 
-            var task = Monkey.Run(config);
-            await UniTask.Delay(2200, DelayType.DeltaTime);
-
-            Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
+            await Monkey.Run(config).Timeout(TimeSpan.FromSeconds(4));
         }
 
         [Test]
@@ -227,10 +222,7 @@ namespace TestHelper.UI
                 Gizmos = true,                             // show Gizmos
                 OperatorPool = _operatorPool,
             };
-            var task = Monkey.Run(config);
-            await UniTask.Delay(1000, DelayType.DeltaTime);
-
-            Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
+            await Monkey.Run(config).Timeout(TimeSpan.FromSeconds(1));
             Assert.That(GameViewControlHelper.GetGizmos(), Is.False, "Reverted Gizmos");
         }
 
@@ -630,10 +622,8 @@ namespace TestHelper.UI
             [TearDown]
             public async Task TearDown()
             {
-                await UniTask.Delay(
-                    TimeSpan.FromSeconds(IndicatorLifetime)); // game-time wait (same basis as FadeOutBehaviour)
-                await UniTask
-                    .DelayFrame(1); // one extra frame to ensure FadeOutBehaviour.Update() calls OnFadeOutCompleted
+                await UniTask.WaitUntil(() => ObjectExtensions.FindObjectsByType<FadeOutBehaviour>().Length == 0)
+                    .Timeout(TimeSpan.FromSeconds(IndicatorLifetime * 3)); // wait for end of life of all indicators
             }
 
             [Test]

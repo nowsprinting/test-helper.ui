@@ -18,7 +18,7 @@ namespace TestHelper.UI.Samples.UguiDemo
         private readonly GameObjectFinder _finder = new GameObjectFinder();
 
         [SetUp]
-        public async Task SetUp()
+        public async Task SetUpAsync()
         {
             var matcher = new ComponentMatcher(componentType: typeof(Dropdown), name: "TabSwitcher");
             var dropdown = await _finder.FindByMatcherAsync(matcher);
@@ -34,7 +34,11 @@ namespace TestHelper.UI.Samples.UguiDemo
             Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
             await clickOperator.OperateAsync(button.GameObject);
+            // UTF4004 asks to wait for a condition instead. Not applied: nothing is asserted afterward;
+            // this fixed wait only lets a person watching the demo see the result on screen.
+#pragma warning disable UTF4004
             await Task.Delay(200); // wait for input text
+#pragma warning restore UTF4004
         }
 
         [Test]
@@ -46,7 +50,11 @@ namespace TestHelper.UI.Samples.UguiDemo
             Assume.That(clickOperator.CanOperate(button.GameObject), Is.True);
 
             await clickOperator.OperateAsync(button.GameObject);
+            // UTF4004 asks to wait for a condition instead. Not applied: nothing is asserted afterward;
+            // this fixed wait only lets a person watching the demo see the result on screen.
+#pragma warning disable UTF4004
             await Task.Delay(200); // wait for input text
+#pragma warning restore UTF4004
         }
     }
 }
