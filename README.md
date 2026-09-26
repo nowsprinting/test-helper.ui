@@ -630,7 +630,7 @@ A paginator must implement the following methods:
 In addition, a paginator must meet the following requirements:
 
 - The `TargetComponent` property setter accepts the pageable component to be controlled. It must accept `null`, reset the internal state tied to the previous target component (`PaginatorPool` reassigns pooled instances), and throw `ArgumentException` for an unsupported component type
-- `ResetAsync` and `HasNextPage` throw `InvalidOperationException` when the target component is not set
+- `ResetAsync`, `NextPageAsync`, and `HasNextPage` throw `InvalidOperationException` when the target component is not set
 - Implement `IPaginator<TComponent>` instead of `IPaginator` to make the paginator selectable by `PaginatorPool.Rent(targetComponent)`
 - `PaginatorPool` creates instances by invoking the public constructor via reflection. Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the Player build
 - A paginator must have exactly one public constructor whose parameters all have default values. Otherwise, register it with explicit constructor arguments via `PaginatorPool.Register<T>(args)`; without them, `PaginatorPool.Rent` throws `InvalidOperationException`

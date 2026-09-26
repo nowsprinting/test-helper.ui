@@ -74,7 +74,18 @@ namespace TestHelper.UI
         public IPaginator Rent(Type type, MonoBehaviour targetComponent = null)
         {
             var paginator = RentWithoutTargetComponent(type);
-            paginator.TargetComponent = targetComponent;
+            try
+            {
+                paginator.TargetComponent = targetComponent;
+            }
+            catch
+            {
+                // Validating the target component before popping is rejected: only the paginator knows which
+                // components it supports, so an instance is needed; putting it back keeps it reusable instead.
+                Push(type, paginator);
+                throw;
+            }
+
             return paginator;
         }
 
@@ -220,7 +231,11 @@ namespace TestHelper.UI
             }
 
             obj.TargetComponent = null;
+            Push(type, obj);
+        }
 
+        private void Push(Type type, IPaginator obj)
+        {
             if (!_pools.TryGetValue(type, out var stack))
             {
                 stack = new Stack<IPaginator>();
