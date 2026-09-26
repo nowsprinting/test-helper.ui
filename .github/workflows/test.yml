@@ -62,10 +62,13 @@ jobs:
 
     steps:
       - name: Create project for test
-        uses: nowsprinting/create-unity-project-action@95f60602e491564583a15ee611a21c23c2f5d5d4 # v4
+        uses: nowsprinting/create-unity-project-action@c086a110a56fd0600a6051e709d99e635e3f208e # v4.1.1
         with:
           project-path: .
           active-input-handler: ${{ matrix.inputHandler }}
+          scripting-backend: 1        # IL2CPP
+          il2cpp-code-generation: 1   # Optimize for code size and build time
+          managed-stripping-level: 3  # High
 
       - name: Get package checkout path
         run: |
