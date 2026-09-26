@@ -28,6 +28,17 @@ Constructor arguments:
 > [!WARNING]\
 > A `GameObjectFinder` instance reuses internal buffers across find calls for performance. Running multiple finds concurrently on the same instance corrupts their results; use a separate instance per concurrent find.
 
+> [!TIP]\
+> How `DefaultReachableStrategy` decides "reachable":
+> the pivot position (or the point given by [annotation components](#control-reachablestrategy)) is always raycast first with `EventSystem.RaycastAll`, the same path the input module uses, and when it hits the `GameObject` or one of its children, that point becomes the operating point.
+> If the first raycast is blocked, it retries inside the visible rect of the `RectTransform` (its corners projected to screen, clipped by the screen and by ancestor `RectMask2D`/`Mask` rects):
+>
+> 1. If the first point lies outside the visible rect (off-screen or masked), the center of the visible rect is tried next.
+> 2. Each miss subtracts the blocking object's screen rect from the remaining rect, and the next raycast targets the center of the largest remaining strip.
+> 3. At most 5 raycasts are made in total. The search stops early when nothing was hit, the blocker is an ancestor of the target, or the blocker is not a `RectTransform` (e.g., a 3D object).
+>
+> Any fallback hit is a real hit on the target, so this adds no false positives. The hit point becomes the operating point (`RaycastResult.screenPosition`). If every attempt fails, the first (pivot) miss is reported in verbose logs and the visualizer.
+
 
 #### Find GameObject by name
 
@@ -144,13 +155,6 @@ public class MyIntegrationTest
 Find a `GameObject` on pageable or scrollable UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
 A paginator provides step-by-step navigation through pageable content, allowing users to find objects that are not currently visible in the viewport.
 
-Arguments:
-
-- **matcher**: Custom `IGameObjectMatcher` implementation
-- **reachable**: Find only reachable object. Default is true
-- **interactable**: Find only interactable object. Default is false
-- **paginator**: `IPaginator` implementation for controlling pageable components
-
 Built-in paginators:
 
 - `UguiScrollbarPaginator`: Used to find `GameObjects` that are on a scrollable component with a `ScrollBar`
@@ -217,17 +221,6 @@ var pool = new PaginatorPool()
 
 var paginator = pool.Rent(scrollRect); // returns UguiScrollRectPaginator
 ```
-
-> [!TIP]\
-> How `DefaultReachableStrategy` decides "reachable":
-> the pivot position (or the point given by [annotation components](#control-reachablestrategy)) is always raycast first with `EventSystem.RaycastAll`, the same path the input module uses, and when it hits the `GameObject` or one of its children, that point becomes the operating point.
-> If the first raycast is blocked, it retries inside the visible rect of the `RectTransform` (its corners projected to screen, clipped by the screen and by ancestor `RectMask2D`/`Mask` rects):
->
-> 1. If the first point lies outside the visible rect (off-screen or masked), the center of the visible rect is tried next.
-> 2. Each miss subtracts the blocking object's screen rect from the remaining rect, and the next raycast targets the center of the largest remaining strip.
-> 3. At most 5 raycasts are made in total. The search stops early when nothing was hit, the blocker is an ancestor of the target, or the blocker is not a `RectTransform` (e.g., a 3D object).
->
-> Any fallback hit is a real hit on the target, so this adds no false positives. The hit point becomes the operating point (`RaycastResult.screenPosition`). If every attempt fails, the first (pivot) miss is reported in verbose logs and the visualizer.
 
 
 
