@@ -16,6 +16,10 @@ namespace TestHelper.UI.Operators
     /// <remarks>
     /// Must be implements sub-interface (e.g., <c>IClickOperator</c>) to represent the type of operator.
     /// If required parameters for the operation, such as hold time, input text strategy, etc., keep them in instance fields of the implementation class.
+    /// <p/>
+    /// <c>OperatorPool</c> creates instances of the implementation class by invoking its public constructor via reflection.
+    /// Annotate every public constructor with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build.
+    /// If the implementation class has multiple public constructors, register it with explicit constructor arguments via <c>OperatorPool.Register&lt;T&gt;(args)</c>.
     /// </remarks>
     public interface IOperator
     {

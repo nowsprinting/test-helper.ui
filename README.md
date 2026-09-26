@@ -615,6 +615,11 @@ If your game title uses a custom UI framework that is not uGUI compatible, you c
 A sub-interface of the `IOperator` (e.g., `IClickOperator`) must be implemented to represent the type of operator.
 An operator must implement the `CanOperate` method to determine whether an operation, such as a click, is possible and the `OperateAsync` method to execute the operation.
 
+[OperatorPool](#operatorpool) creates operator instances by invoking the public constructor via reflection, so the constructor must meet the following:
+
+- Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the player build.
+- If the operator has multiple public constructors, register it with constructor arguments (see [Dependency Injection](#dependency-injection)); otherwise, `OperatorPool.Rent` throws `InvalidOperationException`.
+
 > [!IMPORTANT]\
 > Until test-helper.monkey v0.14.0, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
 

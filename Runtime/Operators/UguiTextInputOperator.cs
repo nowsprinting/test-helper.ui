@@ -14,6 +14,7 @@ using TestHelper.UI.Random;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Scripting;
 using UnityEngine.UI;
 #if ENABLE_TMP
 using TMPro;
@@ -58,6 +59,7 @@ namespace TestHelper.UI.Operators
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <param name="visualizer">Visualizer set if you need</param>
+        [Preserve]
         public UguiTextInputOperator(
             Func<GameObject, RandomStringParameters> randomStringParams = null, IRandomString randomString = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null, IVisualizer visualizer = null)
