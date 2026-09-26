@@ -52,6 +52,7 @@ jobs:
           - '2' # both
         include:
           - unityVersion: *latest_unity_version
+            latestDependencies: true
             octocov: true
           - unityVersion: 2022.3.62f3 # inputsystem package is not pre-installed
             inputHandler: '0' # legacy only
@@ -98,10 +99,18 @@ jobs:
         run: |
           npm install -g openupm-cli
           openupm add -f com.unity.test-framework@stable
-          openupm add -f com.cysharp.unitask
-          openupm add -f com.nowsprinting.test-helper
-          openupm add -f com.nowsprinting.test-helper.random
+          openupm add -f com.cysharp.unitask@2.3.3
+          openupm add -f com.nowsprinting.test-helper@1.3.2
+          openupm add -f com.nowsprinting.test-helper.random@1.1.0
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
+
+      - name: Update dependent UPM packages
+        run: |
+          openupm add -f com.cysharp.unitask@latest
+          openupm add -f com.nowsprinting.test-helper@latest
+          openupm add -f com.nowsprinting.test-helper.random@latest
+        working-directory: ${{ env.CREATED_PROJECT_PATH }}
+        if: ${{ matrix.latestDependencies }}
 
       - name: Install inputsystem package
         run: |
