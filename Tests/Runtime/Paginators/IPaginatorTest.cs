@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using UnityEngine;
+using UnityEngine.Scripting;
 #if UNITY_6000_4_OR_NEWER
 using UnityEngine.Assemblies;
 #endif
@@ -39,23 +39,27 @@ namespace TestHelper.UI.Paginators
                     }
                 })
                 .Where(t => t != null && interfaceType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
+                // Test doubles are excluded because some of them intentionally violate the constructor rules.
+                .Where(t => t.Namespace != "TestHelper.UI.TestDoubles")
                 .ToArray();
         }
 
-        /// <summary>
-        /// Verify that the paginators and supported component type can be obtained via reflection.
-        /// </summary>
         [TestCaseSource(nameof(GetPaginators))]
-        public void Constructor_HasOneParameterAndSubclassOfMonoBehaviour(Type paginatorType)
+        public void Constructor_RentedFromPoolWithoutRegistration_ReturnsInstanceOfPaginatorType(Type paginatorType)
         {
-            var ctor = paginatorType.GetConstructors()
-                .OrderBy(x => x.GetParameters().Length)
-                .FirstOrDefault(x => x.GetParameters().Length > 0);
-            Assume.That(ctor, Is.Not.Null, "A paginator must have a constructor with one or more parameters.");
+            var pool = new PaginatorPool(requireRegistration: false);
 
-            var parameterType = ctor.GetParameters()[0].ParameterType;
-            Assert.That(parameterType.IsSubclassOf(typeof(MonoBehaviour)), Is.True,
-                "The first parameter of the constructor is a pageable or scrollable component to be controlled, which must be a subclass of MonoBehaviour.");
+            var actual = pool.Rent(paginatorType);
+
+            Assert.That(actual, Is.InstanceOf(paginatorType));
+        }
+
+        [TestCaseSource(nameof(GetPaginators))]
+        public void Constructor_PublicConstructors_HavePreserveAttribute(Type paginatorType)
+        {
+            var constructors = paginatorType.GetConstructors();
+
+            Assert.That(constructors, Has.All.Matches<ConstructorInfo>(x => x.IsDefined(typeof(PreserveAttribute))));
         }
     }
 }

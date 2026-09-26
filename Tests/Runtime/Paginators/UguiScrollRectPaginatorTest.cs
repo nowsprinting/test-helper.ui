@@ -1,9 +1,11 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,9 +39,99 @@ namespace TestHelper.UI.Paginators
         }
 
         [Test]
-        public void Constructor_NullScrollRect_ThrowsArgumentNullException()
+        public void Constructor_NullScrollRect_ObjectCreatedSuccessfully()
         {
-            Assert.That(() => new UguiScrollRectPaginator(null), Throws.ArgumentNullException);
+            var sut = new UguiScrollRectPaginator(null);
+
+            Assert.That(sut, Is.Not.Null);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Category("Acceptance")]
+        public async Task TargetComponent_SetValidScrollRect_ControlsAssignedScrollRect()
+        {
+            var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
+            scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f);
+            var sut = new UguiScrollRectPaginator();
+
+            sut.TargetComponent = scrollRect;
+            await sut.ResetAsync();
+
+            Assert.That(scrollRect.normalizedPosition, Is.EqualTo(new Vector2(0f, 1f)));
+        }
+
+        [Test]
+        [CreateScene]
+        public void TargetComponent_SetUnsupportedComponentType_ThrowsArgumentException()
+        {
+            var component = new GameObject("Unsupported").AddComponent<FakeComponent>();
+            var sut = new UguiScrollRectPaginator();
+
+            Assert.That(() => sut.TargetComponent = component, Throws.ArgumentException);
+        }
+
+        [Test]
+        [CreateScene]
+        public void TargetComponent_SetScrollRectWithNullContent_ThrowsArgumentException()
+        {
+            var scrollRect = new GameObject("Scroll View", typeof(RectTransform)).AddComponent<ScrollRect>();
+            Assume.That(scrollRect.content, Is.Null);
+            var sut = new UguiScrollRectPaginator();
+
+            Assert.That(() => sut.TargetComponent = scrollRect, Throws.ArgumentException);
+        }
+
+        [Test]
+        public async Task ResetAsync_TargetComponentNotSet_ThrowsInvalidOperationException()
+        {
+            var sut = new UguiScrollRectPaginator();
+
+            try
+            {
+                await sut.ResetAsync();
+                Assert.Fail("Expected InvalidOperationException but was not thrown");
+            }
+            catch (InvalidOperationException)
+            {
+                // expected
+            }
+        }
+
+        [Test]
+        public async Task NextPageAsync_TargetComponentNotSet_ThrowsInvalidOperationException()
+        {
+            var sut = new UguiScrollRectPaginator();
+
+            try
+            {
+                await sut.NextPageAsync();
+                Assert.Fail("Expected InvalidOperationException but was not thrown");
+            }
+            catch (InvalidOperationException)
+            {
+                // expected
+            }
+        }
+
+        [Test]
+        public void HasNextPage_TargetComponentNotSet_ThrowsInvalidOperationException()
+        {
+            var sut = new UguiScrollRectPaginator();
+
+            Assert.That(() => sut.HasNextPage(), Throws.InvalidOperationException);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public void HasNextPage_AfterTargetComponentSetToNull_ThrowsInvalidOperationException()
+        {
+            var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
+            var sut = new UguiScrollRectPaginator(scrollRect);
+
+            sut.TargetComponent = null;
+
+            Assert.That(() => sut.HasNextPage(), Throws.InvalidOperationException);
         }
 
         [Test]
@@ -282,6 +374,25 @@ namespace TestHelper.UI.Paginators
             Assume.That(scrollRect.normalizedPosition.x, Is.EqualTo(1f).Within(float.Epsilon));
 
             await sut.ResetAsync();
+            var actual = await sut.NextPageAsync();
+
+            Assert.That(actual, Is.True, "return value");
+            Assert.That(scrollRect.normalizedPosition.x, Is.GreaterThan(0f), "normalizedPosition.x");
+            Assert.That(scrollRect.normalizedPosition.y, Is.EqualTo(1f), "normalizedPosition.y");
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task NextPageAsync_AfterTargetComponentReassignedFollowingHorizontalEnd_ScrollsHorizontallyAndReturnsTrue()
+        {
+            var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
+            scrollRect.normalizedPosition = new Vector2(0.99f, 1f);
+            var sut = new UguiScrollRectPaginator(scrollRect);
+            Assume.That(await sut.NextPageAsync(), Is.True);
+            Assume.That(scrollRect.normalizedPosition.x, Is.EqualTo(1f).Within(float.Epsilon));
+
+            scrollRect.normalizedPosition = new Vector2(0f, 1f);
+            sut.TargetComponent = scrollRect;
             var actual = await sut.NextPageAsync();
 
             Assert.That(actual, Is.True, "return value");
