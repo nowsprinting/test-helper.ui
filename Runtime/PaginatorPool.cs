@@ -16,6 +16,10 @@ namespace TestHelper.UI
     {
         private readonly Dictionary<Type, Stack<IPaginator>> _pools = new Dictionary<Type, Stack<IPaginator>>();
         private readonly Dictionary<Type, object[]> _registrations = new Dictionary<Type, object[]>();
+
+        private readonly Dictionary<Type, List<Type>> _paginatorTypesByComponentType =
+            new Dictionary<Type, List<Type>>();
+
         private readonly bool _requireRegistration;
 
         /// <summary>
@@ -45,6 +49,7 @@ namespace TestHelper.UI
         {
             args = args ?? Array.Empty<object>();
             _registrations[typeof(T)] = args;
+            AddPaginatorTypeByComponentType(typeof(T));
             return this;
         }
 
@@ -77,7 +82,7 @@ namespace TestHelper.UI
         /// Rents a paginator whose target component type exactly matches <paramref name="targetComponent"/> from the pool or creates a new one, and assigns the target component to it.
         /// </summary>
         /// <remarks>
-        /// Candidates are the registered paginator types and the types of pooled instances that implement <see cref="IPaginator{TComponent}"/>.
+        /// Candidates are the registered paginator types and the types of returned instances that implement <see cref="IPaginator{TComponent}"/>.
         /// </remarks>
         /// <param name="targetComponent">The pageable component to be controlled by the paginator</param>
         /// <returns>An instance of the paginator for <paramref name="targetComponent"/></returns>
@@ -90,46 +95,46 @@ namespace TestHelper.UI
                 throw new ArgumentNullException(nameof(targetComponent));
             }
 
-            return Rent(FindPaginatorType(targetComponent.GetType()), targetComponent);
-        }
-
-        private Type FindPaginatorType(Type componentType)
-        {
-            var paginatorInterface = typeof(IPaginator<>).MakeGenericType(componentType);
-            Type found = null;
-            foreach (var type in _registrations.Keys)
+            var componentType = targetComponent.GetType();
+            if (!_paginatorTypesByComponentType.TryGetValue(componentType, out var paginatorTypes))
             {
-                found = SelectMatchedType(paginatorInterface, type, found, componentType);
+                throw new InvalidOperationException($"No paginator for {componentType.Name} is registered.");
             }
 
-            foreach (var type in _pools.Keys)
-            {
-                if (!_registrations.ContainsKey(type))
-                {
-                    found = SelectMatchedType(paginatorInterface, type, found, componentType);
-                }
-            }
-
-            return found ?? throw new InvalidOperationException(
-                $"No paginator for {componentType.Name} is registered.");
-        }
-
-        // Picking one of multiple matches (e.g., the first registered) is rejected: Dictionary does not guarantee
-        // the enumeration order, so the chosen paginator could silently change.
-        private static Type SelectMatchedType(Type paginatorInterface, Type candidate, Type found, Type componentType)
-        {
-            if (!paginatorInterface.IsAssignableFrom(candidate))
-            {
-                return found;
-            }
-
-            if (found != null)
+            // Picking one of multiple matches (e.g., the first registered) is rejected: it would silently depend on
+            // the registration order, which callers do not expect to be significant.
+            if (paginatorTypes.Count > 1)
             {
                 throw new InvalidOperationException(
-                    $"Multiple paginators for {componentType.Name} are registered: {found.Name}, {candidate.Name}.");
+                    $"Multiple paginators for {componentType.Name} are registered: {string.Join(", ", paginatorTypes.ConvertAll(x => x.Name))}.");
             }
 
-            return candidate;
+            return Rent(paginatorTypes[0], targetComponent);
+        }
+
+        // Resolving by MakeGenericType(componentType) on each Rent is rejected: it allocates on every call, and on
+        // IL2CPP it can fail for a component type whose IPaginator<> instantiation is not in the Player build.
+        private void AddPaginatorTypeByComponentType(Type paginatorType)
+        {
+            foreach (var interfaceType in paginatorType.GetInterfaces())
+            {
+                if (!interfaceType.IsGenericType || interfaceType.GetGenericTypeDefinition() != typeof(IPaginator<>))
+                {
+                    continue;
+                }
+
+                var componentType = interfaceType.GetGenericArguments()[0];
+                if (!_paginatorTypesByComponentType.TryGetValue(componentType, out var paginatorTypes))
+                {
+                    paginatorTypes = new List<Type>();
+                    _paginatorTypesByComponentType[componentType] = paginatorTypes;
+                }
+
+                if (!paginatorTypes.Contains(paginatorType))
+                {
+                    paginatorTypes.Add(paginatorType);
+                }
+            }
         }
 
         private IPaginator RentWithoutTargetComponent(Type type)
@@ -220,6 +225,7 @@ namespace TestHelper.UI
             {
                 stack = new Stack<IPaginator>();
                 _pools[type] = stack;
+                AddPaginatorTypeByComponentType(type);
             }
 
             stack.Push(obj);
