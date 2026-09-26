@@ -15,9 +15,16 @@ namespace TestHelper.UI.Paginators
     /// <remarks>
     /// The implementation class must meet the following requirements:
     /// <list type="bullet">
-    ///     <item>A paginator must have a constructor with one or more parameters</item>
-    ///     <item>The first parameter of the constructor is a pageable or scrollable component to be controlled</item>
-    ///     <item>The type of the first parameter must be a subclass of <c>MonoBehaviour</c></item>
+    ///     <item><c>PaginatorPool</c> creates instances by invoking the public constructor via reflection.
+    ///     Annotate every public constructor with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code
+    ///     stripping does not remove it from the Player build</item>
+    ///     <item>A paginator must have exactly one public constructor whose parameters all have default values;
+    ///     otherwise, register it with explicit constructor arguments via <c>PaginatorPool.Register&lt;T&gt;(args)</c></item>
+    ///     <item>The <see cref="TargetComponent"/> setter must accept null, reset the internal state tied to the
+    ///     previous target component (pooled instances are reassigned), and throw <see cref="System.ArgumentException"/>
+    ///     for an unsupported component type</item>
+    ///     <item><see cref="ResetAsync"/> and <see cref="HasNextPage"/> must throw
+    ///     <see cref="System.InvalidOperationException"/> when the target component is not set</item>
     ///     <item><see cref="NextPageAsync"/> must eventually return false: callers loop on the return value, so
     ///     when the page position cannot advance (e.g., the layout has not been calculated yet), it must return
     ///     false instead of true</item>
@@ -28,8 +35,10 @@ namespace TestHelper.UI.Paginators
     public interface IPaginator
     {
         /// <summary>
-        /// The pageable component to be controlled.
+        /// The pageable component to be controlled (scrollable components are a kind of pageable component).
+        /// Set null to clear it.
         /// </summary>
+        /// <exception cref="System.ArgumentException">When the value is not the component type this paginator supports, or is in an invalid state</exception>
         MonoBehaviour TargetComponent { set; }
 
         /// <summary>
