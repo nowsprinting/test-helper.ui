@@ -301,6 +301,20 @@ namespace TestHelper.UI
 
         [Test]
         [CreateScene]
+        public void Rent_TargetComponent_AfterReturn_DoesNotAllocateGCMemory()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+            var instance = pool.Rent(targetComponent);
+            Assume.That(instance, Is.Not.Null);
+            pool.Return(instance);
+
+            Assert.That(() => { pool.Rent(targetComponent); }, Is.Not.AllocatingGCMemory());
+        }
+
+        [Test]
+        [CreateScene]
         [Category("Acceptance")]
         public void Rent_WithTargetComponent_AfterReturn_PooledInstanceHasTargetComponentAssigned()
         {
