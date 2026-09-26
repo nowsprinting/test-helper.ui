@@ -315,6 +315,22 @@ namespace TestHelper.UI
 
         [Test]
         [CreateScene]
+        public void Rent_AfterRentWithUnsupportedTargetComponentFailed_ReturnsPooledInstance()
+        {
+            var unsupportedComponent = new GameObject("Unsupported").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<UguiScrollRectPaginator>();
+            var instance1 = pool.Rent<UguiScrollRectPaginator>();
+            pool.Return(instance1);
+            Assume.That(() => pool.Rent<UguiScrollRectPaginator>(unsupportedComponent), Throws.ArgumentException);
+
+            var instance2 = pool.Rent<UguiScrollRectPaginator>();
+
+            Assert.That(instance2, Is.Not.Null.And.SameAs(instance1));
+        }
+
+        [Test]
+        [CreateScene]
         [Category("Acceptance")]
         public void Rent_WithTargetComponent_AfterReturn_PooledInstanceHasTargetComponentAssigned()
         {
