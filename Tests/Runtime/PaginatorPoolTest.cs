@@ -125,7 +125,7 @@ namespace TestHelper.UI
         {
             var pool = new PaginatorPool(requireRegistration: false);
 
-            Assert.That(() => pool.Rent((Type)null), Throws.ArgumentNullException);
+            Assert.That(() => pool.Rent(null), Throws.ArgumentNullException);
         }
 
         [Test]

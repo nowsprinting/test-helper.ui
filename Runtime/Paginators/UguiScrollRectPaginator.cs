@@ -45,7 +45,8 @@ namespace TestHelper.UI.Paginators
                 var scrollRect = value as ScrollRect;
                 if (value && !scrollRect)
                 {
-                    throw new ArgumentException($"TargetComponent must be a ScrollRect, but was {value.GetType().Name}.",
+                    throw new ArgumentException(
+                        $"TargetComponent must be a ScrollRect, but was {value.GetType().Name}.",
                         nameof(value));
                 }
 
@@ -63,6 +64,7 @@ namespace TestHelper.UI.Paginators
         public async UniTask ResetAsync(CancellationToken cancellationToken = default)
         {
             ThrowIfTargetComponentNotSet();
+
             _scrollRect.normalizedPosition = new Vector2(0f, 1f);
             _isHorizontalAtEnd = false;
             await UniTask.Yield(cancellationToken);

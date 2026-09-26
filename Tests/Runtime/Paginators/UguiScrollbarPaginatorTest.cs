@@ -60,6 +60,8 @@ namespace TestHelper.UI.Paginators
         [Test]
         public void Constructor_NullScrollbar_ObjectCreatedSuccessfully()
         {
+            // Omitting the argument is rejected: this test specifies passing null explicitly.
+            // ReSharper disable once RedundantArgumentDefaultValue
             var sut = new UguiScrollbarPaginator(null);
 
             Assert.That(sut, Is.Not.Null);

@@ -55,6 +55,7 @@ namespace TestHelper.UI.Paginators
         public async UniTask ResetAsync(CancellationToken cancellationToken = default)
         {
             ThrowIfTargetComponentNotSet();
+
             _scrollbar.value = 0f;
             await UniTask.Yield(cancellationToken);
         }

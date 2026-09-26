@@ -124,7 +124,7 @@ namespace TestHelper.UI
                 {
                     throw new InvalidOperationException(
                         $"Cannot resolve required parameter '{parameters[i].Name}' of type {parameters[i].ParameterType.Name}. " +
-                        $"Register with explicit constructor arguments or add a default value.");
+                        "Register with explicit constructor arguments or add a default value.");
                 }
 
                 defaultArgs[i] = parameters[i].DefaultValue;

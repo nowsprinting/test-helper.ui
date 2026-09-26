@@ -41,6 +41,8 @@ namespace TestHelper.UI.Paginators
         [Test]
         public void Constructor_NullScrollRect_ObjectCreatedSuccessfully()
         {
+            // Omitting the argument is rejected: this test specifies passing null explicitly.
+            // ReSharper disable once RedundantArgumentDefaultValue
             var sut = new UguiScrollRectPaginator(null);
 
             Assert.That(sut, Is.Not.Null);
@@ -383,7 +385,8 @@ namespace TestHelper.UI.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task NextPageAsync_AfterTargetComponentReassignedFollowingHorizontalEnd_ScrollsHorizontallyAndReturnsTrue()
+        public async Task
+            NextPageAsync_AfterTargetComponentReassignedFollowingHorizontalEnd_ScrollsHorizontallyAndReturnsTrue()
         {
             var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
             scrollRect.normalizedPosition = new Vector2(0.99f, 1f);
