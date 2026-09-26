@@ -20,7 +20,7 @@ namespace TestHelper.UI.Paginators
     /// <summary>
     /// Paginator implementation for <see cref="ScrollRect"/>.
     /// </summary>
-    public class UguiScrollRectPaginator : IPaginator
+    public class UguiScrollRectPaginator : IPaginator<ScrollRect>
     {
         private ScrollRect _scrollRect;
         private bool _isHorizontalAtEnd;

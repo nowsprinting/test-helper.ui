@@ -1,12 +1,14 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.UI.Paginators;
 using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.TestTools.Constraints;
+using UnityEngine.UI;
 // UnityEngine.TestTools.Constraints is imported for the AllocatingGCMemory extension method, which brings a
 // second `Is` into scope. Aliased to NUnit's so that the other assertions in this file keep resolving to it.
 using Is = NUnit.Framework.Is;
@@ -124,7 +126,7 @@ namespace TestHelper.UI
         {
             var pool = new PaginatorPool(requireRegistration: false);
 
-            Assert.That(() => pool.Rent(null), Throws.ArgumentNullException);
+            Assert.That(() => pool.Rent((Type)null), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -199,6 +201,99 @@ namespace TestHelper.UI
 
             Assert.That(instance, Is.InstanceOf<FakePaginator>());
             Assert.That(((FakePaginator)instance).TargetComponent, Is.SameAs(targetComponent));
+        }
+
+        [Test]
+        [CreateScene]
+        [Category("Acceptance")]
+        public void Rent_TargetComponent_ReturnsInstanceOfMatchingPaginatorWithTargetComponentAssigned()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<UguiScrollbarPaginator>();
+            pool.Register<FakePaginator>();
+
+            var instance = pool.Rent(targetComponent);
+
+            Assert.That(instance, Is.InstanceOf<FakePaginator>());
+            Assert.That(((FakePaginator)instance).TargetComponent, Is.SameAs(targetComponent));
+        }
+
+        [Test]
+        [CreateScene]
+        public void Rent_TargetComponentOfScrollbar_ReturnsUguiScrollbarPaginator()
+        {
+            var scrollbar = new GameObject("Scrollbar", typeof(RectTransform)).AddComponent<Scrollbar>();
+            var pool = new PaginatorPool();
+            pool.Register<UguiScrollRectPaginator>();
+            pool.Register<UguiScrollbarPaginator>();
+
+            var instance = pool.Rent(scrollbar);
+
+            Assert.That(instance, Is.InstanceOf<UguiScrollbarPaginator>());
+        }
+
+        [Test]
+        [CreateScene]
+        public void Rent_TargetComponentOfDerivedType_ThrowsInvalidOperationException()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeDerivedComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+
+            Assert.That(() => pool.Rent(targetComponent),
+                Throws.InvalidOperationException
+                    .With.Message.EqualTo("No paginator for FakeDerivedComponent is registered."));
+        }
+
+        [Test]
+        [CreateScene]
+        public void Rent_TargetComponentWithoutMatchingPaginator_ThrowsInvalidOperationException()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<UguiScrollbarPaginator>();
+
+            Assert.That(() => pool.Rent(targetComponent),
+                Throws.InvalidOperationException
+                    .With.Message.EqualTo("No paginator for FakeComponent is registered."));
+        }
+
+        [Test]
+        [CreateScene]
+        public void Rent_TargetComponentWithMultipleMatchingPaginators_ThrowsInvalidOperationException()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+            pool.Register<FakePaginatorWithMultiplePublicConstructors>(42);
+
+            Assert.That(() => pool.Rent(targetComponent),
+                Throws.InvalidOperationException
+                    .With.Message.StartsWith("Multiple paginators for FakeComponent are registered"));
+        }
+
+        [Test]
+        public void Rent_NullTargetComponent_ThrowsArgumentNullException()
+        {
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+
+            Assert.That(() => pool.Rent((MonoBehaviour)null), Throws.ArgumentNullException);
+        }
+
+        [Test]
+        [CreateScene]
+        public void Rent_TargetComponent_AfterReturn_NotRequireRegistration_ReturnsSameInstance()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool(requireRegistration: false);
+            var instance1 = pool.Rent<FakePaginator>();
+            pool.Return(instance1);
+
+            var instance2 = pool.Rent(targetComponent);
+
+            Assert.That(instance2, Is.Not.Null.And.SameAs(instance1));
         }
 
         [Test]

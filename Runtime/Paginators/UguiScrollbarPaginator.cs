@@ -20,7 +20,7 @@ namespace TestHelper.UI.Paginators
     /// <summary>
     /// Paginator implementation for <see cref="Scrollbar"/>.
     /// </summary>
-    public class UguiScrollbarPaginator : IPaginator
+    public class UguiScrollbarPaginator : IPaginator<Scrollbar>
     {
         private Scrollbar _scrollbar;
 

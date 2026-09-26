@@ -12,7 +12,7 @@ using UnityEngine.Scripting;
 namespace TestHelper.UI.TestDoubles
 {
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public class FakePaginatorWithMultiplePublicConstructors : IPaginator
+    public class FakePaginatorWithMultiplePublicConstructors : IPaginator<FakeComponent>
     {
         public int IntValue { get; }
         public MonoBehaviour TargetComponent { get; set; }

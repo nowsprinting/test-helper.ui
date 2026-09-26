@@ -73,6 +73,21 @@ namespace TestHelper.UI
             return paginator;
         }
 
+        /// <summary>
+        /// Rents a paginator whose target component type exactly matches <paramref name="targetComponent"/> from the pool or creates a new one, and assigns the target component to it.
+        /// </summary>
+        /// <remarks>
+        /// Candidates are the registered paginator types and the types of pooled instances that implement <see cref="IPaginator{TComponent}"/>.
+        /// </remarks>
+        /// <param name="targetComponent">The pageable component to be controlled by the paginator</param>
+        /// <returns>An instance of the paginator for <paramref name="targetComponent"/></returns>
+        /// <exception cref="ArgumentNullException">When <paramref name="targetComponent"/> is null</exception>
+        /// <exception cref="InvalidOperationException">When no paginator or multiple paginators match the type of <paramref name="targetComponent"/></exception>
+        public IPaginator Rent(MonoBehaviour targetComponent)
+        {
+            return null;
+        }
+
         private IPaginator RentWithoutTargetComponent(Type type)
         {
             if (type == null)
