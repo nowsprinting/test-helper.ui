@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using TestHelper.UI.Paginators;
 using UnityEngine;
 
@@ -66,7 +66,6 @@ namespace TestHelper.UI
         /// <param name="targetComponent">The pageable component to be controlled by the paginator. If omitted, the paginator has no target component.</param>
         /// <returns>An instance of the requested paginator type</returns>
         /// <exception cref="ArgumentException">When the paginator does not support <paramref name="targetComponent"/></exception>
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public IPaginator Rent(Type type, MonoBehaviour targetComponent = null)
         {
             var paginator = RentWithoutTargetComponent(type);
@@ -116,7 +115,12 @@ namespace TestHelper.UI
                     $"{type.Name} has multiple public constructors. Register with explicit constructor arguments.");
             }
 
-            var parameters = constructors[0].GetParameters();
+            return (IPaginator)constructors[0].Invoke(GetDefaultArguments(constructors[0]));
+        }
+
+        private static object[] GetDefaultArguments(ConstructorInfo constructor)
+        {
+            var parameters = constructor.GetParameters();
             var defaultArgs = new object[parameters.Length];
             for (var i = 0; i < parameters.Length; i++)
             {
@@ -130,7 +134,7 @@ namespace TestHelper.UI
                 defaultArgs[i] = parameters[i].DefaultValue;
             }
 
-            return (IPaginator)constructors[0].Invoke(defaultArgs);
+            return defaultArgs;
         }
 
         /// <summary>

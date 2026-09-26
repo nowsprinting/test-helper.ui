@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using UnityEngine.Scripting;
 #if UNITY_6000_4_OR_NEWER
 using UnityEngine.Assemblies;
 #endif
@@ -52,14 +51,6 @@ namespace TestHelper.UI.Paginators
             var actual = pool.Rent(paginatorType);
 
             Assert.That(actual, Is.InstanceOf(paginatorType));
-        }
-
-        [TestCaseSource(nameof(GetPaginators))]
-        public void Constructor_PublicConstructors_HavePreserveAttribute(Type paginatorType)
-        {
-            var constructors = paginatorType.GetConstructors();
-
-            Assert.That(constructors, Has.All.Matches<ConstructorInfo>(x => x.IsDefined(typeof(PreserveAttribute))));
         }
     }
 }

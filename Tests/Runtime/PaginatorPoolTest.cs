@@ -1,7 +1,6 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.UI.Paginators;
@@ -186,6 +185,20 @@ namespace TestHelper.UI
             var instance = pool.Rent<FakePaginator>(targetComponent);
 
             Assert.That(instance.TargetComponent, Is.SameAs(targetComponent));
+        }
+
+        [Test]
+        [CreateScene]
+        public void Rent_TypeWithTargetComponent_ReturnsInstanceOfTypeWithTargetComponentAssigned()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+
+            var instance = pool.Rent(typeof(FakePaginator), targetComponent);
+
+            Assert.That(instance, Is.InstanceOf<FakePaginator>());
+            Assert.That(((FakePaginator)instance).TargetComponent, Is.SameAs(targetComponent));
         }
 
         [Test]
