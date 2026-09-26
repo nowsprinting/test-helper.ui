@@ -69,6 +69,30 @@ namespace TestHelper.UI
         }
 
         [Test]
+        public void Rent_RegisteredTypeWithMultiplePublicConstructorsAndNoArgs_ThrowsInvalidOperationException()
+        {
+            var pool = new OperatorPool();
+            pool.Register<FakeOperatorWithMultiplePublicConstructors>();
+
+            Assert.That(() => pool.Rent<FakeOperatorWithMultiplePublicConstructors>(),
+                Throws.InvalidOperationException
+                    .With.Message.EqualTo("FakeOperatorWithMultiplePublicConstructors has multiple public constructors. " +
+                                          "Register with explicit constructor arguments."));
+        }
+
+        [Test]
+        public void Rent_RegisteredTypeWithMultiplePublicConstructorsAndArgs_ReturnsInstanceCreatedWithArgs()
+        {
+            const int IntValue = 42;
+            var pool = new OperatorPool();
+            pool.Register<FakeOperatorWithMultiplePublicConstructors>(IntValue);
+
+            var instance = pool.Rent<FakeOperatorWithMultiplePublicConstructors>();
+
+            Assert.That(instance.IntValue, Is.EqualTo(IntValue));
+        }
+
+        [Test]
         public void Rent_UnregisteredType_NoRegistrations_ThrowsInvalidOperationException()
         {
             var pool = new OperatorPool();

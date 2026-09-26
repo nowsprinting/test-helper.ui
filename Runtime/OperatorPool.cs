@@ -63,6 +63,9 @@ namespace TestHelper.UI
         /// <remarks>
         /// Instances are created by invoking the public constructor of <typeparamref name="T"/> via reflection.
         /// Annotate every public constructor of <typeparamref name="T"/> with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build.
+        /// <p/>
+        /// When <paramref name="args"/> is omitted, <typeparamref name="T"/> must have exactly one public constructor; its parameters are resolved from the values injected into this pool or their default values.
+        /// If <typeparamref name="T"/> has multiple public constructors, specify <paramref name="args"/> to select one; otherwise, <c>Rent</c> throws <see cref="InvalidOperationException"/>.
         /// </remarks>
         /// <typeparam name="T">The operator type to register</typeparam>
         /// <param name="args">Constructor arguments for creating instances</param>
@@ -135,6 +138,15 @@ namespace TestHelper.UI
             if (constructors.Length == 0)
             {
                 throw new InvalidOperationException($"{type.Name} has no public constructor.");
+            }
+
+            // Picking one of multiple constructors (e.g., the first, or the one with the most parameters) is rejected:
+            // GetConstructors() does not guarantee the order, and managed code stripping on the Player can remove
+            // some of them, so the chosen constructor could silently differ between the Editor and the Player.
+            if (constructors.Length > 1)
+            {
+                throw new InvalidOperationException(
+                    $"{type.Name} has multiple public constructors. Register with explicit constructor arguments.");
             }
 
             var parameters = constructors[0].GetParameters();
