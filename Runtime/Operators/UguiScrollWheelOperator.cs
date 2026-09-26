@@ -12,6 +12,7 @@ using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Scripting;
 using UnityEngine.UI;
 // System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
 #if UNITY_2021_2_OR_NEWER
@@ -75,6 +76,7 @@ namespace TestHelper.UI.Operators
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <exception cref="ArgumentException">Thrown when scrollPerFrame is zero or negative</exception>
         /// <param name="visualizer">Visualizer set if you need</param>
+        [Preserve]
         public UguiScrollWheelOperator(int scrollSpeed = 1200, Func<GameObject, Vector2> getScreenPoint = null,
             IRandom random = null, ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             IVisualizer visualizer = null)

@@ -60,6 +60,10 @@ namespace TestHelper.UI
         /// <summary>
         /// Registers an operator type with its constructor arguments.
         /// </summary>
+        /// <remarks>
+        /// Instances are created by invoking the public constructor of <typeparamref name="T"/> via reflection.
+        /// Annotate every public constructor of <typeparamref name="T"/> with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build.
+        /// </remarks>
         /// <typeparam name="T">The operator type to register</typeparam>
         /// <param name="args">Constructor arguments for creating instances</param>
         public OperatorPool Register<T>(params object[] args) where T : class, IOperator

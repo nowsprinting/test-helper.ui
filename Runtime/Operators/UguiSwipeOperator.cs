@@ -12,6 +12,7 @@ using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Scripting;
 using UnityEngine.UI;
 
 namespace TestHelper.UI.Operators
@@ -61,6 +62,7 @@ namespace TestHelper.UI.Operators
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console).</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need.</param>
         /// <param name="visualizer">Visualizer set if you need</param>
+        [Preserve]
         public UguiSwipeOperator(int swipeSpeed = 1200, float swipeDistance = 200f,
             Func<GameObject, Vector2> getScreenPoint = null, IRandom random = null,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null, IVisualizer visualizer = null)
