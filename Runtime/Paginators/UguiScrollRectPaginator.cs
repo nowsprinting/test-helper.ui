@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Scripting;
 using UnityEngine.UI;
 // System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
 #if UNITY_2021_2_OR_NEWER
@@ -19,34 +20,51 @@ namespace TestHelper.UI.Paginators
     /// <summary>
     /// Paginator implementation for <see cref="ScrollRect"/>.
     /// </summary>
-    public class UguiScrollRectPaginator : IPaginator
+    public class UguiScrollRectPaginator : IPaginator<ScrollRect>
     {
-        private readonly ScrollRect _scrollRect;
+        private ScrollRect _scrollRect;
         private bool _isHorizontalAtEnd;
 
         /// <summary>
         /// Constructor that takes a scroller instance.
         /// </summary>
-        /// <param name="scrollRect">ScrollRect to be controlled</param>
-        /// <exception cref="ArgumentNullException">When scrollRect is null</exception>
-        public UguiScrollRectPaginator(ScrollRect scrollRect)
+        /// <param name="scrollRect">ScrollRect to be controlled. If omitted, assign it via <see cref="TargetComponent"/> later.</param>
+        /// <exception cref="ArgumentException">When scrollRect.content is null</exception>
+        [Preserve]
+        public UguiScrollRectPaginator(ScrollRect scrollRect = null)
         {
-            if (!scrollRect)
-            {
-                throw new ArgumentNullException(nameof(scrollRect));
-            }
+            TargetComponent = scrollRect;
+        }
 
-            if (!scrollRect.content)
+        /// <inheritdoc />
+        /// <exception cref="ArgumentException">When the value is not a <see cref="ScrollRect"/>, or its content is null</exception>
+        public MonoBehaviour TargetComponent
+        {
+            set
             {
-                throw new ArgumentNullException(nameof(scrollRect.content), "ScrollRect.content is null");
-            }
+                var scrollRect = value as ScrollRect;
+                if (value && !scrollRect)
+                {
+                    throw new ArgumentException(
+                        $"TargetComponent must be a ScrollRect, but was {value.GetType().Name}.",
+                        nameof(value));
+                }
 
-            _scrollRect = scrollRect;
+                if (scrollRect && !scrollRect.content)
+                {
+                    throw new ArgumentException("ScrollRect.content is null.", nameof(value));
+                }
+
+                _scrollRect = scrollRect;
+                _isHorizontalAtEnd = false;
+            }
         }
 
         /// <inheritdoc />
         public async UniTask ResetAsync(CancellationToken cancellationToken = default)
         {
+            ThrowIfTargetComponentNotSet();
+
             _scrollRect.normalizedPosition = new Vector2(0f, 1f);
             _isHorizontalAtEnd = false;
             await UniTask.Yield(cancellationToken);
@@ -109,9 +127,19 @@ namespace TestHelper.UI.Paginators
         /// <inheritdoc />
         public bool HasNextPage()
         {
+            ThrowIfTargetComponentNotSet();
+
             // Dispatching by _scrollRect.horizontal/vertical is unnecessary: a disabled axis has a zero scroll
             // amount, so IsHorizontalAtEnd/IsVerticalAtEnd already report it as at the end.
             return !(IsHorizontalAtEnd() && IsVerticalAtEnd());
+        }
+
+        private void ThrowIfTargetComponentNotSet()
+        {
+            if (!_scrollRect)
+            {
+                throw new InvalidOperationException("Target component is not set.");
+            }
         }
 
         private Vector2 CalculateViewportSize()

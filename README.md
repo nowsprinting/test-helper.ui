@@ -28,6 +28,17 @@ Constructor arguments:
 > [!WARNING]\
 > A `GameObjectFinder` instance reuses internal buffers across find calls for performance. Running multiple finds concurrently on the same instance corrupts their results; use a separate instance per concurrent find.
 
+> [!TIP]\
+> How `DefaultReachableStrategy` decides "reachable":
+> the pivot position (or the point given by [annotation components](#control-reachablestrategy)) is always raycast first with `EventSystem.RaycastAll`, the same path the input module uses, and when it hits the `GameObject` or one of its children, that point becomes the operating point.
+> If the first raycast is blocked, it retries inside the visible rect of the `RectTransform` (its corners projected to screen, clipped by the screen and by ancestor `RectMask2D`/`Mask` rects):
+>
+> 1. If the first point lies outside the visible rect (off-screen or masked), the center of the visible rect is tried next.
+> 2. Each miss subtracts the blocking object's screen rect from the remaining rect, and the next raycast targets the center of the largest remaining strip.
+> 3. At most 5 raycasts are made in total. The search stops early when nothing was hit, the blocker is an ancestor of the target, or the blocker is not a `RectTransform` (e.g., a 3D object).
+>
+> Any fallback hit is a real hit on the target, so this adds no false positives. The hit point becomes the operating point (`RaycastResult.screenPosition`). If every attempt fails, the first (pivot) miss is reported in verbose logs and the visualizer.
+
 
 #### Find GameObject by name
 
@@ -144,13 +155,6 @@ public class MyIntegrationTest
 Find a `GameObject` on pageable or scrollable UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
 A paginator provides step-by-step navigation through pageable content, allowing users to find objects that are not currently visible in the viewport.
 
-Arguments:
-
-- **matcher**: Custom `IGameObjectMatcher` implementation
-- **reachable**: Find only reachable object. Default is true
-- **interactable**: Find only interactable object. Default is false
-- **paginator**: `IPaginator` implementation for controlling pageable components
-
 Built-in paginators:
 
 - `UguiScrollbarPaginator`: Used to find `GameObjects` that are on a scrollable component with a `ScrollBar`
@@ -184,16 +188,39 @@ public class MyIntegrationTest
 }
 ```
 
-> [!TIP]\
-> How `DefaultReachableStrategy` decides "reachable":
-> the pivot position (or the point given by [annotation components](#control-reachablestrategy)) is always raycast first with `EventSystem.RaycastAll`, the same path the input module uses, and when it hits the `GameObject` or one of its children, that point becomes the operating point.
-> If the first raycast is blocked, it retries inside the visible rect of the `RectTransform` (its corners projected to screen, clipped by the screen and by ancestor `RectMask2D`/`Mask` rects):
->
-> 1. If the first point lies outside the visible rect (off-screen or masked), the center of the visible rect is tried next.
-> 2. Each miss subtracts the blocking object's screen rect from the remaining rect, and the next raycast targets the center of the largest remaining strip.
-> 3. At most 5 raycasts are made in total. The search stops early when nothing was hit, the blocker is an ancestor of the target, or the blocker is not a `RectTransform` (e.g., a 3D object).
->
-> Any fallback hit is a real hit on the target, so this adds no false positives. The hit point becomes the operating point (`RaycastResult.screenPosition`). If every attempt fails, the first (pivot) miss is reported in verbose logs and the visualizer.
+Paginators can also be reused via `PaginatorPool`.
+`Rent` assigns the target component (the pageable component to be controlled) to the paginator; if omitted, the paginator has no target component.
+`Return` clears the target component.
+
+```csharp
+var pool = new PaginatorPool()
+    .Register<UguiScrollRectPaginator>();
+
+var paginator = pool.Rent<UguiScrollRectPaginator>(scrollRect);
+
+try
+{
+    var result = await finder.FindByMatcherAsync(matcher, paginator: paginator);
+}
+finally
+{
+    pool.Return(paginator);
+}
+```
+
+Alternatively, you can specify the constructor argument `requireRegistration: false` to rent a paginator without registration.
+
+You can also rent a paginator by the target component alone.
+`Rent(targetComponent)` selects the registered (or pooled) paginator implementing `IPaginator<TComponent>` whose `TComponent` exactly matches the type of the target component.
+It throws `InvalidOperationException` if no paginator or multiple paginators match.
+
+```csharp
+var pool = new PaginatorPool()
+    .Register<UguiScrollbarPaginator>()
+    .Register<UguiScrollRectPaginator>();
+
+var paginator = pool.Rent(scrollRect); // returns UguiScrollRectPaginator
+```
 
 
 
@@ -600,11 +627,13 @@ A paginator must implement the following methods:
 > [!IMPORTANT]\
 > `NextPageAsync` must eventually return `false`. Callers (e.g., `GameObjectFinder`) loop on the return value, so when the page position cannot advance (e.g., the layout has not been calculated yet), it must return `false` instead of `true`; otherwise the caller loops forever.
 
-In addition, the constructor must meet the following requirements:
+In addition, a paginator must meet the following requirements:
 
-- A paginator must have a constructor with one or more parameters
-- The first parameter of the constructor is a pageable or scrollable component to be controlled
-- The type of the first parameter must be a subclass of `MonoBehaviour`
+- The `TargetComponent` property setter accepts the pageable component to be controlled. It must accept `null`, reset the internal state tied to the previous target component (`PaginatorPool` reassigns pooled instances), and throw `ArgumentException` for an unsupported component type
+- `ResetAsync`, `NextPageAsync`, and `HasNextPage` throw `InvalidOperationException` when the target component is not set
+- Implement `IPaginator<TComponent>` instead of `IPaginator` to make the paginator selectable by `PaginatorPool.Rent(targetComponent)`
+- `PaginatorPool` creates instances by invoking the public constructor via reflection. Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the Player build
+- A paginator must have exactly one public constructor whose parameters all have default values. Otherwise, register it with explicit constructor arguments via `PaginatorPool.Register<T>(args)`; without them, `PaginatorPool.Rent` throws `InvalidOperationException`
 
 
 

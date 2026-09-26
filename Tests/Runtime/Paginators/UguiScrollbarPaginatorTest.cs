@@ -1,9 +1,11 @@
 // Copyright (c) 2023-2026 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.UI.TestDoubles;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -56,9 +58,91 @@ namespace TestHelper.UI.Paginators
         }
 
         [Test]
-        public void Constructor_NullScrollbar_ThrowsArgumentNullException()
+        public void Constructor_NullScrollbar_ObjectCreatedSuccessfully()
         {
-            Assert.That(() => new UguiScrollbarPaginator(null), Throws.ArgumentNullException);
+            // Omitting the argument is rejected: this test specifies passing null explicitly.
+            // ReSharper disable once RedundantArgumentDefaultValue
+            var sut = new UguiScrollbarPaginator(null);
+
+            Assert.That(sut, Is.Not.Null);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        [Category("Acceptance")]
+        public async Task TargetComponent_SetValidScrollbar_ControlsAssignedScrollbar()
+        {
+            var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
+            scrollbar.value = 0.5f;
+            await Task.Yield();
+            var sut = new UguiScrollbarPaginator();
+
+            sut.TargetComponent = scrollbar;
+            await sut.ResetAsync();
+
+            Assert.That(scrollbar.value, Is.EqualTo(0f));
+        }
+
+        [Test]
+        [CreateScene]
+        public void TargetComponent_SetUnsupportedComponentType_ThrowsArgumentException()
+        {
+            var component = new GameObject("Unsupported").AddComponent<FakeComponent>();
+            var sut = new UguiScrollbarPaginator();
+
+            Assert.That(() => sut.TargetComponent = component, Throws.ArgumentException);
+        }
+
+        [Test]
+        public async Task ResetAsync_TargetComponentNotSet_ThrowsInvalidOperationException()
+        {
+            var sut = new UguiScrollbarPaginator();
+
+            try
+            {
+                await sut.ResetAsync();
+                Assert.Fail("Expected InvalidOperationException but was not thrown");
+            }
+            catch (InvalidOperationException)
+            {
+                // expected
+            }
+        }
+
+        [Test]
+        public async Task NextPageAsync_TargetComponentNotSet_ThrowsInvalidOperationException()
+        {
+            var sut = new UguiScrollbarPaginator();
+
+            try
+            {
+                await sut.NextPageAsync();
+                Assert.Fail("Expected InvalidOperationException but was not thrown");
+            }
+            catch (InvalidOperationException)
+            {
+                // expected
+            }
+        }
+
+        [Test]
+        public void HasNextPage_TargetComponentNotSet_ThrowsInvalidOperationException()
+        {
+            var sut = new UguiScrollbarPaginator();
+
+            Assert.That(() => sut.HasNextPage(), Throws.InvalidOperationException);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public void HasNextPage_AfterTargetComponentSetToNull_ThrowsInvalidOperationException()
+        {
+            var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
+            var sut = new UguiScrollbarPaginator(scrollbar);
+
+            sut.TargetComponent = null;
+
+            Assert.That(() => sut.HasNextPage(), Throws.InvalidOperationException);
         }
 
         [Test]
