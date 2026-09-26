@@ -9,6 +9,7 @@ using TestHelper.UI.Operators;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Scripting;
 
 namespace TestHelper.UI.TestDoubles
 {
@@ -21,6 +22,7 @@ namespace TestHelper.UI.TestDoubles
         public ScreenshotOptions ScreenshotOptions { get; set; }
         public IVisualizer Visualizer { get; set; }
 
+        [Preserve]
         public FakeOperatorWithRequiredParam(string requiredParam)
         {
             RequiredParam = requiredParam;

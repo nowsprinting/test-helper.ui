@@ -12,6 +12,7 @@ using TestHelper.UI.Strategies;
 using TestHelper.UI.Visualizers;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Scripting;
 
 namespace TestHelper.UI.TestDoubles
 {
@@ -26,6 +27,7 @@ namespace TestHelper.UI.TestDoubles
         public IReachableStrategy ReachableStrategy { get; set; }
         public IRandom Random { get; set; }
 
+        [Preserve]
         public FakeOperator(int intValue = 0,
             ILogger logger = null,
             ScreenshotOptions screenshotOptions = null,
