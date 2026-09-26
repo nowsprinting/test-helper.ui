@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Scripting;
 using UnityEngine.UI;
 // System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
 #if UNITY_2021_2_OR_NEWER
@@ -29,7 +30,8 @@ namespace TestHelper.UI.Paginators
         /// </summary>
         /// <param name="scrollRect">ScrollRect to be controlled</param>
         /// <exception cref="ArgumentNullException">When scrollRect is null</exception>
-        public UguiScrollRectPaginator(ScrollRect scrollRect)
+        [Preserve]
+        public UguiScrollRectPaginator(ScrollRect scrollRect = null)
         {
             if (!scrollRect)
             {
@@ -42,6 +44,12 @@ namespace TestHelper.UI.Paginators
             }
 
             _scrollRect = scrollRect;
+        }
+
+        /// <inheritdoc />
+        public MonoBehaviour TargetComponent
+        {
+            set { }
         }
 
         /// <inheritdoc />

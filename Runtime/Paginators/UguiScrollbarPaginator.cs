@@ -4,6 +4,8 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Scripting;
 using UnityEngine.UI;
 // System.MathF requires .NET Standard 2.1 (Unity 2021.2 or newer); aliased so that call sites need no directives.
 #if UNITY_2021_2_OR_NEWER
@@ -27,7 +29,8 @@ namespace TestHelper.UI.Paginators
         /// </summary>
         /// <param name="scrollbar">Scrollbar to be controlled</param>
         /// <exception cref="ArgumentNullException">When scrollbar is null</exception>
-        public UguiScrollbarPaginator(Scrollbar scrollbar)
+        [Preserve]
+        public UguiScrollbarPaginator(Scrollbar scrollbar = null)
         {
             if (!scrollbar)
             {
@@ -35,6 +38,12 @@ namespace TestHelper.UI.Paginators
             }
 
             _scrollbar = scrollbar;
+        }
+
+        /// <inheritdoc />
+        public MonoBehaviour TargetComponent
+        {
+            set { }
         }
 
         /// <inheritdoc />

@@ -4,6 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace TestHelper.UI.Paginators
 {
@@ -26,6 +27,11 @@ namespace TestHelper.UI.Paginators
     [SuppressMessage("ReSharper", "InvalidXmlDocComment")]
     public interface IPaginator
     {
+        /// <summary>
+        /// The pageable component to be controlled.
+        /// </summary>
+        MonoBehaviour TargetComponent { set; }
+
         /// <summary>
         /// Move the page position to the beginning.
         /// For scroll components, the display position (top, bottom, left, or right) depends on the implementation.
