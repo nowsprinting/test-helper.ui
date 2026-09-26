@@ -189,8 +189,8 @@ Paginators can also be reused via `PaginatorPool`.
 `Return` clears the target component.
 
 ```csharp
-var pool = new PaginatorPool();
-pool.Register<UguiScrollRectPaginator>();
+var pool = new PaginatorPool()
+    .Register<UguiScrollRectPaginator>();
 
 var paginator = pool.Rent<UguiScrollRectPaginator>(scrollRect);
 
@@ -205,6 +205,18 @@ finally
 ```
 
 Alternatively, you can specify the constructor argument `requireRegistration: false` to rent a paginator without registration.
+
+You can also rent a paginator by the target component alone.
+`Rent(targetComponent)` selects the registered (or pooled) paginator implementing `IPaginator<TComponent>` whose `TComponent` exactly matches the type of the target component.
+It throws `InvalidOperationException` if no paginator or multiple paginators match.
+
+```csharp
+var pool = new PaginatorPool()
+    .Register<UguiScrollbarPaginator>()
+    .Register<UguiScrollRectPaginator>();
+
+var paginator = pool.Rent(scrollRect); // returns UguiScrollRectPaginator
+```
 
 > [!TIP]\
 > How `DefaultReachableStrategy` decides "reachable":
@@ -626,6 +638,7 @@ In addition, a paginator must meet the following requirements:
 
 - The `TargetComponent` property setter accepts the pageable component to be controlled. It must accept `null`, reset the internal state tied to the previous target component (`PaginatorPool` reassigns pooled instances), and throw `ArgumentException` for an unsupported component type
 - `ResetAsync` and `HasNextPage` throw `InvalidOperationException` when the target component is not set
+- Implement `IPaginator<TComponent>` instead of `IPaginator` to make the paginator selectable by `PaginatorPool.Rent(targetComponent)`
 - `PaginatorPool` creates instances by invoking the public constructor via reflection. Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the Player build
 - A paginator must have exactly one public constructor whose parameters all have default values. Otherwise, register it with explicit constructor arguments via `PaginatorPool.Register<T>(args)`; without them, `PaginatorPool.Rent` throws `InvalidOperationException`
 

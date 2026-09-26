@@ -279,6 +279,9 @@ namespace TestHelper.UI
             var pool = new PaginatorPool();
             pool.Register<FakePaginator>();
 
+            // Removing the cast is rejected: overload resolution picks Rent(MonoBehaviour) only because Rent(Type, ...)
+            // needs a default argument, which is too subtle to make the tested overload obvious.
+            // ReSharper disable once RedundantCast
             Assert.That(() => pool.Rent((MonoBehaviour)null), Throws.ArgumentNullException);
         }
 

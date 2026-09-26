@@ -85,7 +85,51 @@ namespace TestHelper.UI
         /// <exception cref="InvalidOperationException">When no paginator or multiple paginators match the type of <paramref name="targetComponent"/></exception>
         public IPaginator Rent(MonoBehaviour targetComponent)
         {
-            return null;
+            if (targetComponent == null)
+            {
+                throw new ArgumentNullException(nameof(targetComponent));
+            }
+
+            return Rent(FindPaginatorType(targetComponent.GetType()), targetComponent);
+        }
+
+        private Type FindPaginatorType(Type componentType)
+        {
+            var paginatorInterface = typeof(IPaginator<>).MakeGenericType(componentType);
+            Type found = null;
+            foreach (var type in _registrations.Keys)
+            {
+                found = SelectMatchedType(paginatorInterface, type, found, componentType);
+            }
+
+            foreach (var type in _pools.Keys)
+            {
+                if (!_registrations.ContainsKey(type))
+                {
+                    found = SelectMatchedType(paginatorInterface, type, found, componentType);
+                }
+            }
+
+            return found ?? throw new InvalidOperationException(
+                $"No paginator for {componentType.Name} is registered.");
+        }
+
+        // Picking one of multiple matches (e.g., the first registered) is rejected: Dictionary does not guarantee
+        // the enumeration order, so the chosen paginator could silently change.
+        private static Type SelectMatchedType(Type paginatorInterface, Type candidate, Type found, Type componentType)
+        {
+            if (!paginatorInterface.IsAssignableFrom(candidate))
+            {
+                return found;
+            }
+
+            if (found != null)
+            {
+                throw new InvalidOperationException(
+                    $"Multiple paginators for {componentType.Name} are registered: {found.Name}, {candidate.Name}.");
+            }
+
+            return candidate;
         }
 
         private IPaginator RentWithoutTargetComponent(Type type)
