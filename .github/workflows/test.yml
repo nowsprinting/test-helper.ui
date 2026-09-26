@@ -11,12 +11,14 @@ on:
       - '**.md'
       - '.github/**'
       - '!.github/workflows/test.yml'
+      - 'TestHelper.UI.Analyzers~/**'
   pull_request:
     types: [ opened, synchronize, reopened ]  # Same as default
     paths-ignore:
       - '**.md'
       - '.github/**'
       - '!.github/workflows/test.yml'
+      - 'TestHelper.UI.Analyzers~/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

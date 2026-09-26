@@ -669,6 +669,26 @@ To use the feature in player builds, add `INCLUDE_COM_NOWSPRINTING_TEST_HELPER` 
 
 
 
+## Roslyn analyzers
+
+This package includes Roslyn analyzers that diagnose the usage of this package's APIs.
+They apply to assemblies that reference the `TestHelper.UI` assembly.
+
+> [!NOTE]\
+> The analyzers require Unity 2022.3.12f1 or later.
+> Unity 2020.2 through 2022.3.11 cannot load them and reports warning CS8032. Unity 2019.4 through 2020.1 ignores them.
+
+Diagnostic IDs use the `TestHelperUI` prefix with the category encoded in the first digit:
+
+| Range            | Category      | Description                                                     |
+|------------------|---------------|-----------------------------------------------------------------|
+| TestHelperUI1xxx | Usage         | How to use this package's APIs                                  |
+| TestHelperUI2xxx | Alternative   | Use this package's APIs instead of the Unity standard APIs      |
+| TestHelperUI3xxx | Performance   | Usage to avoid at runtime                                       |
+| TestHelperUI4xxx | Extensibility | Rules for authors of custom operators, matchers, and paginators |
+
+
+
 ## Troubleshooting
 
 ### GameObjectFinder
@@ -1002,6 +1022,21 @@ UNITY_VERSION=2019.4.40f1 make -k test
 
 > [!WARNING]\
 > You must select "Input Manager (Old)" or "Both" in the **Project Settings > Player > Active Input Handling** for running tests.
+
+
+### Build and test analyzers
+
+The analyzers are developed in the `TestHelper.UI.Analyzers~` .NET solution, not in Unity.
+
+```bash
+cd TestHelper.UI.Analyzers~
+dotnet build -c Release TestHelper.UI.Analyzers  # Copies the dll into Runtime/
+dotnet test
+```
+
+> [!IMPORTANT]\
+> Commit the built `Runtime/TestHelper.UI.Analyzers.dll` once per pull request, right before pushing, after rebuilding it from the final source.
+> CI does not build or commit the dll.
 
 
 ### Release workflow

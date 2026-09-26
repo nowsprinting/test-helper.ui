@@ -10,10 +10,12 @@ codeToTestRatio:
     - '!**/Tests/**'
     - '!UnityProject~/Library/**'
     - '!Library/**'
+    - '!TestHelper.UI.Analyzers~/**'
   test:
     - '**/Tests/**/*.cs'
     - '!UnityProject~/Library/**'
     - '!Library/**'
+    - '!TestHelper.UI.Analyzers~/**'
 
 testExecutionTime:
   if: true
