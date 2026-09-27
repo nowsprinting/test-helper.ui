@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -49,16 +48,36 @@ namespace TestHelper.UI.Analyzers
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
-            // Checking the interfaces before the constructors is rejected: almost every class has a public constructor
-            // (at least the implicit one), so the constructor check rejects most types without walking AllInterfaces.
-            if (type.TypeKind != TypeKind.Class || type.IsAbstract ||
-                type.InstanceConstructors.Any(c => c.DeclaredAccessibility == Accessibility.Public) ||
-                !type.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i.OriginalDefinition, operatorType)))
+            // Checking the constructors before the interfaces is rejected: InstanceConstructors builds a new array on
+            // every access while AllInterfaces is cached, so rejecting non-operators by interface first is about twice as
+            // fast. LINQ Any is rejected for boxing the ImmutableArray enumerator on every type.
+            if (type.TypeKind != TypeKind.Class || type.IsAbstract || !ImplementsOperator(type, operatorType))
             {
                 return;
             }
 
+            foreach (var constructor in type.InstanceConstructors)
+            {
+                if (constructor.DeclaredAccessibility == Accessibility.Public)
+                {
+                    return;
+                }
+            }
+
             context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
+        }
+
+        private static bool ImplementsOperator(INamedTypeSymbol type, INamedTypeSymbol operatorType)
+        {
+            foreach (var implemented in type.AllInterfaces)
+            {
+                if (SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, operatorType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
