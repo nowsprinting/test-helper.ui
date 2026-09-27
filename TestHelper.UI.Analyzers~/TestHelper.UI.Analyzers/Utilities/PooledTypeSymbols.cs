@@ -9,6 +9,8 @@ namespace TestHelper.UI.Analyzers.Utilities
     /// </summary>
     internal static class PooledTypeSymbols
     {
+        public const string OperatorPoolMetadataName = "TestHelper.UI.OperatorPool";
+        public const string PaginatorPoolMetadataName = "TestHelper.UI.PaginatorPool";
         public const string IOperatorMetadataName = "TestHelper.UI.Operators.IOperator";
         public const string IPaginatorMetadataName = "TestHelper.UI.Paginators.IPaginator";
         public const string GenericIPaginatorMetadataName = "TestHelper.UI.Paginators.IPaginator`1";

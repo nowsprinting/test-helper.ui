@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using TestHelper.UI.Analyzers.Utilities;
 
 namespace TestHelper.UI.Analyzers
 {
@@ -10,7 +11,6 @@ namespace TestHelper.UI.Analyzers
     {
         public const string DiagnosticId = "TestHelperUI3002";
 
-        private const string OperatorPoolMetadataName = "TestHelper.UI.OperatorPool";
         private const string RentAllMethodName = "RentAll";
 
         private static readonly DiagnosticDescriptor s_rule = new DiagnosticDescriptor(
@@ -36,7 +36,7 @@ namespace TestHelper.UI.Analyzers
             context.RegisterCompilationStartAction(compilationContext =>
             {
                 var operatorPoolType =
-                    compilationContext.Compilation.GetTypeByMetadataName(OperatorPoolMetadataName);
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.OperatorPoolMetadataName);
                 if (operatorPoolType == null)
                 {
                     return;

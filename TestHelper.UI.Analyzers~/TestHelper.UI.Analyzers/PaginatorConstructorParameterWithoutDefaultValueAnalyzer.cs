@@ -30,8 +30,8 @@ namespace TestHelper.UI.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            PoolRegistration.RegisterRuleAction(context, PoolRegistration.PaginatorPoolMetadataName,
-                injectsParameters: false, PoolRegistrationRule.RequiredParameter, s_rule);
+            PoolRegistration.RegisterRuleAction(context, PooledTypeSymbols.PaginatorPoolMetadataName,
+                PoolRegistrationRule.RequiredParameter, s_rule);
         }
     }
 }

@@ -1,17 +1,33 @@
+using System;
 using System.Collections.Generic;
+using TestHelper.Random;
 using TestHelper.UI.Operators;
+using TestHelper.UI.Strategies;
+using TestHelper.UI.Visualizers;
+using UnityEngine;
 
 namespace TestHelper.UI
 {
     public class OperatorPool
     {
-        // The real signature is nullable-oblivious; annotating it lets fixtures pass null without CS8625.
-        public OperatorPool Register<T>(params object?[]? args) where T : class, IOperator =>
-            throw new System.NotImplementedException();
+#nullable disable
+        public OperatorPool(
+            ILogger logger = null,
+            ScreenshotOptions screenshotOptions = null,
+            IVisualizer visualizer = null,
+            Func<GameObject, Vector2> getScreenPoint = null,
+            IReachableStrategy reachableStrategy = null,
+            IRandom random = null,
+            bool requireRegistration = true) =>
+            throw new NotImplementedException();
+
+        public OperatorPool Register<T>(params object[] args) where T : class, IOperator =>
+            throw new NotImplementedException();
+#nullable restore
 
         public IReadOnlyList<IOperator> RentAll(List<IOperator>? operators = null) =>
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
 
-        public T Rent<T>() where T : class, IOperator => throw new System.NotImplementedException();
+        public T Rent<T>() where T : class, IOperator => throw new NotImplementedException();
     }
 }
