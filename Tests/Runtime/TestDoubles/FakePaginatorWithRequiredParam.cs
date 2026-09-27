@@ -20,9 +20,7 @@ namespace TestHelper.UI.TestDoubles
         // A default value is rejected: this fake verifies that PaginatorPool rejects renting an
         // IPaginator type whose constructor parameter has no default value.
         [Preserve]
-#pragma warning disable TestHelperUI4007
         public FakePaginatorWithRequiredParam(string requiredParam)
-#pragma warning restore TestHelperUI4007
         {
             RequiredParam = requiredParam;
         }

@@ -12,14 +12,14 @@ namespace TestHelper.UI.Analyzers
 
         private static readonly DiagnosticDescriptor s_rule = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "IPaginator implementation has no public constructor",
+            title: "IPaginator registered to PaginatorPool has no usable public constructor",
             messageFormat:
-            "'{0}' has no public constructor: the paginator cannot be rented. Make the constructor public.",
+            "'{0}' {1}",
             category: "Extensibility",
-            defaultSeverity: DiagnosticSeverity.Warning,
+            defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description:
-            "PaginatorPool creates paginators only through a public constructor, so creating an instance of a paginator whose constructors are all non-public always throws.",
+            "PaginatorPool creates paginators only through a public constructor, so renting an abstract type or a type whose constructors are all non-public always throws.",
             helpLinkUri:
             "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4006.md");
 
@@ -30,32 +30,8 @@ namespace TestHelper.UI.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterCompilationStartAction(compilationContext =>
-            {
-                var paginatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IPaginatorMetadataName);
-                if (paginatorType == null)
-                {
-                    return;
-                }
-
-                compilationContext.RegisterSymbolAction(
-                    symbolContext => AnalyzeNamedType(symbolContext, paginatorType),
-                    SymbolKind.NamedType);
-            });
-        }
-
-        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol paginatorType)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            var type = (INamedTypeSymbol)context.Symbol;
-            if (!PooledTypeSymbols.IsConcreteImplementation(type, paginatorType) ||
-                PooledTypeSymbols.CountPublicConstructors(type, out _) > 0)
-            {
-                return;
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
+            PoolRegistration.RegisterRuleAction(context, PoolRegistration.PaginatorPoolMetadataName,
+                injectsParameters: false, PoolRegistrationRule.NoPublicConstructor, s_rule);
         }
     }
 }

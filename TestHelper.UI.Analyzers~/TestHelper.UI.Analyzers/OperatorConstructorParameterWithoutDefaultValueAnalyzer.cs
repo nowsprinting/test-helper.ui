@@ -12,14 +12,14 @@ namespace TestHelper.UI.Analyzers
 
         private static readonly DiagnosticDescriptor s_rule = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Constructor parameter of IOperator implementation has no default value",
+            title: "Constructor parameter of IOperator registered without arguments cannot be resolved",
             messageFormat:
-            "Parameter '{0}' of the '{1}' constructor has no default value: the operator cannot be rented unless the pool injects the value or the operator is registered with constructor arguments. Add a default value.",
+            "Cannot resolve required parameter '{0}' of type {1}. Register with explicit constructor arguments or add a default value.",
             category: "Extensibility",
-            defaultSeverity: DiagnosticSeverity.Warning,
+            defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description:
-            "OperatorPool fills a constructor parameter without a default value only when the pool holds a value to inject for its type, so the operator depends on how the caller configures the pool.",
+            "When registered without constructor arguments, OperatorPool fills each parameter of the single public constructor with a value injected into the pool or its default value, so renting throws when a parameter has neither. Parameters of the injected types are not reported because whether the pool holds the value is unknown at the call.",
             helpLinkUri:
             "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4002.md");
 
@@ -30,43 +30,8 @@ namespace TestHelper.UI.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterCompilationStartAction(compilationContext =>
-            {
-                var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
-                if (operatorType == null)
-                {
-                    return;
-                }
-
-                compilationContext.RegisterSymbolAction(
-                    symbolContext => AnalyzeNamedType(symbolContext, operatorType),
-                    SymbolKind.NamedType);
-            });
-        }
-
-        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol operatorType)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            var type = (INamedTypeSymbol)context.Symbol;
-            // Reporting the parameters of multiple public constructors is rejected: OperatorPool resolves parameters
-            // only for a single one, and TestHelperUI4004 reports the multiple constructors instead.
-            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType) ||
-                PooledTypeSymbols.CountPublicConstructors(type, out var publicConstructor) != 1)
-            {
-                return;
-            }
-
-            foreach (var parameter in publicConstructor!.Parameters)
-            {
-                // IsOptional is rejected: a parameter with only [Optional] has no default value for reflection
-                // (ParameterInfo.HasDefaultValue is false), so OperatorPool cannot resolve it either.
-                if (!parameter.HasExplicitDefaultValue)
-                {
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(s_rule, parameter.Locations[0], parameter.Name, type.Name));
-                }
-            }
+            PoolRegistration.RegisterRuleAction(context, PoolRegistration.OperatorPoolMetadataName,
+                injectsParameters: true, PoolRegistrationRule.RequiredParameter, s_rule);
         }
     }
 }

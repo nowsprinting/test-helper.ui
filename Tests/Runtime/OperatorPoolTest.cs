@@ -62,7 +62,11 @@ namespace TestHelper.UI
         public void Rent_RegisteredTypeWithoutPublicConstructor_ThrowsInvalidOperationException()
         {
             var pool = new OperatorPool();
+            // Registering a valid type is rejected: this test verifies that the pool throws when renting
+            // a type that has no public constructor.
+#pragma warning disable TestHelperUI4001
             pool.Register<FakeOperatorWithoutPublicConstructor>();
+#pragma warning restore TestHelperUI4001
 
             Assert.That(() => pool.Rent<FakeOperatorWithoutPublicConstructor>(),
                 Throws.InvalidOperationException
@@ -73,7 +77,11 @@ namespace TestHelper.UI
         public void Rent_RegisteredTypeWithMultiplePublicConstructorsAndNoArgs_ThrowsInvalidOperationException()
         {
             var pool = new OperatorPool();
+            // Registering a valid type is rejected: this test verifies that the pool throws when renting
+            // a type that has multiple public constructors.
+#pragma warning disable TestHelperUI4004
             pool.Register<FakeOperatorWithMultiplePublicConstructors>();
+#pragma warning restore TestHelperUI4004
 
             Assert.That(() => pool.Rent<FakeOperatorWithMultiplePublicConstructors>(),
                 Throws.InvalidOperationException
@@ -378,13 +386,40 @@ namespace TestHelper.UI
         public void Rent_RegisteredTypeWithRequiredUnresolvableParameter_ThrowsInvalidOperationException()
         {
             var pool = new OperatorPool();
+            // Registering a valid type is rejected: this test verifies that the pool throws when renting
+            // a type that has a constructor parameter that can be neither injected nor defaulted.
+#pragma warning disable TestHelperUI4002
             pool.Register<FakeOperatorWithRequiredParam>();
+#pragma warning restore TestHelperUI4002
 
             Assert.That(() => pool.Rent<FakeOperatorWithRequiredParam>(),
                 Throws.InvalidOperationException
                     .With.Message.EqualTo(
                         "Cannot resolve required parameter 'requiredParam' of type String. " +
                         "Register with explicit constructor arguments or add a default value."));
+        }
+
+        [Test]
+        public void Rent_AllBuiltInOperatorsRegisteredWithoutArgs_ReturnsInstanceOfEachType()
+        {
+            // Registering the types enumerated by reflection is rejected: the analyzers check only the type
+            // arguments written at Register<T> calls, so each built-in operator must be registered here by name.
+            var pool = new OperatorPool()
+                .Register<UguiClickAndHoldOperator>()
+                .Register<UguiClickOperator>()
+                .Register<UguiDoubleClickOperator>()
+                .Register<UguiDragAndDropOperator>()
+                .Register<UguiScrollWheelOperator>()
+                .Register<UguiSwipeOperator>()
+                .Register<UguiTextInputOperator>()
+                .Register<UguiToggleOperator>();
+            var builtInTypes = typeof(IOperator).Assembly.GetTypes()
+                .Where(type => type.IsClass && !type.IsAbstract && typeof(IOperator).IsAssignableFrom(type));
+
+            foreach (var type in builtInTypes)
+            {
+                Assert.That(pool.Rent(type), Is.TypeOf(type));
+            }
         }
     }
 }

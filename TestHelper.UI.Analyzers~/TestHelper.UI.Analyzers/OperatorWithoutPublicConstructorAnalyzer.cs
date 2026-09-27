@@ -12,14 +12,14 @@ namespace TestHelper.UI.Analyzers
 
         private static readonly DiagnosticDescriptor s_rule = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "IOperator implementation has no public constructor",
+            title: "IOperator registered to OperatorPool has no usable public constructor",
             messageFormat:
-            "'{0}' has no public constructor: the operator cannot be rented. Make the constructor public.",
+            "'{0}' {1}",
             category: "Extensibility",
-            defaultSeverity: DiagnosticSeverity.Warning,
+            defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description:
-            "OperatorPool creates operators only through a public constructor, so creating an instance of an operator whose constructors are all non-public always throws.",
+            "OperatorPool creates operators only through a public constructor, so renting an abstract type or a type whose constructors are all non-public always throws.",
             helpLinkUri:
             "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4001.md");
 
@@ -30,32 +30,8 @@ namespace TestHelper.UI.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterCompilationStartAction(compilationContext =>
-            {
-                var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
-                if (operatorType == null)
-                {
-                    return;
-                }
-
-                compilationContext.RegisterSymbolAction(
-                    symbolContext => AnalyzeNamedType(symbolContext, operatorType),
-                    SymbolKind.NamedType);
-            });
-        }
-
-        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol operatorType)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            var type = (INamedTypeSymbol)context.Symbol;
-            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType) ||
-                PooledTypeSymbols.CountPublicConstructors(type, out _) > 0)
-            {
-                return;
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
+            PoolRegistration.RegisterRuleAction(context, PoolRegistration.OperatorPoolMetadataName,
+                injectsParameters: true, PoolRegistrationRule.NoPublicConstructor, s_rule);
         }
     }
 }

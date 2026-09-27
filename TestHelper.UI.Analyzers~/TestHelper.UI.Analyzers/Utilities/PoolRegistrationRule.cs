@@ -11,6 +11,6 @@ namespace TestHelper.UI.Analyzers.Utilities
         MultiplePublicConstructors,
         RequiredParameter,
         NoMatchingConstructor,
-        NotPreserved,
+        NotPreserved
     }
 }
