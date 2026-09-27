@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using TestHelper.UI.Analyzers.Utilities;
 
 namespace TestHelper.UI.Analyzers
 {
@@ -32,7 +33,7 @@ namespace TestHelper.UI.Analyzers
             context.RegisterCompilationStartAction(compilationContext =>
             {
                 var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName("TestHelper.UI.Operators.IOperator");
+                    compilationContext.Compilation.GetTypeByMetadataName(OperatorSymbols.IOperatorMetadataName);
                 if (operatorType == null)
                 {
                     return;
@@ -50,12 +51,13 @@ namespace TestHelper.UI.Analyzers
             var type = (INamedTypeSymbol)context.Symbol;
             // Checking the constructors before the interfaces is rejected: InstanceConstructors builds a new array on
             // every access while AllInterfaces is cached, so rejecting non-operators by interface first is about twice as
-            // fast. LINQ Any is rejected for boxing the ImmutableArray enumerator on every type.
-            if (type.TypeKind != TypeKind.Class || type.IsAbstract || !ImplementsOperator(type, operatorType))
+            // fast.
+            if (!OperatorSymbols.IsConcreteOperator(type, operatorType))
             {
                 return;
             }
 
+            // LINQ Any is rejected for boxing the ImmutableArray enumerator on every call.
             foreach (var constructor in type.InstanceConstructors)
             {
                 if (constructor.DeclaredAccessibility == Accessibility.Public)
@@ -67,17 +69,5 @@ namespace TestHelper.UI.Analyzers
             context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
         }
 
-        private static bool ImplementsOperator(INamedTypeSymbol type, INamedTypeSymbol operatorType)
-        {
-            foreach (var implemented in type.AllInterfaces)
-            {
-                if (SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, operatorType))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 }
