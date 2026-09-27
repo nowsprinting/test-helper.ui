@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using TestHelper.UI.Analyzers.Utilities;
 
 namespace TestHelper.UI.Analyzers
 {
@@ -27,6 +28,47 @@ namespace TestHelper.UI.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                var paginatorType =
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IPaginatorMetadataName);
+                if (paginatorType == null)
+                {
+                    return;
+                }
+
+                compilationContext.RegisterSymbolAction(
+                    symbolContext => AnalyzeNamedType(symbolContext, paginatorType),
+                    SymbolKind.NamedType);
+            });
+        }
+
+        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol paginatorType)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            var type = (INamedTypeSymbol)context.Symbol;
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, paginatorType))
+            {
+                return;
+            }
+
+            var isTypePreserved = PooledTypeSymbols.HasPreserveAttribute(type);
+            // LINQ is rejected for boxing the ImmutableArray enumerator on every call.
+            foreach (var constructor in type.InstanceConstructors)
+            {
+                if (constructor.DeclaredAccessibility != Accessibility.Public ||
+                    PooledTypeSymbols.HasPreserveAttribute(constructor) ||
+                    (isTypePreserved && constructor.Parameters.IsEmpty))
+                {
+                    continue;
+                }
+
+                // The implicit default constructor has no syntax to point at, and the fix may go on the class.
+                var location = constructor.IsImplicitlyDeclared ? type.Locations[0] : constructor.Locations[0];
+                context.ReportDiagnostic(Diagnostic.Create(s_rule, location, type.Name));
+            }
         }
     }
 }
