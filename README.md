@@ -712,6 +712,7 @@ Rules for authors of custom operators, matchers, and paginators.
 | [TestHelperUI4003](Documentation~/rules/TestHelperUI4003.md) | Public constructor of IOperator implementation is not preserved | ⚠️ |
 | [TestHelperUI4004](Documentation~/rules/TestHelperUI4004.md) | IOperator implementation has multiple public constructors | ⚠️ |
 | [TestHelperUI4005](Documentation~/rules/TestHelperUI4005.md) | IOperator implementation does not implement a sub-interface | ℹ️ |
+| [TestHelperUI4006](Documentation~/rules/TestHelperUI4006.md) | IPaginator implementation has no public constructor | ⚠️ |
 
 
 
