@@ -1,6 +1,6 @@
 # TestHelperUI4001 — IOperator registered to OperatorPool has no usable public constructor
 
-Detects a call to `OperatorPool.Register<T>` whose type argument is abstract or has no public constructor. `OperatorPool.Rent` creates operators only through a public constructor, so it always throws when it has to create an instance of such an operator.
+Detects a call to `OperatorPool.Register<T>` whose type argument is an interface, is abstract, or has no public constructor. `OperatorPool.Rent` creates operators only through a public constructor, so it always throws when it has to create an instance of such an operator.
 
 | Item     | Value         |
 |----------|---------------|
@@ -11,7 +11,7 @@ Detects a call to `OperatorPool.Register<T>` whose type argument is abstract or 
 
 Message: "'{0}' {1}"
 
-`{0}` is the name of the registered type, and `{1}` is "is abstract" for an abstract class, or "has no public constructor" otherwise.
+`{0}` is the name of the registered type, and `{1}` is "is an interface" for an interface, "is an abstract class" for an abstract class, or "has no public constructor" otherwise.
 
 Severity is Error because renting the registered operator throws on every path, with or without registered constructor arguments.
 
@@ -71,7 +71,7 @@ var pool = new OperatorPool()
 ## Notes
 
 - The rule is checked first for every `Register<T>` call, regardless of the arguments. When it is reported, no other rule is reported for the call.
-- An interface type argument has no constructor and is reported with "has no public constructor".
+- An interface type argument has no constructor and is reported with "is an interface".
 - A class with no explicit constructor has a public compiler-generated default constructor and is not reported.
 - Static constructors are not counted.
 - The diagnostic is reported at `Register<T>` of the call, also when the call is made through a class derived from `OperatorPool`, through `?.`, or in a fluent chain.

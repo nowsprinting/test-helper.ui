@@ -18,7 +18,8 @@ namespace TestHelper.UI.Analyzers.Utilities
         private const string RegisterMethodName = "Register";
 
         private const string NoPublicConstructorDetail = "has no public constructor";
-        private const string AbstractDetail = "is abstract";
+        private const string AbstractDetail = "is an abstract class";
+        private const string InterfaceDetail = "is an interface";
 
         private readonly Compilation _compilation;
         private readonly IMethodSymbol _registerMethod;
@@ -132,12 +133,20 @@ namespace TestHelper.UI.Analyzers.Utilities
                 return (PoolRegistrationRule.None, Array.Empty<object>());
             }
 
-            var isAbstractClass = type.TypeKind == TypeKind.Class && type.IsAbstract;
-            var publicConstructorCount = PooledTypeSymbols.CountPublicConstructors(type, out var firstConstructor);
-            if (isAbstractClass || publicConstructorCount == 0)
+            if (type.TypeKind == TypeKind.Interface)
             {
-                return (PoolRegistrationRule.NoPublicConstructor,
-                    new object[] { type.Name, isAbstractClass ? AbstractDetail : NoPublicConstructorDetail });
+                return (PoolRegistrationRule.NoPublicConstructor, new object[] { type.Name, InterfaceDetail });
+            }
+
+            if (type.IsAbstract)
+            {
+                return (PoolRegistrationRule.NoPublicConstructor, new object[] { type.Name, AbstractDetail });
+            }
+
+            var publicConstructorCount = PooledTypeSymbols.CountPublicConstructors(type, out var firstConstructor);
+            if (publicConstructorCount == 0)
+            {
+                return (PoolRegistrationRule.NoPublicConstructor, new object[] { type.Name, NoPublicConstructorDetail });
             }
 
             var isTypePreserved = PooledTypeSymbols.HasPreserveAttribute(type);
