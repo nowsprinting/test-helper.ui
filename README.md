@@ -682,7 +682,6 @@ They apply to assemblies that reference the `TestHelper.UI` assembly.
 > Unity 2020.2 through 2022.3.11 cannot load them and reports warning CS8032. Unity 2019.4 through 2020.1 ignores them.
 
 Diagnostic IDs use the `TestHelperUI` prefix with the category encoded in the first digit.
-The Severity column shows ❌ for Error, ⚠️ for Warning, and ℹ️ for Info.
 
 ### Usage (TestHelperUI1xxx)
 
