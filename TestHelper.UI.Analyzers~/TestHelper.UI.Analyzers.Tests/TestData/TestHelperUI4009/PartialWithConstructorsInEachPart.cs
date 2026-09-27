@@ -5,13 +5,19 @@ using UnityEngine;
 
 namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4009
 {
-    public partial class PartialWithConstructorsInEachPart : IPaginator<MonoBehaviour> // TestHelperUI4009
+    public class PartialWithConstructorsInEachPart
     {
-        public PartialWithConstructorsInEachPart()
+        public void Register(PaginatorPool pool)
         {
+            pool.Register<PartialWithConstructorsInEachPartPaginator>(); // TestHelperUI4009
         }
+    }
 
-        public MonoBehaviour? TargetComponent { get; set; }
+    public partial class PartialWithConstructorsInEachPartPaginator : IPaginator
+    {
+        public PartialWithConstructorsInEachPartPaginator() { }
+
+        public MonoBehaviour TargetComponent { set { } }
 
         public UniTask ResetAsync(CancellationToken cancellationToken = default) =>
             throw new System.NotImplementedException();
@@ -22,9 +28,9 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4009
         public bool HasNextPage() => throw new System.NotImplementedException();
     }
 
-    public partial class PartialWithConstructorsInEachPart
+    public partial class PartialWithConstructorsInEachPartPaginator
     {
-        public PartialWithConstructorsInEachPart(int value)
+        public PartialWithConstructorsInEachPartPaginator(int value)
         {
         }
     }

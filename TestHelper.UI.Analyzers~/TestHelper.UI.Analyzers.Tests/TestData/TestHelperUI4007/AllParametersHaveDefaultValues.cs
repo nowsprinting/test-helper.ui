@@ -5,14 +5,19 @@ using UnityEngine;
 
 namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4007
 {
-    public class AllParametersHaveDefaultValues : IPaginator<MonoBehaviour>
+    public class AllParametersHaveDefaultValues
     {
-        public AllParametersHaveDefaultValues(MonoBehaviour? carousel = null, float pageDelaySeconds = 0.2f)
+        public void Register(PaginatorPool pool)
         {
-            TargetComponent = carousel;
+            pool.Register<AllParametersHaveDefaultValuesPaginator>();
         }
+    }
 
-        public MonoBehaviour? TargetComponent { get; set; }
+    public class AllParametersHaveDefaultValuesPaginator : IPaginator
+    {
+        public AllParametersHaveDefaultValuesPaginator(int value = 1, string? text = null) { }
+
+        public MonoBehaviour TargetComponent { set { } }
 
         public UniTask ResetAsync(CancellationToken cancellationToken = default) =>
             throw new System.NotImplementedException();

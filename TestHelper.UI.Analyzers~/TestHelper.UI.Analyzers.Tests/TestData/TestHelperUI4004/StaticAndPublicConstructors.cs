@@ -7,19 +7,22 @@ using UnityEngine.EventSystems;
 
 namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4004
 {
-    public class StaticAndPublicConstructors : IClickOperator
+    public class StaticAndPublicConstructors
     {
-        static StaticAndPublicConstructors()
+        public void Register(OperatorPool pool)
         {
+            pool.Register<StaticAndPublicConstructorsOperator>();
         }
+    }
 
-        public StaticAndPublicConstructors()
-        {
-        }
+    public class StaticAndPublicConstructorsOperator : IOperator
+    {
+        static StaticAndPublicConstructorsOperator() { }
+        public StaticAndPublicConstructorsOperator() { }
 
-        public ILogger? Logger { get; set; }
-        public ScreenshotOptions? ScreenshotOptions { get; set; }
-        public IVisualizer? Visualizer { get; set; }
+        public ILogger Logger { set { } }
+        public ScreenshotOptions ScreenshotOptions { set { } }
+        public IVisualizer Visualizer { set { } }
 
         public bool CanOperate(GameObject gameObject) => throw new System.NotImplementedException();
 

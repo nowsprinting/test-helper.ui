@@ -8,31 +8,30 @@ namespace TestHelper.UI.Analyzers.Tests
     public class PaginatorWithoutPublicConstructorAnalyzerTest
     {
         [Theory]
-        [InlineData("ImplementsPaginatorOfComponentWithPrivateConstructor", 8, 18,
-            "ImplementsPaginatorOfComponentWithPrivateConstructor")]
-        [InlineData("ImplementsPaginatorDirectlyWithPrivateConstructor", 8, 18,
-            "ImplementsPaginatorDirectlyWithPrivateConstructor")]
-        [InlineData("InheritsPaginatorBaseWithPrivateConstructor", 23, 18,
-            "InheritsPaginatorBaseWithPrivateConstructor")]
-        [InlineData("GenericPaginatorWithPrivateConstructor", 8, 18, "GenericPaginatorWithPrivateConstructor")]
-        [InlineData("PartialPaginatorWithPrivateConstructor", 8, 26, "PartialPaginatorWithPrivateConstructor")]
-        [InlineData("NestedPaginatorWithPrivateConstructor", 10, 22, "Nested")]
-        [InlineData("StaticAndPrivateConstructors", 8, 18, "StaticAndPrivateConstructors")]
-        public async Task PaginatorWithoutPublicConstructor_ReportsOnceAtClassIdentifier(
-            string caseName, int line, int column, string className)
+        [InlineData("NoArgs", 12, 18, "NoArgsPaginator", "has no public constructor")]
+        [InlineData("NullArgs", 12, 18, "NullArgsPaginator", "has no public constructor")]
+        [InlineData("DefaultArgs", 12, 18, "DefaultArgsPaginator", "has no public constructor")]
+        [InlineData("WithArgs", 12, 18, "WithArgsPaginator", "has no public constructor")]
+        [InlineData("AbstractType", 12, 18, "AbstractTypePaginator", "is abstract")]
+        [InlineData("InterfaceTypeArgument", 12, 18, "IPaginator", "has no public constructor")]
+        [InlineData("ArgsArrayVariable", 12, 18, "ArgsArrayVariablePaginator", "has no public constructor")]
+        [InlineData("ThroughDerivedPool", 12, 18, "ThroughDerivedPoolPaginator", "has no public constructor")]
+        [InlineData("ConditionalAccess", 12, 19, "ConditionalAccessPaginator", "has no public constructor")]
+        [InlineData("FluentChain", 12, 62, "FluentChainPaginator", "has no public constructor")]
+        public async Task NoPublicConstructor_ReportsAtRegister(string caseName, int line, int column, string typeName, string detail)
         {
-            var expected = Verifier.Diagnostic().WithLocation(line, column).WithArguments(className);
+            var expected = Verifier.Diagnostic().WithLocation(line, column).WithArguments(typeName, detail);
             await Verifier.VerifyAsync($"TestHelperUI4006/{caseName}.cs", expected);
         }
 
         [Theory]
         [InlineData("PublicConstructor")]
-        [InlineData("PublicAndPrivateConstructors")]
-        [InlineData("NoExplicitConstructor")]
-        [InlineData("StaticConstructorOnly")]
-        [InlineData("AbstractPaginatorWithProtectedConstructor")]
-        [InlineData("NotPaginatorWithPrivateConstructor")]
-        public async Task ClassRentableOrOutOfScope_ReportsNothing(string caseName)
+        [InlineData("ImplicitDefaultConstructor")]
+        [InlineData("GenericTypeParameter")]
+        [InlineData("RentOnly")]
+        [InlineData("OtherTypeRegister")]
+        [InlineData("DeclarationOnly")]
+        public async Task PublicConstructorOrOutOfScope_ReportsNothing(string caseName)
         {
             await Verifier.VerifyAsync($"TestHelperUI4006/{caseName}.cs");
         }

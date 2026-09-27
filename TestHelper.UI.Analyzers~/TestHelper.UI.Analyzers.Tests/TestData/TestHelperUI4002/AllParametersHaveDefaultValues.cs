@@ -7,16 +7,21 @@ using UnityEngine.EventSystems;
 
 namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
 {
-    public class AllParametersHaveDefaultValues : IClickOperator
+    public class AllParametersHaveDefaultValues
     {
-        public AllParametersHaveDefaultValues(int holdMillis = 100, ILogger? logger = null)
+        public void Register(OperatorPool pool)
         {
-            Logger = logger;
+            pool.Register<AllParametersHaveDefaultValuesOperator>();
         }
+    }
 
-        public ILogger? Logger { get; set; }
-        public ScreenshotOptions? ScreenshotOptions { get; set; }
-        public IVisualizer? Visualizer { get; set; }
+    public class AllParametersHaveDefaultValuesOperator : IOperator
+    {
+        public AllParametersHaveDefaultValuesOperator(int value = 1, string? text = null) { }
+
+        public ILogger Logger { set { } }
+        public ScreenshotOptions ScreenshotOptions { set { } }
+        public IVisualizer Visualizer { set { } }
 
         public bool CanOperate(GameObject gameObject) => throw new System.NotImplementedException();
 

@@ -5,7 +5,8 @@ namespace TestHelper.UI
 {
     public class OperatorPool
     {
-        public OperatorPool Register<T>(params object[] args) where T : class, IOperator =>
+        // The real signature is nullable-oblivious; annotating it lets fixtures pass null without CS8625.
+        public OperatorPool Register<T>(params object?[]? args) where T : class, IOperator =>
             throw new System.NotImplementedException();
 
         public IReadOnlyList<IOperator> RentAll(List<IOperator>? operators = null) =>

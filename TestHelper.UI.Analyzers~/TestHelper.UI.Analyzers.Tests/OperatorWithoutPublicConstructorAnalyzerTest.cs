@@ -8,38 +8,30 @@ namespace TestHelper.UI.Analyzers.Tests
     public class OperatorWithoutPublicConstructorAnalyzerTest
     {
         [Theory]
-        [InlineData("ImplementsClickOperatorWithPrivateConstructor", 10, 18,
-            "ImplementsClickOperatorWithPrivateConstructor")]
-        [InlineData("ImplementsClickOperatorWithProtectedConstructor", 10, 18,
-            "ImplementsClickOperatorWithProtectedConstructor")]
-        [InlineData("ImplementsClickOperatorWithInternalConstructor", 10, 18,
-            "ImplementsClickOperatorWithInternalConstructor")]
-        [InlineData("ImplementsClickOperatorWithPrivateProtectedConstructor", 10, 18,
-            "ImplementsClickOperatorWithPrivateProtectedConstructor")]
-        [InlineData("ImplementsClickOperatorWithProtectedInternalConstructor", 10, 18,
-            "ImplementsClickOperatorWithProtectedInternalConstructor")]
-        [InlineData("ImplementsOperatorDirectlyWithPrivateConstructor", 10, 18,
-            "ImplementsOperatorDirectlyWithPrivateConstructor")]
-        [InlineData("InheritsOperatorBaseWithPrivateConstructor", 24, 18, "InheritsOperatorBaseWithPrivateConstructor")]
-        [InlineData("GenericOperatorWithPrivateConstructor", 10, 18, "GenericOperatorWithPrivateConstructor")]
-        [InlineData("PartialOperatorWithPrivateConstructor", 10, 26, "PartialOperatorWithPrivateConstructor")]
-        [InlineData("NestedOperatorWithPrivateConstructor", 12, 22, "Nested")]
-        [InlineData("StaticAndPrivateConstructors", 10, 18, "StaticAndPrivateConstructors")]
-        public async Task OperatorWithoutPublicConstructor_ReportsOnceAtClassIdentifier(
-            string caseName, int line, int column, string className)
+        [InlineData("NoArgs", 14, 18, "NoArgsOperator", "has no public constructor")]
+        [InlineData("NullArgs", 14, 18, "NullArgsOperator", "has no public constructor")]
+        [InlineData("DefaultArgs", 14, 18, "DefaultArgsOperator", "has no public constructor")]
+        [InlineData("WithArgs", 14, 18, "WithArgsOperator", "has no public constructor")]
+        [InlineData("AbstractType", 14, 18, "AbstractTypeOperator", "is abstract")]
+        [InlineData("InterfaceTypeArgument", 14, 18, "IClickOperator", "has no public constructor")]
+        [InlineData("ArgsArrayVariable", 14, 18, "ArgsArrayVariableOperator", "has no public constructor")]
+        [InlineData("ThroughDerivedPool", 14, 18, "ThroughDerivedPoolOperator", "has no public constructor")]
+        [InlineData("ConditionalAccess", 14, 19, "ConditionalAccessOperator", "has no public constructor")]
+        [InlineData("FluentChain", 14, 61, "FluentChainOperator", "has no public constructor")]
+        public async Task NoPublicConstructor_ReportsAtRegister(string caseName, int line, int column, string typeName, string detail)
         {
-            var expected = Verifier.Diagnostic().WithLocation(line, column).WithArguments(className);
+            var expected = Verifier.Diagnostic().WithLocation(line, column).WithArguments(typeName, detail);
             await Verifier.VerifyAsync($"TestHelperUI4001/{caseName}.cs", expected);
         }
 
         [Theory]
         [InlineData("PublicConstructor")]
-        [InlineData("PublicAndPrivateConstructors")]
-        [InlineData("NoExplicitConstructor")]
-        [InlineData("StaticConstructorOnly")]
-        [InlineData("AbstractOperatorWithProtectedConstructor")]
-        [InlineData("NotOperatorWithPrivateConstructor")]
-        public async Task ClassRentableOrOutOfScope_ReportsNothing(string caseName)
+        [InlineData("ImplicitDefaultConstructor")]
+        [InlineData("GenericTypeParameter")]
+        [InlineData("RentOnly")]
+        [InlineData("OtherTypeRegister")]
+        [InlineData("DeclarationOnly")]
+        public async Task PublicConstructorOrOutOfScope_ReportsNothing(string caseName)
         {
             await Verifier.VerifyAsync($"TestHelperUI4001/{caseName}.cs");
         }

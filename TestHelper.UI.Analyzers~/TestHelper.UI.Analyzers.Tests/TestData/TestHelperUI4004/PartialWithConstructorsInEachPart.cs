@@ -7,15 +7,21 @@ using UnityEngine.EventSystems;
 
 namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4004
 {
-    public partial class PartialWithConstructorsInEachPart : IClickOperator // TestHelperUI4004
+    public class PartialWithConstructorsInEachPart
     {
-        public PartialWithConstructorsInEachPart()
+        public void Register(OperatorPool pool)
         {
+            pool.Register<PartialWithConstructorsInEachPartOperator>(); // TestHelperUI4004
         }
+    }
 
-        public ILogger? Logger { get; set; }
-        public ScreenshotOptions? ScreenshotOptions { get; set; }
-        public IVisualizer? Visualizer { get; set; }
+    public partial class PartialWithConstructorsInEachPartOperator : IOperator
+    {
+        public PartialWithConstructorsInEachPartOperator() { }
+
+        public ILogger Logger { set { } }
+        public ScreenshotOptions ScreenshotOptions { set { } }
+        public IVisualizer Visualizer { set { } }
 
         public bool CanOperate(GameObject gameObject) => throw new System.NotImplementedException();
 
@@ -23,9 +29,9 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4004
             CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
     }
 
-    public partial class PartialWithConstructorsInEachPart
+    public partial class PartialWithConstructorsInEachPartOperator
     {
-        public PartialWithConstructorsInEachPart(int value)
+        public PartialWithConstructorsInEachPartOperator(int value)
         {
         }
     }
