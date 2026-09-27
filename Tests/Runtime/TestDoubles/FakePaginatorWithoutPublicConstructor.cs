@@ -14,7 +14,9 @@ namespace TestHelper.UI.TestDoubles
     // Intentionally has no public constructor: this fake verifies that PaginatorPool rejects
     // renting an IPaginator type without one, so it must stay non-instantiable directly.
     [SuppressMessage("ReSharper", "ClassCannotBeInstantiated")]
+#pragma warning disable TestHelperUI4006
     public class FakePaginatorWithoutPublicConstructor : IPaginator
+#pragma warning restore TestHelperUI4006
     {
         public MonoBehaviour TargetComponent { get; set; }
 
