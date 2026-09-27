@@ -225,10 +225,18 @@ namespace TestHelper.UI.Analyzers.Utilities
         {
             foreach (var argument in invocation.Arguments)
             {
-                if (argument.ArgumentKind == ArgumentKind.ParamArray &&
-                    argument.Value is IArrayCreationOperation { Initializer: { } initializer })
+                // Checking ArgumentKind.ParamArray alone is rejected: an explicitly created array
+                // (Register<T>(new object[] { 1 }), Register<T>(new object[0])) is known at compile time as well.
+                if (argument.Value is IArrayCreationOperation arrayCreation)
                 {
-                    return initializer.ElementValues;
+                    if (arrayCreation.Initializer is { } initializer)
+                    {
+                        return initializer.ElementValues;
+                    }
+
+                    return arrayCreation.DimensionSizes[0].ConstantValue is { HasValue: true, Value: 0 }
+                        ? ImmutableArray<IOperation>.Empty
+                        : (ImmutableArray<IOperation>?)null;
                 }
 
                 // The pool treats a null args array the same as no arguments (Register<T>(null), Register<T>(default)).
@@ -324,6 +332,12 @@ namespace TestHelper.UI.Analyzers.Utilities
             }
 
             var argumentType = argument.Type;
+            // A nullable value is boxed to its underlying value or to null, so either may bind to the parameter.
+            if (argumentType?.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
+            {
+                return false;
+            }
+
             // Only a struct or sealed class has a runtime type equal to its static type. Any other static type
             // (interface, non-sealed class, object) may hold an instance that matches the parameter.
             if (argumentType == null ||

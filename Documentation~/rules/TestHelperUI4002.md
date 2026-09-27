@@ -92,7 +92,7 @@ var pool = new OperatorPool()
 
 ## Notes
 
-- The rule applies only to calls without constructor arguments: `Register<T>()`, `Register<T>(null)`, and `Register<T>(default)`.
+- The rule applies only to calls without constructor arguments: `Register<T>()`, `Register<T>(null)`, `Register<T>(default)`, and an empty array such as `Register<T>(new object[0])`.
 - The rule applies only when the type argument has exactly one public constructor, which is the constructor `Rent` resolves parameters for. TestHelperUI4001 (no public constructor, or abstract) and TestHelperUI4004 (multiple public constructors) take precedence; when this rule is reported, TestHelperUI4003 is not reported for the call.
 - Only the first parameter that cannot be resolved is reported.
 - Parameters of the injectable types listed in Motivation (the reference-type parameters of the `OperatorPool` constructor) are not reported, because whether the pool holds a value for them is unknown at the `Register<T>` call. As a result, registering an operator with an `ILogger` parameter without a default value to a pool created without a logger is not detected.

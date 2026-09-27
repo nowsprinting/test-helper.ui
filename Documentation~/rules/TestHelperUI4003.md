@@ -108,7 +108,7 @@ var pool = new OperatorPool()
     - The constructor has an attribute whose class is named `PreserveAttribute`, or derives (directly or indirectly) from a class named `PreserveAttribute`, in any namespace.
     - The constructor has no parameters and the class has such an attribute.
 - The constructors checked depend on the arguments of the call:
-    - Without constructor arguments (`Register<T>()`, `Register<T>(null)`, or `Register<T>(default)`): the single public constructor. TestHelperUI4001, TestHelperUI4004, and TestHelperUI4002 take precedence in this order, and this rule is reported only when none of them is.
+    - Without constructor arguments (`Register<T>()`, `Register<T>(null)`, `Register<T>(default)`, or an empty array such as `Register<T>(new object[0])`): the single public constructor. TestHelperUI4001, TestHelperUI4004, and TestHelperUI4002 take precedence in this order, and this rule is reported only when none of them is.
     - With arguments written in the call (e.g., `Register<T>(100)`): the public constructors that can possibly match the arguments, as TestHelperUI4011 determines. A constructor that certainly does not match is not checked. TestHelperUI4001 and TestHelperUI4011 take precedence.
     - With an array expression whose contents are unknown at compile time (e.g., `Register<T>(args)` with an `object[]` variable): every public constructor. TestHelperUI4001 takes precedence.
 - The diagnostic is reported once per call, at `Register<T>`, even when multiple constructors are not preserved. See [TestHelperUI4001](TestHelperUI4001.md) for the calls that are not diagnosed.

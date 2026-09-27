@@ -91,7 +91,7 @@ var pool = new OperatorPool()
 
 ## Notes
 
-- The rule applies only to calls without constructor arguments: `Register<T>()`, `Register<T>(null)`, and `Register<T>(default)`. A call with constructor arguments is diagnosed by TestHelperUI4011 when no public constructor matches them.
+- The rule applies only to calls without constructor arguments: `Register<T>()`, `Register<T>(null)`, `Register<T>(default)`, and an empty array such as `Register<T>(new object[0])`. A call with constructor arguments is diagnosed by TestHelperUI4011 when no public constructor matches them.
 - Only public instance constructors are counted, as `Type.GetConstructors()` does. Non-public and static constructors are ignored.
 - A type argument without any public constructor is diagnosed by TestHelperUI4001 instead. When this rule is reported, TestHelperUI4002 and TestHelperUI4003 are not reported for the call.
 - The diagnostic is reported at `Register<T>` of the call. See [TestHelperUI4001](TestHelperUI4001.md) for the calls that are not diagnosed.

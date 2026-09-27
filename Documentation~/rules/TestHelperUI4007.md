@@ -91,7 +91,7 @@ var pool = new PaginatorPool()
 
 ## Notes
 
-- The rule applies only to calls without constructor arguments: `Register<T>()`, `Register<T>(null)`, and `Register<T>(default)`.
+- The rule applies only to calls without constructor arguments: `Register<T>()`, `Register<T>(null)`, `Register<T>(default)`, and an empty array such as `Register<T>(new object[0])`.
 - The rule applies only when the type argument has exactly one public constructor, which is the constructor `Rent` resolves parameters for. TestHelperUI4006 (no public constructor, or abstract) and TestHelperUI4009 (multiple public constructors) take precedence; when this rule is reported, TestHelperUI4008 is not reported for the call.
 - Only the first parameter that cannot be resolved is reported.
 - A `params` array parameter has no default value and is reported. `ref` and `out` parameters cannot have a default value and are reported.
