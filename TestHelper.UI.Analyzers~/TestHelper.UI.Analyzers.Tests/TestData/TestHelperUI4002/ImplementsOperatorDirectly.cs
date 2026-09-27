@@ -9,7 +9,7 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
 {
     public class ImplementsOperatorDirectly : IOperator
     {
-        public ImplementsOperatorDirectly(int value)   // TestHelperUI4002
+        public ImplementsOperatorDirectly(int value) // TestHelperUI4002
         {
         }
 

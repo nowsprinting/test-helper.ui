@@ -10,7 +10,7 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
 {
     public class OptionalAttributeWithoutDefaultValue : IClickOperator
     {
-        public OptionalAttributeWithoutDefaultValue([Optional] int value)   // TestHelperUI4002
+        public OptionalAttributeWithoutDefaultValue([Optional] int value) // TestHelperUI4002
         {
         }
 

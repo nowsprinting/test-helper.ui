@@ -81,6 +81,7 @@ public class MyClickOperator : IClickOperator
 - The rule applies only when the class has exactly one public constructor, which is the constructor `Rent` resolves parameters for. A class with multiple public constructors is diagnosed by TestHelperUI4004 instead.
 - Parameters of the injectable types are reported too, because the pool injects them only when the caller passes a non-null value to the `OperatorPool` constructor.
 - A `params` array parameter has no default value and is reported. `ref` and `out` parameters cannot have a default value and are reported.
+- A parameter with only `[Optional]` and no `[DefaultParameterValue]` is reported: reflection reports no default value for it (`ParameterInfo.HasDefaultValue` is false), so `OperatorPool` cannot resolve it either. A default value given by `[Optional, DefaultParameterValue(...)]` counts as a default value.
 - The diagnostic is reported at each parameter identifier.
 
 If you always register the operator with explicit constructor arguments, or always create the pool with the values to inject, suppress the diagnostic with `[SuppressMessage]`, or change the severity in `.editorconfig` or `.globalconfig`:

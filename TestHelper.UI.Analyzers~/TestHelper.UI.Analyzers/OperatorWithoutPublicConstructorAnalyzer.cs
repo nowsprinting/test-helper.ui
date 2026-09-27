@@ -49,25 +49,13 @@ namespace TestHelper.UI.Analyzers
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
-            // Checking the constructors before the interfaces is rejected: InstanceConstructors builds a new array on
-            // every access while AllInterfaces is cached, so rejecting non-operators by interface first is about twice as
-            // fast.
-            if (!OperatorSymbols.IsConcreteOperator(type, operatorType))
+            if (!OperatorSymbols.IsConcreteOperator(type, operatorType) ||
+                OperatorSymbols.CountPublicConstructors(type, out _) > 0)
             {
                 return;
             }
 
-            // LINQ Any is rejected for boxing the ImmutableArray enumerator on every call.
-            foreach (var constructor in type.InstanceConstructors)
-            {
-                if (constructor.DeclaredAccessibility == Accessibility.Public)
-                {
-                    return;
-                }
-            }
-
             context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
         }
-
     }
 }

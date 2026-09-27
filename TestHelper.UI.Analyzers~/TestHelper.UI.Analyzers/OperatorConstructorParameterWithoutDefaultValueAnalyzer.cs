@@ -49,35 +49,15 @@ namespace TestHelper.UI.Analyzers
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
-            if (!OperatorSymbols.IsConcreteOperator(type, operatorType))
+            // Reporting the parameters of multiple public constructors is rejected: OperatorPool resolves parameters
+            // only for a single one, and TestHelperUI4004 reports the multiple constructors instead.
+            if (!OperatorSymbols.IsConcreteOperator(type, operatorType) ||
+                OperatorSymbols.CountPublicConstructors(type, out var publicConstructor) != 1)
             {
                 return;
             }
 
-            IMethodSymbol? publicConstructor = null;
-            foreach (var constructor in type.InstanceConstructors)
-            {
-                if (constructor.DeclaredAccessibility != Accessibility.Public)
-                {
-                    continue;
-                }
-
-                // Reporting the parameters of multiple public constructors is rejected: OperatorPool resolves parameters
-                // only for a single one, and TestHelperUI4004 reports the multiple constructors instead.
-                if (publicConstructor != null)
-                {
-                    return;
-                }
-
-                publicConstructor = constructor;
-            }
-
-            if (publicConstructor == null)
-            {
-                return;
-            }
-
-            foreach (var parameter in publicConstructor.Parameters)
+            foreach (var parameter in publicConstructor!.Parameters)
             {
                 // IsOptional is rejected: a parameter with only [Optional] has no default value for reflection
                 // (ParameterInfo.HasDefaultValue is false), so OperatorPool cannot resolve it either.

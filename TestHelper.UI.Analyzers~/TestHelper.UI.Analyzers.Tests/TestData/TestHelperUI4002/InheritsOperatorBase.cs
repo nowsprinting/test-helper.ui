@@ -21,7 +21,7 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
 
     public class InheritsOperatorBase : OperatorBase
     {
-        public InheritsOperatorBase(int value)   // TestHelperUI4002
+        public InheritsOperatorBase(int value) // TestHelperUI4002
         {
         }
     }

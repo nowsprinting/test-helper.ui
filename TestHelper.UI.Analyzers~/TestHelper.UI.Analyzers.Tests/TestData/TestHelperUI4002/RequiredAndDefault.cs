@@ -10,7 +10,7 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
     public class RequiredAndDefault : IClickOperator
     {
         public RequiredAndDefault(
-            string text,   // TestHelperUI4002
+            string text, // TestHelperUI4002
             int holdMillis = 100)
         {
         }

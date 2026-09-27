@@ -10,6 +10,11 @@ namespace TestHelper.UI.Analyzers.Utilities
         /// Whether <paramref name="type"/> is a class that <c>OperatorPool</c> can instantiate as an operator:
         /// non-abstract and implementing <c>IOperator</c> directly, through a sub-interface, or through a base class.
         /// </summary>
+        /// <remarks>
+        /// Call this before <see cref="CountPublicConstructors"/>. Checking the constructors first is rejected:
+        /// <c>InstanceConstructors</c> builds a new array on every access while <c>AllInterfaces</c> is cached,
+        /// so rejecting non-operators by interface first is about twice as fast.
+        /// </remarks>
         public static bool IsConcreteOperator(INamedTypeSymbol type, INamedTypeSymbol operatorType)
         {
             if (type.TypeKind != TypeKind.Class || type.IsAbstract)
@@ -27,6 +32,31 @@ namespace TestHelper.UI.Analyzers.Utilities
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Counts the public instance constructors, which are the ones <c>OperatorPool</c> can invoke.
+        /// </summary>
+        /// <param name="type">The operator type</param>
+        /// <param name="first">The first public constructor, or null if there is none</param>
+        /// <returns>The number of public instance constructors, including the implicit default constructor</returns>
+        public static int CountPublicConstructors(INamedTypeSymbol type, out IMethodSymbol? first)
+        {
+            first = null;
+            var count = 0;
+            // LINQ is rejected for boxing the ImmutableArray enumerator on every call.
+            foreach (var constructor in type.InstanceConstructors)
+            {
+                if (constructor.DeclaredAccessibility != Accessibility.Public)
+                {
+                    continue;
+                }
+
+                first ??= constructor;
+                count++;
+            }
+
+            return count;
         }
     }
 }

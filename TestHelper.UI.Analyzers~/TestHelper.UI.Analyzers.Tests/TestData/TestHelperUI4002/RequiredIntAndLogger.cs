@@ -9,7 +9,7 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
 {
     public class RequiredIntAndLogger : IClickOperator
     {
-        public RequiredIntAndLogger(int holdMillis, ILogger logger)   // TestHelperUI4002
+        public RequiredIntAndLogger(int holdMillis, ILogger logger) // TestHelperUI4002
         {
             Logger = logger;
         }

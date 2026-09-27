@@ -9,7 +9,7 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
 {
     public class PublicAndPrivateConstructors : IClickOperator
     {
-        public PublicAndPrivateConstructors(int value)   // TestHelperUI4002
+        public PublicAndPrivateConstructors(int value) // TestHelperUI4002
         {
         }
 

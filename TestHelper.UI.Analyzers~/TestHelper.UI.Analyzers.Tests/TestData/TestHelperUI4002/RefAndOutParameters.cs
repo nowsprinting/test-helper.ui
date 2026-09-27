@@ -9,7 +9,7 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
 {
     public class RefAndOutParameters : IClickOperator
     {
-        public RefAndOutParameters(ref int a, out int b)   // TestHelperUI4002
+        public RefAndOutParameters(ref int a, out int b) // TestHelperUI4002
         {
             b = a;
         }

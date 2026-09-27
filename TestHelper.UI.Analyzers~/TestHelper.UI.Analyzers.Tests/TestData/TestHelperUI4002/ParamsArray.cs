@@ -9,7 +9,7 @@ namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4002
 {
     public class ParamsArray : IClickOperator
     {
-        public ParamsArray(params int[] values)   // TestHelperUI4002
+        public ParamsArray(params int[] values) // TestHelperUI4002
         {
         }
 
