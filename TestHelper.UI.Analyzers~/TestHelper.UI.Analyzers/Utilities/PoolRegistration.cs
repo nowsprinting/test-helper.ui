@@ -160,7 +160,13 @@ namespace TestHelper.UI.Analyzers.Utilities
             return (ClassifyConstructors(type, arguments, isTypePreserved, cancellationToken), new object[] { type.Name });
         }
 
+        /// <summary>
+        /// Classifies the public constructors of <paramref name="type"/> that the arguments might bind to.
+        /// </summary>
+        /// <param name="type">The registered type</param>
         /// <param name="arguments">The arguments to match, or null to treat every public constructor as matching</param>
+        /// <param name="isTypePreserved">Whether <paramref name="type"/> has a <c>[Preserve]</c> attribute</param>
+        /// <param name="cancellationToken">The cancellation token of the analysis</param>
         private PoolRegistrationRule ClassifyConstructors(INamedTypeSymbol type, ImmutableArray<IOperation>? arguments,
             bool isTypePreserved, CancellationToken cancellationToken)
         {
@@ -199,6 +205,9 @@ namespace TestHelper.UI.Analyzers.Utilities
             return (name ?? invocation.Syntax).GetLocation();
         }
 
+        /// <summary>
+        /// Extracts the constructor arguments of a <c>Register&lt;T&gt;</c> call.
+        /// </summary>
         /// <returns>
         /// The arguments written in the call (empty for no arguments), or null when the call passes an array expression
         /// whose elements are unknown at compile time
