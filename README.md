@@ -716,6 +716,7 @@ Rules for authors of custom operators, matchers, and paginators.
 | [TestHelperUI4007](Documentation~/rules/TestHelperUI4007.md) | Constructor parameter of IPaginator implementation has no default value | ⚠️ |
 | [TestHelperUI4008](Documentation~/rules/TestHelperUI4008.md) | Public constructor of IPaginator implementation is not preserved | ⚠️ |
 | [TestHelperUI4009](Documentation~/rules/TestHelperUI4009.md) | IPaginator implementation has multiple public constructors | ⚠️ |
+| [TestHelperUI4010](Documentation~/rules/TestHelperUI4010.md) | IPaginator implementation does not implement IPaginator&lt;TComponent&gt; | ⚠️ |
 
 
 
