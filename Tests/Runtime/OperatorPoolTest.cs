@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.UI.Operators;
@@ -174,6 +175,41 @@ namespace TestHelper.UI
                 typeof(UguiClickAndHoldOperator),
                 typeof(UguiClickOperator)
             }));
+        }
+
+        [Test]
+        public void RentAll_WithList_ClearsAndStoresAllOperatorInstancesToSpecifiedList()
+        {
+            var pool = new OperatorPool();
+            pool.Register<UguiClickAndHoldOperator>();
+            pool.Register<UguiClickOperator>();
+            var list = new List<IOperator> { new UguiDoubleClickOperator() };
+
+            var actual = pool.RentAll(list);
+            Assert.That(actual, Is.SameAs(list));
+
+            var operatorTypes = list.Select(instance => instance.GetType()).ToArray();
+            Assert.That(operatorTypes, Is.EquivalentTo(new[]
+            {
+                typeof(UguiClickAndHoldOperator),
+                typeof(UguiClickOperator)
+            }));
+        }
+
+        [Test]
+        public void RentAll_WithListAfterReturn_DoesNotAllocateGCMemory()
+        {
+            var pool = new OperatorPool();
+            pool.Register<UguiClickAndHoldOperator>();
+            pool.Register<UguiClickOperator>();
+            var list = new List<IOperator>();
+            pool.RentAll(list);
+            foreach (var instance in list)
+            {
+                pool.Return(instance);
+            }
+
+            Assert.That(() => { pool.RentAll(list); }, Is.Not.AllocatingGCMemory());
         }
 
         [Test]
