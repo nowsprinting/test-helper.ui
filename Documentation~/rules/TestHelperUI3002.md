@@ -74,7 +74,7 @@ public class OperatorSelector : MonoBehaviour
 - The rule applies to invocations of `TestHelper.UI.OperatorPool.RentAll(List<IOperator>)`, including a call through a subclass of `OperatorPool` and a conditional access such as `pool?.RentAll()`.
 - The diagnostic is reported when the `operators` argument is omitted, or when it is a constant null value, such as `null`, `default`, or `operators: null`. These allocate a new list just like the omitted argument.
 - An argument that is not a constant, such as a variable or a field that may be null at runtime, is not reported, because the analyzer cannot see its value.
-- The diagnostic is reported at the invocation expression.
+- The diagnostic is reported at the invocation expression, e.g., `pool.RentAll()`. For a conditional access, it is the part after `?`, e.g., `.RentAll()` in `pool?.RentAll()`.
 
 To change the severity, add the following to `.editorconfig` or `.globalconfig`:
 

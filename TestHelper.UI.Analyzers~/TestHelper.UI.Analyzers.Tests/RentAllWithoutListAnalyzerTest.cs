@@ -9,8 +9,8 @@ namespace TestHelper.UI.Analyzers.Tests
     {
         [Theory]
         [InlineData("OmittedArgument", 7, 13)]
-        [InlineData("NullArgument", 7, 13)]
-        [InlineData("DefaultArgument", 7, 13)]
+        [InlineData("NullArgument", 9, 13)]
+        [InlineData("DefaultArgument", 9, 13)]
         [InlineData("NamedNullArgument", 7, 13)]
         [InlineData("ConditionalAccess", 7, 18)]
         [InlineData("CallThroughSubclass", 7, 13)]
