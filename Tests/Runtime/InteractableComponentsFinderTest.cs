@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.UI.Operators;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -141,6 +142,31 @@ namespace TestHelper.UI
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjectsInOverlayCanvas()));
+                }
+
+                [Test]
+                [LoadScene(TestScene)]
+                public void FindInteractableComponentsAndOperators_NestedEnumeration_ReturnsSameResultsAsSingleEnumeration()
+                {
+                    var pool = new OperatorPool().Register<UguiClickOperator>();
+                    var sut = new InteractableComponentsFinder(operators: pool);
+                    var expected = sut.FindInteractableComponentsAndOperators()
+                        .Select(x => x.Item1.gameObject.name)
+                        .ToArray();
+                    Assume.That(expected, Is.Not.Empty);
+
+                    var outer = new List<string>();
+                    var inner = new List<string>();
+                    foreach (var (component, _) in sut.FindInteractableComponentsAndOperators())
+                    {
+                        outer.Add(component.gameObject.name);
+                        inner = sut.FindInteractableComponentsAndOperators()
+                            .Select(x => x.Item1.gameObject.name)
+                            .ToList();
+                    }
+
+                    Assert.That(outer, Is.EquivalentTo(expected));
+                    Assert.That(inner, Is.EquivalentTo(expected));
                 }
             }
 
