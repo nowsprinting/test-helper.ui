@@ -1,6 +1,5 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.UI;
 using TestHelper.UI.Operators;
 using TestHelper.UI.Visualizers;
 using UnityEngine;

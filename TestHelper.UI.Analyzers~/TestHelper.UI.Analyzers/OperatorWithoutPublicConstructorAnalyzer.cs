@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -12,14 +13,18 @@ namespace TestHelper.UI.Analyzers
         private static readonly DiagnosticDescriptor s_rule = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "IOperator implementation has no public constructor",
-            messageFormat: "'{0}' has no public constructor: the operator cannot be rented. Make the constructor public.",
+            messageFormat:
+            "'{0}' has no public constructor: the operator cannot be rented. Make the constructor public.",
             category: "Extensibility",
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "OperatorPool creates operators only through a public constructor, so renting an operator whose constructors are all non-public always throws.",
-            helpLinkUri: "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4001.md");
+            description:
+            "OperatorPool creates operators only through a public constructor, so renting an operator whose constructors are all non-public always throws.",
+            helpLinkUri:
+            "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4001.md");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(s_rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+            ImmutableArray.Create(s_rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -27,7 +32,8 @@ namespace TestHelper.UI.Analyzers
             context.EnableConcurrentExecution();
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                var operatorType = compilationContext.Compilation.GetTypeByMetadataName("TestHelper.UI.Operators.IOperator");
+                var operatorType =
+                    compilationContext.Compilation.GetTypeByMetadataName("TestHelper.UI.Operators.IOperator");
                 if (operatorType == null)
                 {
                     return;
@@ -41,40 +47,18 @@ namespace TestHelper.UI.Analyzers
 
         private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol operatorType)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
-            if (type.TypeKind != TypeKind.Class || type.IsAbstract)
+            // Checking the interfaces before the constructors is rejected: almost every class has a public constructor
+            // (at least the implicit one), so the constructor check rejects most types without walking AllInterfaces.
+            if (type.TypeKind != TypeKind.Class || type.IsAbstract ||
+                type.InstanceConstructors.Any(c => c.DeclaredAccessibility == Accessibility.Public) ||
+                !type.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i.OriginalDefinition, operatorType)))
             {
                 return;
-            }
-
-            if (!ImplementsOperator(type, operatorType))
-            {
-                return;
-            }
-
-            foreach (var constructor in type.InstanceConstructors)
-            {
-                context.CancellationToken.ThrowIfCancellationRequested();
-                if (constructor.DeclaredAccessibility == Accessibility.Public)
-                {
-                    return;
-                }
             }
 
             context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
-        }
-
-        private static bool ImplementsOperator(INamedTypeSymbol type, INamedTypeSymbol operatorType)
-        {
-            foreach (var implemented in type.AllInterfaces)
-            {
-                if (SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, operatorType))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

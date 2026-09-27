@@ -67,4 +67,5 @@ public class MyClickOperator : IClickOperator
 - The rule applies to non-abstract classes that implement `TestHelper.UI.Operators.IOperator` directly, through a sub-interface (e.g., `IClickOperator`), or through a base class. Abstract classes are skipped because they cannot be instantiated.
 - A class with no explicit constructor has a public compiler-generated default constructor and is not reported.
 - Static constructors are not counted.
-- The diagnostic is reported once at the class identifier.
+- Generic class definitions and nested classes are checked like any other class; a closed generic type such as `MyOperator<int>` is rented through the same constructors.
+- The diagnostic is reported once at the class identifier. For a partial class, it is reported at the identifier of the first declaration only.
