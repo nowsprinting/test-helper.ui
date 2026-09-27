@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -81,7 +82,7 @@ namespace TestHelper.UI.Analyzers
                      attributeClass != null;
                      attributeClass = attributeClass.BaseType)
                 {
-                    if (attributeClass.Name == "PreserveAttribute")
+                    if (string.Equals(attributeClass.Name, "PreserveAttribute", StringComparison.Ordinal))
                     {
                         return true;
                     }

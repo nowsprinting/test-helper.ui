@@ -96,10 +96,11 @@ public class MyHoverOperator : IHoverOperator
 
 - The rule applies to non-abstract classes that implement `TestHelper.UI.Operators.IOperator` directly, through a sub-interface (e.g., `IClickOperator`), or through a base class. Abstract classes are skipped because they cannot be instantiated.
 - A constructor is preserved when either of the following holds:
-    - The constructor has an attribute whose class is named `PreserveAttribute`, or derives from a class named `PreserveAttribute`, in any namespace.
+    - The constructor has an attribute whose class is named `PreserveAttribute`, or derives (directly or indirectly) from a class named `PreserveAttribute`, in any namespace.
     - The constructor has no parameters and the class has such an attribute.
 - Every public constructor is checked; when a class has multiple public constructors, each unpreserved one gets its own diagnostic (TestHelperUI4004 is reported separately).
-- The diagnostic is reported at the constructor identifier. For a class with no explicit constructor, the compiler-generated default constructor cannot take an attribute, so the diagnostic is reported at the class identifier; apply `[Preserve]` to the class, or declare the constructor explicitly and apply `[Preserve]` to it.
+- The diagnostic is reported at the constructor identifier. For a class with no explicit constructor, the compiler-generated default constructor cannot take an attribute, so the diagnostic is reported at the class identifier (of the first declaration, for a partial class); apply `[Preserve]` to the class, or declare the constructor explicitly and apply `[Preserve]` to it.
+- `[Preserve]` on a base class does not preserve the derived class or its constructors, because the attribute is not inherited.
 - Non-public constructors are not checked because `OperatorPool` does not invoke them.
 - Preservation by `[assembly: Preserve]` or a `link.xml` file is not recognized; the analyzer cannot see `link.xml`, and `[assembly: Preserve]` is documented to preserve types, not their constructors. If you rely on them, change the severity in `.editorconfig` or `.globalconfig`:
 
