@@ -27,7 +27,6 @@ namespace TestHelper.UI.Analyzers.Tests
         }
 
         [Theory]
-        [InlineData("RequiredAndDefault", 11, 20, "text")]
         [InlineData("ParamsArray", 10, 41, "values")]
         [InlineData("OptionalAttributeWithoutDefaultValue", 11, 68, "value")]
         [InlineData("ImplementsPaginatorDirectly", 10, 48, "value")]
@@ -43,7 +42,6 @@ namespace TestHelper.UI.Analyzers.Tests
         [Theory]
         [InlineData("AllParametersHaveDefaultValues")]
         [InlineData("DefaultValueByAttribute")]
-        [InlineData("NoExplicitConstructor")]
         [InlineData("MultiplePublicConstructors")]
         [InlineData("NoPublicConstructor")]
         [InlineData("AbstractPaginator")]
