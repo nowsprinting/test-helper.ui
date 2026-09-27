@@ -17,7 +17,7 @@ Severity is Suggestion because `OperatorPool` and monkey testing accept any `IOp
 
 ## Motivation
 
-The package's `IOperator` documentation and README require every operator to implement a sub-interface of `IOperator` to represent the kind of operator. `IOperator` itself declares only the members for monkey testing (`CanOperate` and `OperateAsync`), and says nothing about what the operation is.
+The package's `IOperator` documentation and README require every operator to implement a sub-interface of `IOperator` to represent the kind of operator. `IOperator` itself declares only the members for monkey testing (`CanOperate`, `OperateAsync`, and the setters for the logger, screenshot options, and visualizer), and says nothing about what the operation is.
 
 The sub-interface is the type that callers depend on. Test code holds an operator as `IToggleOperator` or `ITextInputOperator` so that the implementation for another UI framework can be swapped in, and a sub-interface declares the overloads specific to its kind of operation, such as the text to input or the destination to drop at. An operator that implements `IOperator` directly can be referred to only by its concrete class.
 
