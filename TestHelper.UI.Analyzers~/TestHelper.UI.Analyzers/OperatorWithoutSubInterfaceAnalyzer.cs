@@ -63,8 +63,8 @@ namespace TestHelper.UI.Analyzers
             // LINQ is rejected for boxing the ImmutableArray enumerator on every call.
             foreach (var implemented in type.AllInterfaces)
             {
-                if (!SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, operatorType) &&
-                    OperatorSymbols.InheritsOperator(implemented, operatorType))
+                // Excluding IOperator explicitly is rejected: an interface's AllInterfaces never contains the interface itself.
+                if (OperatorSymbols.InheritsOperator(implemented, operatorType))
                 {
                     return true;
                 }

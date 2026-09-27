@@ -73,7 +73,7 @@ public class MyLongPressOperator : ILongPressOperator
 - The rule applies to non-abstract classes that implement `TestHelper.UI.Operators.IOperator` directly, through a sub-interface, or through a base class. Abstract classes are skipped; they are checked through their concrete subclasses.
 - A sub-interface is any interface, including one defined by the operator author, that inherits `IOperator` directly or indirectly (e.g., `IToggleOperator : IClickOperator`). A sub-interface implemented by a base class counts.
 - Interfaces that do not inherit `IOperator`, such as `IScreenPointCustomizable`, do not count.
-- The diagnostic is reported once at the class identifier.
+- The diagnostic is reported once at the class identifier (of the first declaration, for a partial class).
 
 To change the severity, add the following to `.editorconfig` or `.globalconfig`:
 
