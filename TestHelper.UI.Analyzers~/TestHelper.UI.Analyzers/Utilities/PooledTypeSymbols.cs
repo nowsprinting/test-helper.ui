@@ -2,33 +2,37 @@ using Microsoft.CodeAnalysis;
 
 namespace TestHelper.UI.Analyzers.Utilities
 {
-    internal static class OperatorSymbols
+    /// <summary>
+    /// Symbol helpers for the types that <c>OperatorPool</c> and <c>PaginatorPool</c> instantiate via reflection.
+    /// </summary>
+    internal static class PooledTypeSymbols
     {
         public const string IOperatorMetadataName = "TestHelper.UI.Operators.IOperator";
+        public const string IPaginatorMetadataName = "TestHelper.UI.Paginators.IPaginator";
 
         /// <summary>
-        /// Whether <paramref name="type"/> is a class that <c>OperatorPool</c> can instantiate as an operator:
-        /// non-abstract and implementing <c>IOperator</c> directly, through a sub-interface, or through a base class.
+        /// Whether <paramref name="type"/> is a class that a pool can instantiate as <paramref name="interfaceType"/>:
+        /// non-abstract and implementing <paramref name="interfaceType"/> directly, through a sub-interface, or through a base class.
         /// </summary>
         /// <remarks>
         /// Call this before <see cref="CountPublicConstructors"/>. Checking the constructors first is rejected:
         /// <c>InstanceConstructors</c> builds a new array on every access while <c>AllInterfaces</c> is cached,
-        /// so rejecting non-operators by interface first is about twice as fast.
+        /// so rejecting other types by interface first is about twice as fast.
         /// </remarks>
-        public static bool IsConcreteOperator(INamedTypeSymbol type, INamedTypeSymbol operatorType)
+        public static bool IsConcreteImplementation(INamedTypeSymbol type, INamedTypeSymbol interfaceType)
         {
-            return type.TypeKind == TypeKind.Class && !type.IsAbstract && InheritsOperator(type, operatorType);
+            return type.TypeKind == TypeKind.Class && !type.IsAbstract && Implements(type, interfaceType);
         }
 
         /// <summary>
-        /// Whether <paramref name="type"/> implements or inherits <c>IOperator</c>, directly or indirectly.
+        /// Whether <paramref name="type"/> implements or inherits <paramref name="interfaceType"/>, directly or indirectly.
         /// </summary>
-        public static bool InheritsOperator(ITypeSymbol type, INamedTypeSymbol operatorType)
+        public static bool Implements(ITypeSymbol type, INamedTypeSymbol interfaceType)
         {
             // LINQ Any is rejected for boxing the ImmutableArray enumerator on every call; this runs for every class.
             foreach (var implemented in type.AllInterfaces)
             {
-                if (SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, operatorType))
+                if (SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, interfaceType))
                 {
                     return true;
                 }
@@ -38,9 +42,9 @@ namespace TestHelper.UI.Analyzers.Utilities
         }
 
         /// <summary>
-        /// Counts the public instance constructors, which are the ones <c>OperatorPool</c> can invoke.
+        /// Counts the public instance constructors, which are the ones the pools can invoke.
         /// </summary>
-        /// <param name="type">The operator type</param>
+        /// <param name="type">The pooled type</param>
         /// <param name="first">The first public constructor, or null if there is none</param>
         /// <returns>The number of public instance constructors, including the implicit default constructor</returns>
         public static int CountPublicConstructors(INamedTypeSymbol type, out IMethodSymbol? first)

@@ -34,7 +34,7 @@ namespace TestHelper.UI.Analyzers
             context.RegisterCompilationStartAction(compilationContext =>
             {
                 var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(OperatorSymbols.IOperatorMetadataName);
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
                 if (operatorType == null)
                 {
                     return;
@@ -50,7 +50,7 @@ namespace TestHelper.UI.Analyzers
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
-            if (!OperatorSymbols.IsConcreteOperator(type, operatorType))
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType))
             {
                 return;
             }
