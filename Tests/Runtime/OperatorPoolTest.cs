@@ -168,7 +168,11 @@ namespace TestHelper.UI
             pool.Register<UguiClickAndHoldOperator>();
             pool.Register<UguiClickOperator>();
 
+            // TestHelperUI3002 asks to pass a list to reuse. Not applied: the list allocated by RentAll without a list
+            // is the subject of this test.
+#pragma warning disable TestHelperUI3002
             var operators = pool.RentAll().ToArray();
+#pragma warning restore TestHelperUI3002
             var operatorTypes = operators.Select(instance => instance.GetType()).ToArray();
             Assert.That(operatorTypes, Is.EquivalentTo(new[]
             {
