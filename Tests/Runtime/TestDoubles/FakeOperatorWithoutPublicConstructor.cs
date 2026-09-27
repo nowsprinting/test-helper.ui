@@ -16,7 +16,9 @@ namespace TestHelper.UI.TestDoubles
     // Intentionally has no public constructor: this fake verifies that OperatorPool rejects
     // registering an IOperator type without one, so it must stay non-instantiable directly.
     [SuppressMessage("ReSharper", "ClassCannotBeInstantiated")]
+#pragma warning disable TestHelperUI4001
     public class FakeOperatorWithoutPublicConstructor : IOperator
+#pragma warning restore TestHelperUI4001
     {
         public ILogger Logger { get; set; }
         public ScreenshotOptions ScreenshotOptions { get; set; }

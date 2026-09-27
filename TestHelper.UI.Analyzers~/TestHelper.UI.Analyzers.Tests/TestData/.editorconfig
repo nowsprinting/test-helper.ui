@@ -1,0 +1,12 @@
+# Test data reproduces user code for the analyzers to inspect, so IDE inspections about that code are noise here.
+
+[*.cs]
+# Dummies declare the real namespaces of Unity, UniTask, and TestHelper.UI types, not the folder-based one
+resharper_check_namespace_highlighting = none
+
+# Fixtures deliberately declare uninstantiable classes, redundant and unused constructors, and unused type parameters
+resharper_class_cannot_be_instantiated_highlighting = none
+resharper_empty_constructor_highlighting = none
+resharper_unused_member_local_highlighting = none
+resharper_unused_parameter_local_highlighting = none
+resharper_unused_type_parameter_highlighting = none

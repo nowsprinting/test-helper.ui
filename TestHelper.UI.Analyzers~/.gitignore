@@ -1,0 +1,9 @@
+# The package root .gitignore is for Unity and ignores .NET solution/project files
+!*.sln
+!*.csproj
+
+[Bb]in/
+[Oo]bj/
+artifacts/
+*.binlog
+coverage.cobertura.xml

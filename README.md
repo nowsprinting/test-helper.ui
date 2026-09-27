@@ -669,6 +669,52 @@ To use the feature in player builds, add `INCLUDE_COM_NOWSPRINTING_TEST_HELPER` 
 
 
 
+## Roslyn analyzers
+
+This package includes Roslyn analyzers that diagnose the usage of this package's APIs.
+They apply to assemblies that reference the `TestHelper.UI` assembly.
+
+> [!NOTE]\
+> The analyzers require Unity 2022.3.12f1 or later.
+> Unity 2020.2 through 2022.3.11 cannot load them and reports warning CS8032. Unity 2019.4 through 2020.1 ignores them.
+
+Diagnostic IDs use the `TestHelperUI` prefix with the category encoded in the first digit.
+
+### Usage (TestHelperUI1xxx)
+
+Rules about how to use this package's APIs.
+
+| Id | Title | Severity |
+|----|-------|----------|
+
+### Alternative (TestHelperUI2xxx)
+
+Rules to use this package's APIs instead of the Unity standard APIs.
+
+| Id | Title | Severity |
+|----|-------|----------|
+
+### Performance (TestHelperUI3xxx)
+
+Rules about usage to avoid at runtime.
+
+| Id | Title | Severity |
+|----|-------|----------|
+
+### Extensibility (TestHelperUI4xxx)
+
+Rules for authors of custom operators, matchers, and paginators.
+
+| Id | Title | Severity |
+|----|-------|----------|
+| [TestHelperUI4001](Documentation~/rules/TestHelperUI4001.md) | IOperator implementation has no public constructor | ⚠️ |
+| [TestHelperUI4002](Documentation~/rules/TestHelperUI4002.md) | Constructor parameter of IOperator implementation has no default value | ⚠️ |
+| [TestHelperUI4003](Documentation~/rules/TestHelperUI4003.md) | Public constructor of IOperator implementation is not preserved | ⚠️ |
+| [TestHelperUI4004](Documentation~/rules/TestHelperUI4004.md) | IOperator implementation has multiple public constructors | ⚠️ |
+| [TestHelperUI4005](Documentation~/rules/TestHelperUI4005.md) | IOperator implementation does not implement a sub-interface | ℹ️ |
+
+
+
 ## Troubleshooting
 
 ### GameObjectFinder
@@ -1002,6 +1048,21 @@ UNITY_VERSION=2019.4.40f1 make -k test
 
 > [!WARNING]\
 > You must select "Input Manager (Old)" or "Both" in the **Project Settings > Player > Active Input Handling** for running tests.
+
+
+### Build and test analyzers
+
+The analyzers are developed in the `TestHelper.UI.Analyzers~` .NET solution, not in Unity.
+
+```bash
+cd TestHelper.UI.Analyzers~
+dotnet build -c Release TestHelper.UI.Analyzers  # Copies the dll into Runtime/
+dotnet test
+```
+
+> [!IMPORTANT]\
+> Commit the built `Runtime/TestHelper.UI.Analyzers.dll` once per pull request, right before pushing, after rebuilding it from the final source.
+> CI does not build or commit the dll.
 
 
 ### Release workflow
