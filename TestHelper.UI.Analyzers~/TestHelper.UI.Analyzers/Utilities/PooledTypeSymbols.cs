@@ -1,3 +1,4 @@
+using System;
 using Microsoft.CodeAnalysis;
 
 namespace TestHelper.UI.Analyzers.Utilities
@@ -64,6 +65,29 @@ namespace TestHelper.UI.Analyzers.Utilities
             }
 
             return count;
+        }
+
+        /// <summary>
+        /// Whether <paramref name="symbol"/> has an attribute that the Unity linker treats as <c>[Preserve]</c>.
+        /// </summary>
+        public static bool HasPreserveAttribute(ISymbol symbol)
+        {
+            foreach (var attribute in symbol.GetAttributes())
+            {
+                // Matching UnityEngine.Scripting.PreserveAttribute by symbol is rejected: the Unity linker recognizes
+                // any attribute class named PreserveAttribute in any namespace, or deriving from one.
+                for (var attributeClass = attribute.AttributeClass;
+                     attributeClass != null;
+                     attributeClass = attributeClass.BaseType)
+                {
+                    if (string.Equals(attributeClass.Name, "PreserveAttribute", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
