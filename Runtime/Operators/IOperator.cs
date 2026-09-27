@@ -10,16 +10,20 @@ using UnityEngine.EventSystems;
 namespace TestHelper.UI.Operators
 {
     /// <summary>
-    /// Matcher and Operator pair for monkey testing.
+    /// Operator that performs one kind of operation, such as click, on a <c>GameObject</c> for monkey testing.
     /// Implement the <c>CanOperate</c> method to determine whether an operation such as click is possible, and the <c>OperateAsync</c> method to execute the operation.
     /// </summary>
     /// <remarks>
-    /// Must be implements sub-interface (e.g., <c>IClickOperator</c>) to represent the type of operator.
+    /// Implement a sub-interface (e.g., <c>IClickOperator</c>) to represent the kind of operation.
     /// If required parameters for the operation, such as hold time, input text strategy, etc., keep them in instance fields of the implementation class.
     /// <p/>
     /// <c>OperatorPool</c> creates instances of the implementation class by invoking its public constructor via reflection.
     /// Annotate every public constructor with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build.
-    /// If the implementation class has multiple public constructors, register it with explicit constructor arguments via <c>OperatorPool.Register&lt;T&gt;(args)</c>.
+    /// <c>OperatorPool</c> cannot invoke a non-public constructor, even with registered constructor arguments.
+    /// When registered without constructor arguments, the implementation class must have exactly one public constructor,
+    /// and each of its parameters must have a default value or a type whose value is passed to the <c>OperatorPool</c> constructor.
+    /// If the implementation class has multiple public constructors or a parameter that cannot be resolved this way,
+    /// register it with explicit constructor arguments via <c>OperatorPool.Register&lt;T&gt;(args)</c>.
     /// </remarks>
     public interface IOperator
     {

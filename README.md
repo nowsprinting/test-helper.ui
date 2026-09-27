@@ -648,7 +648,9 @@ An operator must implement the `CanOperate` method to determine whether an opera
 [OperatorPool](#operatorpool) creates operator instances by invoking the public constructor via reflection, so the constructor must meet the following:
 
 - Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the player build.
-- If the operator has multiple public constructors, register it with constructor arguments (see [Dependency Injection](#dependency-injection)); otherwise, `OperatorPool.Rent` throws `InvalidOperationException`.
+- The operator must have a public constructor; `OperatorPool` cannot invoke a non-public constructor, even with registered constructor arguments.
+- Each parameter of the public constructor must have a default value, unless its value is passed to the `OperatorPool` constructor (see [Dependency Injection](#dependency-injection)).
+- If the operator has multiple public constructors or a parameter that cannot be resolved as above, register it with constructor arguments (see [Dependency Injection](#dependency-injection)); otherwise, `OperatorPool.Rent` throws `InvalidOperationException`.
 
 > [!IMPORTANT]\
 > Until test-helper.monkey v0.14.0, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
