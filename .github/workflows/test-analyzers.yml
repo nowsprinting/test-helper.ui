@@ -61,18 +61,22 @@ jobs:
           submodules: false
           lfs: false
 
-      - name: Verify the analyzer dll is committed with the analyzer sources
+      - name: Verify the analyzer dll is committed after the last change to the analyzer sources
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          changed=$(git diff --name-only "$BASE_SHA...$HEAD_SHA")
-          if ! grep -q '^TestHelper\.UI\.Analyzers~/TestHelper\.UI\.Analyzers/.*\.cs$' <<< "$changed"; then
+          # Checking only whether the pull request changes the dll at all is rejected: a dll committed before
+          # the last source change passes it while being stale.
+          source_commit=$(git log -1 --format=%H "$BASE_SHA..$HEAD_SHA" -- ':(glob)TestHelper.UI.Analyzers~/TestHelper.UI.Analyzers/**/*.cs')
+          if [ -z "$source_commit" ]; then
             echo "The analyzer sources are not changed."
             exit 0
           fi
-          if ! grep -qx 'Runtime/TestHelper\.UI\.Analyzers\.dll' <<< "$changed"; then
-            echo "::error file=Runtime/TestHelper.UI.Analyzers.dll::The analyzer sources are changed, but the dll is not. Run 'dotnet build -c Release TestHelper.UI.Analyzers' in TestHelper.UI.Analyzers~/ and commit the dll."
+          # Starting the range at the source commit itself is rejected: it fails a dll committed together with the sources.
+          dll_commit=$(git log -1 --format=%H "$source_commit^..$HEAD_SHA" -- Runtime/TestHelper.UI.Analyzers.dll)
+          if [ -z "$dll_commit" ]; then
+            echo "::error file=Runtime/TestHelper.UI.Analyzers.dll::The analyzer sources are changed in $source_commit, but the dll is not committed after it. Run 'dotnet build -c Release TestHelper.UI.Analyzers' in TestHelper.UI.Analyzers~/ and commit the dll."
             exit 1
           fi
-          echo "The dll is committed with the analyzer sources."
+          echo "The dll is committed in $dll_commit, after the last change to the analyzer sources in $source_commit."
