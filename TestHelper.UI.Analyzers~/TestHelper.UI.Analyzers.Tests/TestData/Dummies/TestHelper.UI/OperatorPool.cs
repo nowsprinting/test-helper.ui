@@ -5,7 +5,12 @@ namespace TestHelper.UI
 {
     public class OperatorPool
     {
+        public OperatorPool Register<T>(params object[] args) where T : class, IOperator =>
+            throw new System.NotImplementedException();
+
         public IReadOnlyList<IOperator> RentAll(List<IOperator>? operators = null) =>
             throw new System.NotImplementedException();
+
+        public T Rent<T>() where T : class, IOperator => throw new System.NotImplementedException();
     }
 }
