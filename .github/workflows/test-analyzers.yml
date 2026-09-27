@@ -1,0 +1,78 @@
+# Copyright (c) 2026 Koji Hasegawa.
+# This software is released under the MIT License.
+
+name: Test analyzers
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'TestHelper.UI.Analyzers~/**'
+      - '.github/workflows/test-analyzers.yml'
+  pull_request:
+    types: [ opened, synchronize, reopened ]  # Same as default
+    paths:
+      - 'TestHelper.UI.Analyzers~/**'
+      - '.github/workflows/test-analyzers.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: { }
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          submodules: false
+          lfs: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run tests
+        run: dotnet test
+        working-directory: TestHelper.UI.Analyzers~
+
+  dll-updated:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0  # The merge base is required to list the files changed in the pull request
+          submodules: false
+          lfs: false
+
+      - name: Verify the analyzer dll is committed with the analyzer sources
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE_SHA...$HEAD_SHA")
+          if ! grep -q '^TestHelper\.UI\.Analyzers~/TestHelper\.UI\.Analyzers/.*\.cs$' <<< "$changed"; then
+            echo "The analyzer sources are not changed."
+            exit 0
+          fi
+          if ! grep -qx 'Runtime/TestHelper\.UI\.Analyzers\.dll' <<< "$changed"; then
+            echo "::error file=Runtime/TestHelper.UI.Analyzers.dll::The analyzer sources are changed, but the dll is not. Run 'dotnet build -c Release TestHelper.UI.Analyzers' in TestHelper.UI.Analyzers~/ and commit the dll."
+            exit 1
+          fi
+          echo "The dll is committed with the analyzer sources."
