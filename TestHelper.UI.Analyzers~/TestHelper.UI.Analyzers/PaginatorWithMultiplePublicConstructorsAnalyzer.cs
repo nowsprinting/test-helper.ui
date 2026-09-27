@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using TestHelper.UI.Analyzers.Utilities;
 
 namespace TestHelper.UI.Analyzers
 {
@@ -27,6 +28,34 @@ namespace TestHelper.UI.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                var paginatorType =
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IPaginatorMetadataName);
+                if (paginatorType == null)
+                {
+                    return;
+                }
+
+                compilationContext.RegisterSymbolAction(
+                    symbolContext => AnalyzeNamedType(symbolContext, paginatorType),
+                    SymbolKind.NamedType);
+            });
+        }
+
+        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol paginatorType)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            var type = (INamedTypeSymbol)context.Symbol;
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, paginatorType) ||
+                PooledTypeSymbols.CountPublicConstructors(type, out _) < 2)
+            {
+                return;
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
         }
     }
 }
