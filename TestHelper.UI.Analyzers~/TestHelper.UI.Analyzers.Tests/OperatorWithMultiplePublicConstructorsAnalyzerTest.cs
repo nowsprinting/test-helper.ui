@@ -11,6 +11,8 @@ namespace TestHelper.UI.Analyzers.Tests
         [InlineData("NoArgs", 14, 18, "NoArgsOperator")]
         [InlineData("NullArgs", 14, 18, "NullArgsOperator")]
         [InlineData("DefaultArgs", 14, 18, "DefaultArgsOperator")]
+        [InlineData("EmptyArrayArgs", 14, 18, "EmptyArrayArgsOperator")]
+        [InlineData("EmptyArrayInitializerArgs", 14, 18, "EmptyArrayInitializerArgsOperator")]
         [InlineData("PartialWithConstructorsInEachPart", 14, 18, "PartialWithConstructorsInEachPartOperator")]
         public async Task MultiplePublicConstructorsWithoutArgs_ReportsAtRegister(string caseName, int line, int column, string typeName)
         {
