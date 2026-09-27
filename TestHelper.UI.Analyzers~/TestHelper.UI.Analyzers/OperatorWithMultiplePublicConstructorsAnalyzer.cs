@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using TestHelper.UI.Analyzers.Utilities;
 
 namespace TestHelper.UI.Analyzers
 {
@@ -27,6 +28,34 @@ namespace TestHelper.UI.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                var operatorType =
+                    compilationContext.Compilation.GetTypeByMetadataName(OperatorSymbols.IOperatorMetadataName);
+                if (operatorType == null)
+                {
+                    return;
+                }
+
+                compilationContext.RegisterSymbolAction(
+                    symbolContext => AnalyzeNamedType(symbolContext, operatorType),
+                    SymbolKind.NamedType);
+            });
+        }
+
+        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol operatorType)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            var type = (INamedTypeSymbol)context.Symbol;
+            if (!OperatorSymbols.IsConcreteOperator(type, operatorType) ||
+                OperatorSymbols.CountPublicConstructors(type, out _) < 2)
+            {
+                return;
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
         }
     }
 }
