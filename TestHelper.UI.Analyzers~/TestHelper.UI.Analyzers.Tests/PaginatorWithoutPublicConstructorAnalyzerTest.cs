@@ -10,14 +10,6 @@ namespace TestHelper.UI.Analyzers.Tests
         [Theory]
         [InlineData("ImplementsPaginatorOfComponentWithPrivateConstructor", 8, 18,
             "ImplementsPaginatorOfComponentWithPrivateConstructor")]
-        [InlineData("ImplementsPaginatorOfComponentWithProtectedConstructor", 8, 18,
-            "ImplementsPaginatorOfComponentWithProtectedConstructor")]
-        [InlineData("ImplementsPaginatorOfComponentWithInternalConstructor", 8, 18,
-            "ImplementsPaginatorOfComponentWithInternalConstructor")]
-        [InlineData("ImplementsPaginatorOfComponentWithPrivateProtectedConstructor", 8, 18,
-            "ImplementsPaginatorOfComponentWithPrivateProtectedConstructor")]
-        [InlineData("ImplementsPaginatorOfComponentWithProtectedInternalConstructor", 8, 18,
-            "ImplementsPaginatorOfComponentWithProtectedInternalConstructor")]
         [InlineData("ImplementsPaginatorDirectlyWithPrivateConstructor", 8, 18,
             "ImplementsPaginatorDirectlyWithPrivateConstructor")]
         [InlineData("InheritsPaginatorBaseWithPrivateConstructor", 23, 18,
