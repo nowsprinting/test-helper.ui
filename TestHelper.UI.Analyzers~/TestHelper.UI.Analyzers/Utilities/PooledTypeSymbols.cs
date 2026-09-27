@@ -4,7 +4,8 @@ using Microsoft.CodeAnalysis;
 namespace TestHelper.UI.Analyzers.Utilities
 {
     /// <summary>
-    /// Symbol helpers for the types that <c>OperatorPool</c> and <c>PaginatorPool</c> instantiate via reflection.
+    /// Symbol helpers for the types that <c>OperatorPool</c> and <c>PaginatorPool</c> instantiate via reflection,
+    /// including whether the Unity linker keeps their constructors.
     /// </summary>
     internal static class PooledTypeSymbols
     {
