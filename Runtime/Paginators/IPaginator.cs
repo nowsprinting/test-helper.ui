@@ -20,8 +20,11 @@ namespace TestHelper.UI.Paginators
     ///     <item><c>PaginatorPool</c> creates instances by invoking the public constructor via reflection.
     ///     Annotate every public constructor with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code
     ///     stripping does not remove it from the Player build</item>
+    ///     <item>Have a public constructor; <c>PaginatorPool</c> cannot invoke a non-public constructor, even with
+    ///     registered constructor arguments</item>
     ///     <item>Have exactly one public constructor whose parameters all have default values;
-    ///     otherwise, register it with explicit constructor arguments via <c>PaginatorPool.Register&lt;T&gt;(args)</c></item>
+    ///     if it has multiple public constructors or a parameter without a default value, register it with
+    ///     explicit constructor arguments via <c>PaginatorPool.Register&lt;T&gt;(args)</c></item>
     ///     <item>Implement the members of <see cref="IPaginator"/> as documented on each member</item>
     /// </list>
     /// </remarks>
