@@ -12,7 +12,11 @@ using UnityEngine.Scripting;
 namespace TestHelper.UI.TestDoubles
 {
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+    // Keeping only one public constructor is rejected: this fake verifies that PaginatorPool
+    // rejects renting an IPaginator type with multiple public constructors.
+#pragma warning disable TestHelperUI4009
     public class FakePaginatorWithMultiplePublicConstructors : IPaginator<FakeComponent>
+#pragma warning restore TestHelperUI4009
     {
         public int IntValue { get; }
         public MonoBehaviour TargetComponent { get; set; }
