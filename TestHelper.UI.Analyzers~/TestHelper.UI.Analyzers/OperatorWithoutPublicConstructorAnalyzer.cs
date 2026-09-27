@@ -25,6 +25,56 @@ namespace TestHelper.UI.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                var operatorType = compilationContext.Compilation.GetTypeByMetadataName("TestHelper.UI.Operators.IOperator");
+                if (operatorType == null)
+                {
+                    return;
+                }
+
+                compilationContext.RegisterSymbolAction(
+                    symbolContext => AnalyzeNamedType(symbolContext, operatorType),
+                    SymbolKind.NamedType);
+            });
+        }
+
+        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol operatorType)
+        {
+            var type = (INamedTypeSymbol)context.Symbol;
+            if (type.TypeKind != TypeKind.Class || type.IsAbstract)
+            {
+                return;
+            }
+
+            if (!ImplementsOperator(type, operatorType))
+            {
+                return;
+            }
+
+            foreach (var constructor in type.InstanceConstructors)
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+                if (constructor.DeclaredAccessibility == Accessibility.Public)
+                {
+                    return;
+                }
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
+        }
+
+        private static bool ImplementsOperator(INamedTypeSymbol type, INamedTypeSymbol operatorType)
+        {
+            foreach (var implemented in type.AllInterfaces)
+            {
+                if (SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, operatorType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
