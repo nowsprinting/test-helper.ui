@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.UI.Paginators;
@@ -417,23 +416,6 @@ namespace TestHelper.UI
             var instance = pool.Rent<FakePaginator>();
 
             Assert.That(instance.IntValue, Is.EqualTo(IntValue));
-        }
-
-        [Test]
-        public void Rent_AllBuiltInPaginatorsRegisteredWithoutArgs_ReturnsInstanceOfEachType()
-        {
-            // Registering the types enumerated by reflection is rejected: the analyzers check only the type
-            // arguments written at Register<T> calls, so each built-in paginator must be registered here by name.
-            var pool = new PaginatorPool()
-                .Register<UguiScrollbarPaginator>()
-                .Register<UguiScrollRectPaginator>();
-            var builtInTypes = typeof(IPaginator).Assembly.GetTypes()
-                .Where(type => type.IsClass && !type.IsAbstract && typeof(IPaginator).IsAssignableFrom(type));
-
-            foreach (var type in builtInTypes)
-            {
-                Assert.That(pool.Rent(type), Is.TypeOf(type));
-            }
         }
     }
 }

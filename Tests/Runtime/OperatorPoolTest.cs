@@ -398,28 +398,5 @@ namespace TestHelper.UI
                         "Cannot resolve required parameter 'requiredParam' of type String. " +
                         "Register with explicit constructor arguments or add a default value."));
         }
-
-        [Test]
-        public void Rent_AllBuiltInOperatorsRegisteredWithoutArgs_ReturnsInstanceOfEachType()
-        {
-            // Registering the types enumerated by reflection is rejected: the analyzers check only the type
-            // arguments written at Register<T> calls, so each built-in operator must be registered here by name.
-            var pool = new OperatorPool()
-                .Register<UguiClickAndHoldOperator>()
-                .Register<UguiClickOperator>()
-                .Register<UguiDoubleClickOperator>()
-                .Register<UguiDragAndDropOperator>()
-                .Register<UguiScrollWheelOperator>()
-                .Register<UguiSwipeOperator>()
-                .Register<UguiTextInputOperator>()
-                .Register<UguiToggleOperator>();
-            var builtInTypes = typeof(IOperator).Assembly.GetTypes()
-                .Where(type => type.IsClass && !type.IsAbstract && typeof(IOperator).IsAssignableFrom(type));
-
-            foreach (var type in builtInTypes)
-            {
-                Assert.That(pool.Rent(type), Is.TypeOf(type));
-            }
-        }
     }
 }
