@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using TestHelper.UI.Analyzers.Utilities;
 
 namespace TestHelper.UI.Analyzers
 {
@@ -27,6 +28,49 @@ namespace TestHelper.UI.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                var operatorType =
+                    compilationContext.Compilation.GetTypeByMetadataName(OperatorSymbols.IOperatorMetadataName);
+                if (operatorType == null)
+                {
+                    return;
+                }
+
+                compilationContext.RegisterSymbolAction(
+                    symbolContext => AnalyzeNamedType(symbolContext, operatorType),
+                    SymbolKind.NamedType);
+            });
+        }
+
+        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol operatorType)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            var type = (INamedTypeSymbol)context.Symbol;
+            if (!OperatorSymbols.IsConcreteOperator(type, operatorType) ||
+                ImplementsSubInterface(type, operatorType))
+            {
+                return;
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
+        }
+
+        private static bool ImplementsSubInterface(INamedTypeSymbol type, INamedTypeSymbol operatorType)
+        {
+            // LINQ is rejected for boxing the ImmutableArray enumerator on every call.
+            foreach (var implemented in type.AllInterfaces)
+            {
+                if (!SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, operatorType) &&
+                    OperatorSymbols.InheritsOperator(implemented, operatorType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -17,11 +17,14 @@ namespace TestHelper.UI.Analyzers.Utilities
         /// </remarks>
         public static bool IsConcreteOperator(INamedTypeSymbol type, INamedTypeSymbol operatorType)
         {
-            if (type.TypeKind != TypeKind.Class || type.IsAbstract)
-            {
-                return false;
-            }
+            return type.TypeKind == TypeKind.Class && !type.IsAbstract && InheritsOperator(type, operatorType);
+        }
 
+        /// <summary>
+        /// Whether <paramref name="type"/> implements or inherits <c>IOperator</c>, directly or indirectly.
+        /// </summary>
+        public static bool InheritsOperator(ITypeSymbol type, INamedTypeSymbol operatorType)
+        {
             // LINQ Any is rejected for boxing the ImmutableArray enumerator on every call; this runs for every class.
             foreach (var implemented in type.AllInterfaces)
             {
