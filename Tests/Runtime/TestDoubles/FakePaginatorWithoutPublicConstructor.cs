@@ -15,7 +15,7 @@ namespace TestHelper.UI.TestDoubles
     // renting an IPaginator type without one, so it must stay non-instantiable directly.
     [SuppressMessage("ReSharper", "ClassCannotBeInstantiated")]
 #pragma warning disable TestHelperUI4006
-    public class FakePaginatorWithoutPublicConstructor : IPaginator
+    public class FakePaginatorWithoutPublicConstructor : IPaginator<FakeComponent>
 #pragma warning restore TestHelperUI4006
     {
         public MonoBehaviour TargetComponent { get; set; }
