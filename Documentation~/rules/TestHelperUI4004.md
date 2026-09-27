@@ -78,7 +78,7 @@ public class MyClickOperator : IClickOperator
 
 - The rule applies to non-abstract classes that implement `TestHelper.UI.Operators.IOperator` directly, through a sub-interface (e.g., `IClickOperator`), or through a base class. Abstract classes are skipped because they cannot be instantiated.
 - Only constructors declared in the class are counted, as `Type.GetConstructors()` does. Non-public constructors are ignored.
-- The diagnostic is reported once at the class identifier.
+- The diagnostic is reported once at the class identifier (of the first declaration, for a partial class).
 - An operator without any public constructor is diagnosed by TestHelperUI4001 instead.
 
 If you register the operator with explicit constructor arguments, suppress the diagnostic at the class with `[SuppressMessage]`, or change the severity in `.editorconfig` or `.globalconfig`:
