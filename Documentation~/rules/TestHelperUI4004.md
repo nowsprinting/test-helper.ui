@@ -1,23 +1,23 @@
-# TestHelperUI4004 — IOperator implementation has multiple public constructors
+# TestHelperUI4004 — IOperator with multiple public constructors is registered without arguments
 
-Detects a concrete class implementing `IOperator` that declares more than one public constructor. `OperatorPool.Rent` cannot choose a constructor for such an operator and throws `InvalidOperationException` unless the operator is registered with explicit constructor arguments.
+Detects a call to `OperatorPool.Register<T>` without constructor arguments whose type argument declares more than one public constructor. `OperatorPool.Rent` cannot choose a constructor for such an operator and throws `InvalidOperationException`.
 
 | Item     | Value         |
 |----------|---------------|
 | Category | Extensibility |
 | Enabled  | True          |
-| Severity | Warning       |
+| Severity | Error         |
 | CodeFix  | False         |
 
-Message: "'{0}' has multiple public constructors: the operator cannot be rented unless it is registered with constructor arguments. Keep only one public constructor."
+Message: "'{0}' has multiple public constructors. Register with explicit constructor arguments."
 
-`{0}` is the name of the operator class.
+`{0}` is the name of the registered type.
 
-Severity is Warning, not Error, because registering the operator with explicit constructor arguments via `OperatorPool.Register<T>(args)` is a documented way to use such an operator, and the analyzer cannot see the registration.
+Severity is Error because renting an operator registered this way always throws; the message is the same as the exception that `Rent` throws.
 
 ## Motivation
 
-`OperatorPool` creates operator instances via reflection. When the operator is registered without constructor arguments (`Register<T>()`), or is rented from a pool created with `requireRegistration: false` without being registered, `Rent` calls `Type.GetConstructors()` and throws `InvalidOperationException` ("{type} has multiple public constructors. Register with explicit constructor arguments.") when it finds more than one.
+`OperatorPool` creates operator instances via reflection. When the operator is registered without constructor arguments (`Register<T>()`), `Rent` calls `Type.GetConstructors()` and throws `InvalidOperationException` ("{type} has multiple public constructors. Register with explicit constructor arguments.") when it finds more than one.
 
 The pool deliberately does not pick one of them (e.g., the first, or the one with the most parameters): `GetConstructors()` does not guarantee the order, and managed code stripping on the Player can remove some of them, so the chosen constructor could silently differ between the Editor and the Player. An operator with a single public constructor whose parameters have default values works with both `Register<T>()` and `Register<T>(args)`.
 
@@ -33,7 +33,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Scripting;
 
-public class MyClickOperator : IClickOperator   // TestHelperUI4004
+public class MyClickOperator : IClickOperator
 {
     private readonly int _holdMillis;
 
@@ -55,9 +55,14 @@ public class MyClickOperator : IClickOperator   // TestHelperUI4004
     public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
         CancellationToken cancellationToken = default) => UniTask.CompletedTask;
 }
+
+var pool = new OperatorPool()
+    .Register<MyClickOperator>();   // TestHelperUI4004
 ```
 
 ## Good
+
+Keep only one public constructor:
 
 ```csharp
 public class MyClickOperator : IClickOperator
@@ -72,17 +77,21 @@ public class MyClickOperator : IClickOperator
         _holdMillis = holdMillis;
     }
 }
+
+var pool = new OperatorPool()
+    .Register<MyClickOperator>();
+```
+
+Or register the operator with explicit constructor arguments:
+
+```csharp
+var pool = new OperatorPool()
+    .Register<MyClickOperator>(100);
 ```
 
 ## Notes
 
-- The rule applies to non-abstract classes that implement `TestHelper.UI.Operators.IOperator` directly, through a sub-interface (e.g., `IClickOperator`), or through a base class. Abstract classes are skipped because they cannot be instantiated.
-- Only constructors declared in the class are counted, as `Type.GetConstructors()` does. Non-public constructors are ignored.
-- The diagnostic is reported once at the class identifier (of the first declaration, for a partial class).
-- An operator without any public constructor is diagnosed by TestHelperUI4001 instead.
-
-If you register the operator with explicit constructor arguments, suppress the diagnostic at the class with `[SuppressMessage]`, or change the severity in `.editorconfig` or `.globalconfig`:
-
-```editorconfig
-dotnet_diagnostic.TestHelperUI4004.severity = suggestion
-```
+- The rule applies only to calls without constructor arguments: `Register<T>()`, `Register<T>(null)`, and `Register<T>(default)`. A call with constructor arguments is diagnosed by TestHelperUI4011 when no public constructor matches them.
+- Only public instance constructors are counted, as `Type.GetConstructors()` does. Non-public and static constructors are ignored.
+- A type argument without any public constructor is diagnosed by TestHelperUI4001 instead. When this rule is reported, TestHelperUI4002 and TestHelperUI4003 are not reported for the call.
+- The diagnostic is reported at `Register<T>` of the call. See [TestHelperUI4001](TestHelperUI4001.md) for the calls that are not diagnosed.

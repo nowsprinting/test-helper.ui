@@ -1,6 +1,6 @@
-# TestHelperUI4003 — Public constructor of IOperator implementation is not preserved
+# TestHelperUI4003 — Constructor of IOperator registered to OperatorPool is not preserved
 
-Detects a public constructor of a concrete class implementing `IOperator` that is not preserved from managed code stripping. `OperatorPool` invokes the constructor only via reflection, so the Unity linker cannot see the call and strips the constructor from the Player.
+Detects a call to `OperatorPool.Register<T>` whose type argument has a public constructor, which the pool may invoke, that is not preserved from managed code stripping. `OperatorPool` invokes the constructor only via reflection, so the Unity linker cannot see the call and strips the constructor from the Player.
 
 | Item     | Value         |
 |----------|---------------|
@@ -11,9 +11,9 @@ Detects a public constructor of a concrete class implementing `IOperator` that i
 
 Message: "The public constructor of '{0}' is not preserved: managed code stripping can remove the constructor from the Player, and the operator cannot be rented there. Apply 'Preserve' to the constructor."
 
-`{0}` is the name of the operator class.
+`{0}` is the name of the registered type.
 
-Severity is Warning, not Error, because the constructor is removed only in a Player build with a raised managed stripping level, which the analyzer cannot see. The default level removes no user-written code (Disabled for Mono, Minimal for IL2CPP), and tests run only in the Editor are never affected. It is not Suggestion, because Unity does not show suggestions in the Console, and operator authors who run monkey tests on the Player should notice it before a build.
+Severity is Warning, not Error, because the constructor is removed only in a Player build with a raised managed stripping level, which the analyzer cannot see, and a `link.xml` file can preserve it instead. The default level removes no user-written code (Disabled for Mono, Minimal for IL2CPP), and tests run only in the Editor are never affected. It is not Suggestion, because Unity does not show suggestions in the Console, and users who run monkey tests on the Player should notice it before a build.
 
 ## Motivation
 
@@ -43,7 +43,7 @@ public class MyClickOperator : IClickOperator
     public ScreenshotOptions ScreenshotOptions { private get; set; }
     public IVisualizer Visualizer { private get; set; }
 
-    public MyClickOperator(int holdMillis = 100)   // TestHelperUI4003
+    public MyClickOperator(int holdMillis = 100)
     {
         _holdMillis = holdMillis;
     }
@@ -54,9 +54,9 @@ public class MyClickOperator : IClickOperator
         CancellationToken cancellationToken = default) => UniTask.CompletedTask;
 }
 
-public class MyHoverOperator : IHoverOperator   // TestHelperUI4003; the implicit default constructor is not preserved
+public class MyHoverOperator : IHoverOperator
 {
-    // (members other than the constructor are omitted)
+    // (members other than the constructor are omitted; the implicit default constructor is not preserved)
 }
 
 [Preserve]
@@ -64,11 +64,17 @@ public class MyToggleOperator : IToggleOperator
 {
     // (members other than the constructor are omitted)
 
-    public MyToggleOperator(ILogger logger = null)   // TestHelperUI4003; [Preserve] on the type keeps only the parameterless constructor
+    // [Preserve] on the type keeps only the parameterless constructor
+    public MyToggleOperator(ILogger logger = null)
     {
         Logger = logger;
     }
 }
+
+var pool = new OperatorPool()
+    .Register<MyClickOperator>()    // TestHelperUI4003
+    .Register<MyHoverOperator>()    // TestHelperUI4003
+    .Register<MyToggleOperator>();  // TestHelperUI4003
 ```
 
 ## Good
@@ -90,16 +96,22 @@ public class MyHoverOperator : IHoverOperator
 {
     // (members other than the constructor are omitted)
 }
+
+var pool = new OperatorPool()
+    .Register<MyClickOperator>()
+    .Register<MyHoverOperator>();
 ```
 
 ## Notes
 
-- The rule applies to non-abstract classes that implement `TestHelper.UI.Operators.IOperator` directly, through a sub-interface (e.g., `IClickOperator`), or through a base class. Abstract classes are skipped because they cannot be instantiated.
 - A constructor is preserved when either of the following holds:
     - The constructor has an attribute whose class is named `PreserveAttribute`, or derives (directly or indirectly) from a class named `PreserveAttribute`, in any namespace.
     - The constructor has no parameters and the class has such an attribute.
-- Every public constructor is checked; when a class has multiple public constructors, each unpreserved one gets its own diagnostic (TestHelperUI4004 is reported separately).
-- The diagnostic is reported at the constructor identifier. For a class with no explicit constructor, the compiler-generated default constructor cannot take an attribute, so the diagnostic is reported at the class identifier (of the first declaration, for a partial class); apply `[Preserve]` to the class, or declare the constructor explicitly and apply `[Preserve]` to it.
+- The constructors checked depend on the arguments of the call:
+    - Without constructor arguments (`Register<T>()`, `Register<T>(null)`, or `Register<T>(default)`): the single public constructor. TestHelperUI4001, TestHelperUI4004, and TestHelperUI4002 take precedence in this order, and this rule is reported only when none of them is.
+    - With arguments written in the call (e.g., `Register<T>(100)`): the public constructors that can possibly match the arguments, as TestHelperUI4011 determines. A constructor that certainly does not match is not checked. TestHelperUI4001 and TestHelperUI4011 take precedence.
+    - With an array expression whose contents are unknown at compile time (e.g., `Register<T>(args)` with an `object[]` variable): every public constructor. TestHelperUI4001 takes precedence.
+- The diagnostic is reported once per call, at `Register<T>`, even when multiple constructors are not preserved. See [TestHelperUI4001](TestHelperUI4001.md) for the calls that are not diagnosed.
 - `[Preserve]` on a base class does not preserve the derived class or its constructors, because the attribute is not inherited.
 - Non-public constructors are not checked because `OperatorPool` does not invoke them.
 - Preservation by `[assembly: Preserve]` or a `link.xml` file is not recognized; the analyzer cannot see `link.xml`, and `[assembly: Preserve]` is documented to preserve types, not their constructors. If you rely on them, change the severity in `.editorconfig` or `.globalconfig`:

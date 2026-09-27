@@ -1,23 +1,23 @@
-# TestHelperUI4001 — IOperator implementation has no public constructor
+# TestHelperUI4001 — IOperator registered to OperatorPool has no usable public constructor
 
-Detects a concrete class implementing `IOperator` whose constructors are all non-public. `OperatorPool.Rent` creates operators only through a public constructor, so it always throws when it has to create an instance of such an operator.
+Detects a call to `OperatorPool.Register<T>` whose type argument is abstract or has no public constructor. `OperatorPool.Rent` creates operators only through a public constructor, so it always throws when it has to create an instance of such an operator.
 
 | Item     | Value         |
 |----------|---------------|
 | Category | Extensibility |
 | Enabled  | True          |
-| Severity | Warning       |
+| Severity | Error         |
 | CodeFix  | False         |
 
-Message: "'{0}' has no public constructor: the operator cannot be rented. Make the constructor public."
+Message: "'{0}' {1}"
 
-`{0}` is the name of the operator class.
+`{0}` is the name of the registered type, and `{1}` is "is abstract" for an abstract class, or "has no public constructor" otherwise.
 
-Severity is Warning, not Error, because the operator fails only when it is rented from `OperatorPool`, and the analyzer cannot see whether the operator is used with `OperatorPool` or only created directly, e.g., by a factory method in test code. When it is rented, creating an instance throws on every path, with or without registered constructor arguments.
+Severity is Error because renting the registered operator throws on every path, with or without registered constructor arguments.
 
 ## Motivation
 
-Without registered constructor arguments, `OperatorPool.Rent` calls `Type.GetConstructors()`, which returns public instance constructors only, and throws `InvalidOperationException` ("{type} has no public constructor.") when the result is empty. With registered arguments, `Rent` calls `Activator.CreateInstance(Type, object[])`, which also binds public constructors only and throws `MissingMethodException`.
+Without registered constructor arguments, `OperatorPool.Rent` calls `Type.GetConstructors()`, which returns public instance constructors only, and throws `InvalidOperationException` ("{type} has no public constructor.") when the result is empty. With registered arguments, `Rent` calls `Activator.CreateInstance(Type, object[])`, which also binds public constructors only and throws `MissingMethodException`. For an abstract class, the constraint `where T : class, IOperator` accepts the type, but creating an instance throws `MemberAccessException`.
 
 A private or internal constructor is a natural choice for an operator author who wants to force construction through a factory method or a singleton, but it makes the operator unusable with `OperatorPool`, and therefore with monkey testing.
 
@@ -33,7 +33,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Scripting;
 
-public class MyClickOperator : IClickOperator   // TestHelperUI4001
+public class MyClickOperator : IClickOperator
 {
     public static readonly MyClickOperator Instance = new MyClickOperator();
 
@@ -48,6 +48,9 @@ public class MyClickOperator : IClickOperator   // TestHelperUI4001
     public UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult = default,
         CancellationToken cancellationToken = default) => UniTask.CompletedTask;
 }
+
+var pool = new OperatorPool()
+    .Register<MyClickOperator>();   // TestHelperUI4001
 ```
 
 ## Good
@@ -60,12 +63,18 @@ public class MyClickOperator : IClickOperator
     [Preserve]
     public MyClickOperator() { }
 }
+
+var pool = new OperatorPool()
+    .Register<MyClickOperator>();
 ```
 
 ## Notes
 
-- The rule applies to non-abstract classes that implement `TestHelper.UI.Operators.IOperator` directly, through a sub-interface (e.g., `IClickOperator`), or through a base class. Abstract classes are skipped because they cannot be instantiated.
+- The rule is checked first for every `Register<T>` call, regardless of the arguments. When it is reported, no other rule is reported for the call.
+- An interface type argument has no constructor and is reported with "has no public constructor".
 - A class with no explicit constructor has a public compiler-generated default constructor and is not reported.
 - Static constructors are not counted.
-- Generic class definitions and nested classes are checked like any other class; a closed generic type such as `MyOperator<int>` is rented through the same constructors.
-- The diagnostic is reported once at the class identifier. For a partial class, it is reported at the identifier of the first declaration only.
+- The diagnostic is reported at `Register<T>` of the call, also when the call is made through a class derived from `OperatorPool`, through `?.`, or in a fluent chain.
+- A call whose type argument is a generic type parameter is not diagnosed, because the actual type is unknown.
+- `Rent<T>()` and `Rent(Type)` calls are not diagnosed, so renting an unregistered operator from a pool created with `requireRegistration: false` is not detected.
+- An operator declaration that is never registered is not diagnosed. A library that only declares operators gets no diagnostic until a user registers them.
