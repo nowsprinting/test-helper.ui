@@ -20,6 +20,7 @@ namespace TestHelper.UI
         private readonly Func<Component, bool> _isInteractable;
         private readonly IEnumerable<IOperator> _operators;
         private readonly OperatorPool _operatorPool;
+        private List<IOperator> _rentedOperatorsBuffer;
 
         /// <summary>
         /// Constructor.
@@ -87,7 +88,11 @@ namespace TestHelper.UI
                 yield break;
             }
 
-            var operators = _operatorPool.RentAll();
+            // Sharing the buffer field directly is rejected: a nested or interleaved enumeration of this method would
+            // clear and refill the list while the outer enumeration is still iterating it.
+            var operators = _rentedOperatorsBuffer ?? new List<IOperator>();
+            _rentedOperatorsBuffer = null;
+            _operatorPool.RentAll(operators);
             try
             {
                 foreach (var component in FindInteractableComponents())
@@ -104,6 +109,9 @@ namespace TestHelper.UI
                 {
                     _operatorPool.Return(iOperator);
                 }
+
+                operators.Clear();
+                _rentedOperatorsBuffer = operators;
             }
         }
 

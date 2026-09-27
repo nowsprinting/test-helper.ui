@@ -474,7 +474,7 @@ classDiagram
 
     class OperatorPool {
         +Register&lt;T&gt;(params object[]) OperatorPool
-        +RentAll() IEnumerable<IOperator>
+        +RentAll(List<IOperator>) IReadOnlyList<IOperator>
         +Rent<T>() T
         +Return(IOperator) void
     }
@@ -703,6 +703,7 @@ Rules about usage to avoid at runtime.
 
 | Id | Title | Severity |
 |----|-------|----------|
+| [TestHelperUI3002](Documentation~/rules/TestHelperUI3002.md) | OperatorPool.RentAll is called without a list | ℹ️ |
 
 ### Extensibility (TestHelperUI4xxx)
 

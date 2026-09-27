@@ -80,12 +80,21 @@ namespace TestHelper.UI
         /// <summary>
         /// Rents all registered operator types from the pool or creates new ones.
         /// </summary>
-        /// <returns>Instances of all registered operator types</returns>
+        /// <param name="operators">List to store the rented instances. It is cleared before storing. If null, a new list is allocated</param>
+        /// <returns>Instances of all registered operator types. The same instance as <paramref name="operators"/> if specified</returns>
         /// <exception cref="InvalidOperationException">When a registered operator type cannot be created without constructor arguments: it has no public constructor, has multiple public constructors, or has a parameter that is neither injected by this pool nor has a default value</exception>
         /// <exception cref="MissingMethodException">When no public constructor of a registered operator type matches the registered constructor arguments</exception>
-        public IReadOnlyList<IOperator> RentAll()
+        public IReadOnlyList<IOperator> RentAll(List<IOperator> operators = null)
         {
-            var operators = new List<IOperator>(_registrations.Count);
+            if (operators == null)
+            {
+                operators = new List<IOperator>(_registrations.Count);
+            }
+            else
+            {
+                operators.Clear();
+            }
+
             foreach (var type in _registrations.Keys)
             {
                 operators.Add(Rent(type));
