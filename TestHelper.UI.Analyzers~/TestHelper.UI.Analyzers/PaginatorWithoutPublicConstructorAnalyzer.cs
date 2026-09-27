@@ -19,7 +19,7 @@ namespace TestHelper.UI.Analyzers
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description:
-            "PaginatorPool creates paginators only through a public constructor, so renting a paginator whose constructors are all non-public always throws.",
+            "PaginatorPool creates paginators only through a public constructor, so creating an instance of a paginator whose constructors are all non-public always throws.",
             helpLinkUri:
             "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4006.md");
 
