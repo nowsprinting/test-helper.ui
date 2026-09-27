@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using UnityEngine;
 using UnityEngine.Scripting;
+using UnityEngine.TestTools;
 
 namespace TestHelper.UI.Paginators
 {
@@ -33,6 +35,9 @@ namespace TestHelper.UI.Paginators
         }
 
         [Test]
+        // Running on the Player is rejected: managed code stripping removes a constructor without [Preserve],
+        // so reflection there does not list it and the check passes for the very constructor it looks for.
+        [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
         public void PublicConstructors_BuiltInPaginator_ArePreserved(
             [ValueSource(nameof(BuiltInPaginatorTypes))] Type type)
         {
@@ -46,6 +51,9 @@ namespace TestHelper.UI.Paginators
         }
 
         [Test]
+        // Running on the Player is rejected: whether managed code stripping keeps the IPaginator<TComponent>
+        // implementation depends on the code that uses it, not on the declaration this test checks.
+        [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
         public void Interfaces_BuiltInPaginator_ContainsGenericIPaginator(
             [ValueSource(nameof(BuiltInPaginatorTypes))] Type type)
         {

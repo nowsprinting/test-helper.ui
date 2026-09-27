@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using UnityEngine;
 using UnityEngine.Scripting;
+using UnityEngine.TestTools;
 
 namespace TestHelper.UI.Operators
 {
@@ -33,6 +35,9 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
+        // Running on the Player is rejected: managed code stripping removes a constructor without [Preserve],
+        // so reflection there does not list it and the check passes for the very constructor it looks for.
+        [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
         public void PublicConstructors_BuiltInOperator_ArePreserved(
             [ValueSource(nameof(BuiltInOperatorTypes))] Type type)
         {
@@ -46,6 +51,9 @@ namespace TestHelper.UI.Operators
         }
 
         [Test]
+        // Running on the Player is rejected: managed code stripping removes the implementation of a sub-interface
+        // that no code uses, so reflection there does not show the interfaces declared in the source.
+        [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
         public void Interfaces_BuiltInOperator_ContainsSubInterfaceOfIOperator(
             [ValueSource(nameof(BuiltInOperatorTypes))] Type type)
         {
