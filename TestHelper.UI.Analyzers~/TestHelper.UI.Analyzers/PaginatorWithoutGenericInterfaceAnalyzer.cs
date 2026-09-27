@@ -53,7 +53,7 @@ namespace TestHelper.UI.Analyzers
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
             // Comparing against a constructed IPaginator<TComponent> is rejected: the analyzer does not know TComponent,
-            // and the class may pass its own type parameter; the IPaginator`1 definition matches every construction.
+            // and the class may pass its own type parameter.
             if (!PooledTypeSymbols.IsConcreteImplementation(type, paginatorType) ||
                 PooledTypeSymbols.Implements(type, genericPaginatorType))
             {

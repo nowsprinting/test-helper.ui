@@ -30,6 +30,9 @@ namespace TestHelper.UI.Analyzers.Utilities
         /// <summary>
         /// Whether <paramref name="type"/> implements or inherits <paramref name="interfaceType"/>, directly or indirectly.
         /// </summary>
+        /// <remarks>
+        /// A generic type definition passed as <paramref name="interfaceType"/> matches every construction of it.
+        /// </remarks>
         public static bool Implements(ITypeSymbol type, INamedTypeSymbol interfaceType)
         {
             // LINQ Any is rejected for boxing the ImmutableArray enumerator on every call; this runs for every class.
