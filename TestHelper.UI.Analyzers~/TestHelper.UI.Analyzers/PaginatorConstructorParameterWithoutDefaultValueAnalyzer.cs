@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using TestHelper.UI.Analyzers.Utilities;
 
 namespace TestHelper.UI.Analyzers
 {
@@ -27,6 +28,45 @@ namespace TestHelper.UI.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                var paginatorType =
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IPaginatorMetadataName);
+                if (paginatorType == null)
+                {
+                    return;
+                }
+
+                compilationContext.RegisterSymbolAction(
+                    symbolContext => AnalyzeNamedType(symbolContext, paginatorType),
+                    SymbolKind.NamedType);
+            });
+        }
+
+        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol paginatorType)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            var type = (INamedTypeSymbol)context.Symbol;
+            // Reporting the parameters of multiple public constructors is rejected: PaginatorPool resolves parameters
+            // only for a single one, and TestHelperUI4009 reports the multiple constructors instead.
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, paginatorType) ||
+                PooledTypeSymbols.CountPublicConstructors(type, out var publicConstructor) != 1)
+            {
+                return;
+            }
+
+            foreach (var parameter in publicConstructor!.Parameters)
+            {
+                // IsOptional is rejected: a parameter with only [Optional] has no default value for reflection
+                // (ParameterInfo.HasDefaultValue is false), so PaginatorPool cannot resolve it either.
+                if (!parameter.HasExplicitDefaultValue)
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(s_rule, parameter.Locations[0], parameter.Name, type.Name));
+                }
+            }
         }
     }
 }
