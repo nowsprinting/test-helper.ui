@@ -11,6 +11,7 @@ namespace TestHelper.UI.Analyzers.Utilities
     {
         public const string IOperatorMetadataName = "TestHelper.UI.Operators.IOperator";
         public const string IPaginatorMetadataName = "TestHelper.UI.Paginators.IPaginator";
+        public const string GenericIPaginatorMetadataName = "TestHelper.UI.Paginators.IPaginator`1";
 
         /// <summary>
         /// Whether <paramref name="type"/> is a class that a pool can instantiate as <paramref name="interfaceType"/>:

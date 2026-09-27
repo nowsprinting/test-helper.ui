@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using TestHelper.UI.Analyzers.Utilities;
 
 namespace TestHelper.UI.Analyzers
 {
@@ -27,6 +28,39 @@ namespace TestHelper.UI.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                var compilation = compilationContext.Compilation;
+                var paginatorType = compilation.GetTypeByMetadataName(PooledTypeSymbols.IPaginatorMetadataName);
+                var genericPaginatorType =
+                    compilation.GetTypeByMetadataName(PooledTypeSymbols.GenericIPaginatorMetadataName);
+                if (paginatorType == null || genericPaginatorType == null)
+                {
+                    return;
+                }
+
+                compilationContext.RegisterSymbolAction(
+                    symbolContext => AnalyzeNamedType(symbolContext, paginatorType, genericPaginatorType),
+                    SymbolKind.NamedType);
+            });
+        }
+
+        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol paginatorType,
+            INamedTypeSymbol genericPaginatorType)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            var type = (INamedTypeSymbol)context.Symbol;
+            // Comparing against a constructed IPaginator<TComponent> is rejected: the analyzer does not know TComponent,
+            // and the class may pass its own type parameter; the IPaginator`1 definition matches every construction.
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, paginatorType) ||
+                PooledTypeSymbols.Implements(type, genericPaginatorType))
+            {
+                return;
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
         }
     }
 }
