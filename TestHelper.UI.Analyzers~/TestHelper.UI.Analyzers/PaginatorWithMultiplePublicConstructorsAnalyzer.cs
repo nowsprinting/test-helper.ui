@@ -19,7 +19,7 @@ namespace TestHelper.UI.Analyzers
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description:
-            "PaginatorPool refuses to choose among multiple public constructors, so renting such a paginator throws unless it is registered with explicit constructor arguments.",
+            "PaginatorPool does not choose among multiple public constructors, so renting such a paginator throws unless it is registered with explicit constructor arguments.",
             helpLinkUri:
             "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4009.md");
 
