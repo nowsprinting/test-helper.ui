@@ -18,7 +18,8 @@ namespace TestHelper.UI.Operators
     /// If required parameters for the operation, such as hold time, input text strategy, etc., keep them in instance fields of the implementation class.
     /// <p/>
     /// <c>OperatorPool</c> creates instances of the implementation class by invoking its public constructor via reflection.
-    /// Annotate every public constructor with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build.
+    /// Annotate every public constructor with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build;
+    /// for the implicit default constructor, annotate the class instead.
     /// <c>OperatorPool</c> cannot invoke a non-public constructor, even with registered constructor arguments.
     /// When registered without constructor arguments, the implementation class must have exactly one public constructor,
     /// and each of its parameters must have a default value or a type whose value is passed to the <c>OperatorPool</c> constructor.

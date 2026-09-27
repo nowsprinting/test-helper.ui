@@ -19,7 +19,7 @@ namespace TestHelper.UI.Paginators
     /// <list type="bullet">
     ///     <item><c>PaginatorPool</c> creates instances by invoking the public constructor via reflection.
     ///     Annotate every public constructor with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code
-    ///     stripping does not remove it from the Player build</item>
+    ///     stripping does not remove it from the Player build; for the implicit default constructor, annotate the class instead</item>
     ///     <item>Have a public constructor; <c>PaginatorPool</c> cannot invoke a non-public constructor, even with
     ///     registered constructor arguments</item>
     ///     <item>Have exactly one public constructor whose parameters all have default values;

@@ -36,7 +36,8 @@ namespace TestHelper.UI
         /// </summary>
         /// <remarks>
         /// Instances are created by invoking the public constructor of <typeparamref name="T"/> via reflection.
-        /// Annotate every public constructor of <typeparamref name="T"/> with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build.
+        /// Annotate every public constructor of <typeparamref name="T"/> with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build;
+        /// for the implicit default constructor, annotate the class instead.
         /// <p/>
         /// When <paramref name="args"/> is omitted, <typeparamref name="T"/> must have exactly one public constructor, and all its parameters must have default values.
         /// If <typeparamref name="T"/> has multiple public constructors, specify <paramref name="args"/> to select one; otherwise, <c>Rent</c> throws <see cref="InvalidOperationException"/>.
