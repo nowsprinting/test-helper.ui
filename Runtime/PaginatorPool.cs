@@ -60,6 +60,9 @@ namespace TestHelper.UI
         /// <typeparam name="T">The paginator type to rent</typeparam>
         /// <param name="targetComponent">The pageable component to be controlled by the paginator. If omitted, the paginator has no target component.</param>
         /// <returns>An instance of the requested paginator type</returns>
+        /// <exception cref="ArgumentException">When the paginator does not support <paramref name="targetComponent"/></exception>
+        /// <exception cref="InvalidOperationException">When <typeparamref name="T"/> is not registered while registration is required, or cannot be created without constructor arguments: it has no public constructor, has multiple public constructors, or has a parameter without a default value</exception>
+        /// <exception cref="MissingMethodException">When no public constructor of <typeparamref name="T"/> matches the registered constructor arguments</exception>
         public T Rent<T>(MonoBehaviour targetComponent = null) where T : class, IPaginator
         {
             return (T)Rent(typeof(T), targetComponent);
@@ -72,6 +75,9 @@ namespace TestHelper.UI
         /// <param name="targetComponent">The pageable component to be controlled by the paginator. If omitted, the paginator has no target component.</param>
         /// <returns>An instance of the requested paginator type</returns>
         /// <exception cref="ArgumentException">When the paginator does not support <paramref name="targetComponent"/></exception>
+        /// <exception cref="ArgumentNullException">When <paramref name="type"/> is null</exception>
+        /// <exception cref="InvalidOperationException">When <paramref name="type"/> does not implement <see cref="IPaginator"/>, is not registered while registration is required, or cannot be created without constructor arguments: it has no public constructor, has multiple public constructors, or has a parameter without a default value</exception>
+        /// <exception cref="MissingMethodException">When no public constructor of <paramref name="type"/> matches the registered constructor arguments</exception>
         public IPaginator Rent(Type type, MonoBehaviour targetComponent = null)
         {
             var paginator = RentWithoutTargetComponent(type);
@@ -99,7 +105,8 @@ namespace TestHelper.UI
         /// <param name="targetComponent">The pageable component to be controlled by the paginator</param>
         /// <returns>An instance of the paginator for <paramref name="targetComponent"/></returns>
         /// <exception cref="ArgumentNullException">When <paramref name="targetComponent"/> is null</exception>
-        /// <exception cref="InvalidOperationException">When no paginator or multiple paginators match the type of <paramref name="targetComponent"/></exception>
+        /// <exception cref="InvalidOperationException">When no paginator or multiple paginators match the type of <paramref name="targetComponent"/>, or the matching paginator cannot be created without constructor arguments</exception>
+        /// <exception cref="MissingMethodException">When no public constructor of the matching paginator matches its registered constructor arguments</exception>
         public IPaginator Rent(MonoBehaviour targetComponent)
         {
             if (targetComponent == null)
