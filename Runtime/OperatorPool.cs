@@ -62,7 +62,8 @@ namespace TestHelper.UI
         /// </summary>
         /// <remarks>
         /// Instances are created by invoking the public constructor of <typeparamref name="T"/> via reflection.
-        /// Annotate every public constructor of <typeparamref name="T"/> with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build.
+        /// Annotate every public constructor of <typeparamref name="T"/> with <c>[UnityEngine.Scripting.Preserve]</c> so that managed code stripping does not remove it from the Player build;
+        /// for the implicit default constructor, annotate the class instead.
         /// <p/>
         /// When <paramref name="args"/> is omitted, <typeparamref name="T"/> must have exactly one public constructor; its parameters are resolved from the values injected into this pool or their default values.
         /// If <typeparamref name="T"/> has multiple public constructors, specify <paramref name="args"/> to select one; otherwise, <c>Rent</c> throws <see cref="InvalidOperationException"/>.
@@ -79,7 +80,9 @@ namespace TestHelper.UI
         /// <summary>
         /// Rents all registered operator types from the pool or creates new ones.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Instances of all registered operator types</returns>
+        /// <exception cref="InvalidOperationException">When a registered operator type cannot be created without constructor arguments: it has no public constructor, has multiple public constructors, or has a parameter that is neither injected by this pool nor has a default value</exception>
+        /// <exception cref="MissingMethodException">When no public constructor of a registered operator type matches the registered constructor arguments</exception>
         public IReadOnlyList<IOperator> RentAll()
         {
             var operators = new List<IOperator>(_registrations.Count);
@@ -96,6 +99,8 @@ namespace TestHelper.UI
         /// </summary>
         /// <typeparam name="T">The operator type to rent</typeparam>
         /// <returns>An instance of the requested operator type</returns>
+        /// <exception cref="InvalidOperationException">When <typeparamref name="T"/> is not registered while registration is required, or cannot be created without constructor arguments: it has no public constructor, has multiple public constructors, or has a parameter that is neither injected by this pool nor has a default value</exception>
+        /// <exception cref="MissingMethodException">When no public constructor of <typeparamref name="T"/> matches the registered constructor arguments</exception>
         public T Rent<T>() where T : class, IOperator
         {
             return (T)Rent(typeof(T));
@@ -106,6 +111,9 @@ namespace TestHelper.UI
         /// </summary>
         /// <param name="type">The operator type to rent</param>
         /// <returns>An instance of the requested operator type</returns>
+        /// <exception cref="ArgumentNullException">When <paramref name="type"/> is null</exception>
+        /// <exception cref="InvalidOperationException">When <paramref name="type"/> does not implement <see cref="IOperator"/>, is not registered while registration is required, or cannot be created without constructor arguments: it has no public constructor, has multiple public constructors, or has a parameter that is neither injected by this pool nor has a default value</exception>
+        /// <exception cref="MissingMethodException">When no public constructor of <paramref name="type"/> matches the registered constructor arguments</exception>
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public IOperator Rent(Type type)
         {

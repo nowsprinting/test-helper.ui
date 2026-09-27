@@ -632,8 +632,9 @@ In addition, a paginator must meet the following requirements:
 - The `TargetComponent` property setter accepts the pageable component to be controlled. It must accept `null`, reset the internal state tied to the previous target component (`PaginatorPool` reassigns pooled instances), and throw `ArgumentException` for an unsupported component type
 - `ResetAsync`, `NextPageAsync`, and `HasNextPage` throw `InvalidOperationException` when the target component is not set
 - Implement `IPaginator<TComponent>` instead of `IPaginator` to make the paginator selectable by `PaginatorPool.Rent(targetComponent)`
-- `PaginatorPool` creates instances by invoking the public constructor via reflection. Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the Player build
-- A paginator must have exactly one public constructor whose parameters all have default values. Otherwise, register it with explicit constructor arguments via `PaginatorPool.Register<T>(args)`; without them, `PaginatorPool.Rent` throws `InvalidOperationException`
+- `PaginatorPool` creates instances by invoking the public constructor via reflection. Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the Player build; for the implicit default constructor, annotate the class instead
+- A paginator must have a public constructor; `PaginatorPool` cannot invoke a non-public constructor, even with registered constructor arguments
+- A paginator must have exactly one public constructor whose parameters all have default values. If it has multiple public constructors or a parameter without a default value, register it with explicit constructor arguments via `PaginatorPool.Register<T>(args)`; without them, `PaginatorPool.Rent` throws `InvalidOperationException`
 
 
 
@@ -646,8 +647,10 @@ An operator must implement the `CanOperate` method to determine whether an opera
 
 [OperatorPool](#operatorpool) creates operator instances by invoking the public constructor via reflection, so the constructor must meet the following:
 
-- Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the player build.
-- If the operator has multiple public constructors, register it with constructor arguments (see [Dependency Injection](#dependency-injection)); otherwise, `OperatorPool.Rent` throws `InvalidOperationException`.
+- Annotate every public constructor with `[UnityEngine.Scripting.Preserve]` so that managed code stripping does not remove it from the player build; for the implicit default constructor, annotate the class instead.
+- The operator must have a public constructor; `OperatorPool` cannot invoke a non-public constructor, even with registered constructor arguments.
+- Each parameter of the public constructor must have a default value, unless its value is passed to the `OperatorPool` constructor (see [Dependency Injection](#dependency-injection)).
+- If the operator has multiple public constructors or a parameter that cannot be resolved as above, register it with constructor arguments (see [Dependency Injection](#dependency-injection)); otherwise, `OperatorPool.Rent` throws `InvalidOperationException`.
 
 > [!IMPORTANT]\
 > Until test-helper.monkey v0.14.0, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
@@ -712,6 +715,11 @@ Rules for authors of custom operators, matchers, and paginators.
 | [TestHelperUI4003](Documentation~/rules/TestHelperUI4003.md) | Public constructor of IOperator implementation is not preserved | ⚠️ |
 | [TestHelperUI4004](Documentation~/rules/TestHelperUI4004.md) | IOperator implementation has multiple public constructors | ⚠️ |
 | [TestHelperUI4005](Documentation~/rules/TestHelperUI4005.md) | IOperator implementation does not implement a sub-interface | ℹ️ |
+| [TestHelperUI4006](Documentation~/rules/TestHelperUI4006.md) | IPaginator implementation has no public constructor | ⚠️ |
+| [TestHelperUI4007](Documentation~/rules/TestHelperUI4007.md) | Constructor parameter of IPaginator implementation has no default value | ⚠️ |
+| [TestHelperUI4008](Documentation~/rules/TestHelperUI4008.md) | Public constructor of IPaginator implementation is not preserved | ⚠️ |
+| [TestHelperUI4009](Documentation~/rules/TestHelperUI4009.md) | IPaginator implementation has multiple public constructors | ⚠️ |
+| [TestHelperUI4010](Documentation~/rules/TestHelperUI4010.md) | IPaginator implementation does not implement IPaginator&lt;TComponent&gt; | ⚠️ |
 
 
 

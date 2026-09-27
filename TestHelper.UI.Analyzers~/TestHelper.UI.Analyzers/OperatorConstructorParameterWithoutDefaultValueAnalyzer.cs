@@ -33,7 +33,7 @@ namespace TestHelper.UI.Analyzers
             context.RegisterCompilationStartAction(compilationContext =>
             {
                 var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(OperatorSymbols.IOperatorMetadataName);
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
                 if (operatorType == null)
                 {
                     return;
@@ -51,8 +51,8 @@ namespace TestHelper.UI.Analyzers
             var type = (INamedTypeSymbol)context.Symbol;
             // Reporting the parameters of multiple public constructors is rejected: OperatorPool resolves parameters
             // only for a single one, and TestHelperUI4004 reports the multiple constructors instead.
-            if (!OperatorSymbols.IsConcreteOperator(type, operatorType) ||
-                OperatorSymbols.CountPublicConstructors(type, out var publicConstructor) != 1)
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType) ||
+                PooledTypeSymbols.CountPublicConstructors(type, out var publicConstructor) != 1)
             {
                 return;
             }

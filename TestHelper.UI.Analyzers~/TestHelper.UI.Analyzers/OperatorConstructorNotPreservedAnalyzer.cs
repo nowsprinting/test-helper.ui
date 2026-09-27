@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -34,7 +33,7 @@ namespace TestHelper.UI.Analyzers
             context.RegisterCompilationStartAction(compilationContext =>
             {
                 var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(OperatorSymbols.IOperatorMetadataName);
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
                 if (operatorType == null)
                 {
                     return;
@@ -50,17 +49,17 @@ namespace TestHelper.UI.Analyzers
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
-            if (!OperatorSymbols.IsConcreteOperator(type, operatorType))
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType))
             {
                 return;
             }
 
-            var isTypePreserved = HasPreserveAttribute(type);
+            var isTypePreserved = PooledTypeSymbols.HasPreserveAttribute(type);
             // LINQ is rejected for boxing the ImmutableArray enumerator on every call.
             foreach (var constructor in type.InstanceConstructors)
             {
                 if (constructor.DeclaredAccessibility != Accessibility.Public ||
-                    HasPreserveAttribute(constructor) ||
+                    PooledTypeSymbols.HasPreserveAttribute(constructor) ||
                     (isTypePreserved && constructor.Parameters.IsEmpty))
                 {
                     continue;
@@ -70,26 +69,6 @@ namespace TestHelper.UI.Analyzers
                 var location = constructor.IsImplicitlyDeclared ? type.Locations[0] : constructor.Locations[0];
                 context.ReportDiagnostic(Diagnostic.Create(s_rule, location, type.Name));
             }
-        }
-
-        private static bool HasPreserveAttribute(ISymbol symbol)
-        {
-            foreach (var attribute in symbol.GetAttributes())
-            {
-                // Matching UnityEngine.Scripting.PreserveAttribute by symbol is rejected: the Unity linker recognizes
-                // any attribute class named PreserveAttribute in any namespace, or deriving from one.
-                for (var attributeClass = attribute.AttributeClass;
-                     attributeClass != null;
-                     attributeClass = attributeClass.BaseType)
-                {
-                    if (string.Equals(attributeClass.Name, "PreserveAttribute", StringComparison.Ordinal))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }

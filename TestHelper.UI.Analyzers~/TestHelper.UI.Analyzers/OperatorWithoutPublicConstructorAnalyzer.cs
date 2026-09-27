@@ -19,7 +19,7 @@ namespace TestHelper.UI.Analyzers
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description:
-            "OperatorPool creates operators only through a public constructor, so renting an operator whose constructors are all non-public always throws.",
+            "OperatorPool creates operators only through a public constructor, so creating an instance of an operator whose constructors are all non-public always throws.",
             helpLinkUri:
             "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4001.md");
 
@@ -33,7 +33,7 @@ namespace TestHelper.UI.Analyzers
             context.RegisterCompilationStartAction(compilationContext =>
             {
                 var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(OperatorSymbols.IOperatorMetadataName);
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
                 if (operatorType == null)
                 {
                     return;
@@ -49,8 +49,8 @@ namespace TestHelper.UI.Analyzers
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
-            if (!OperatorSymbols.IsConcreteOperator(type, operatorType) ||
-                OperatorSymbols.CountPublicConstructors(type, out _) > 0)
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType) ||
+                PooledTypeSymbols.CountPublicConstructors(type, out _) > 0)
             {
                 return;
             }

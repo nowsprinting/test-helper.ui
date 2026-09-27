@@ -12,13 +12,17 @@ using UnityEngine.Scripting;
 namespace TestHelper.UI.TestDoubles
 {
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public class FakePaginatorWithRequiredParam : IPaginator
+    public class FakePaginatorWithRequiredParam : IPaginator<FakeComponent>
     {
         public string RequiredParam { get; }
         public MonoBehaviour TargetComponent { get; set; }
 
+        // A default value is rejected: this fake verifies that PaginatorPool rejects renting an
+        // IPaginator type whose constructor parameter has no default value.
         [Preserve]
+#pragma warning disable TestHelperUI4007
         public FakePaginatorWithRequiredParam(string requiredParam)
+#pragma warning restore TestHelperUI4007
         {
             RequiredParam = requiredParam;
         }

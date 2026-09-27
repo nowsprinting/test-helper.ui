@@ -33,7 +33,7 @@ namespace TestHelper.UI.Analyzers
             context.RegisterCompilationStartAction(compilationContext =>
             {
                 var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(OperatorSymbols.IOperatorMetadataName);
+                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
                 if (operatorType == null)
                 {
                     return;
@@ -49,7 +49,7 @@ namespace TestHelper.UI.Analyzers
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = (INamedTypeSymbol)context.Symbol;
-            if (!OperatorSymbols.IsConcreteOperator(type, operatorType) ||
+            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType) ||
                 ImplementsSubInterface(type, operatorType))
             {
                 return;
@@ -64,7 +64,7 @@ namespace TestHelper.UI.Analyzers
             foreach (var implemented in type.AllInterfaces)
             {
                 // Excluding IOperator explicitly is rejected: an interface's AllInterfaces never contains the interface itself.
-                if (OperatorSymbols.InheritsOperator(implemented, operatorType))
+                if (PooledTypeSymbols.Implements(implemented, operatorType))
                 {
                     return true;
                 }

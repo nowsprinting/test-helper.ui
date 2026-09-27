@@ -1,6 +1,6 @@
 # TestHelperUI4001 — IOperator implementation has no public constructor
 
-Detects a concrete class implementing `IOperator` whose constructors are all non-public. `OperatorPool.Rent` creates operators only through a public constructor, so it always throws for such an operator.
+Detects a concrete class implementing `IOperator` whose constructors are all non-public. `OperatorPool.Rent` creates operators only through a public constructor, so it always throws when it has to create an instance of such an operator.
 
 | Item     | Value         |
 |----------|---------------|
@@ -13,7 +13,7 @@ Message: "'{0}' has no public constructor: the operator cannot be rented. Make t
 
 `{0}` is the name of the operator class.
 
-Severity is Warning, not Error, because the operator fails only when it is rented from `OperatorPool`, and the analyzer cannot see whether the operator is used with `OperatorPool` or only created directly, e.g., by a factory method in test code. When it is rented, renting throws on every path, with or without registered constructor arguments.
+Severity is Warning, not Error, because the operator fails only when it is rented from `OperatorPool`, and the analyzer cannot see whether the operator is used with `OperatorPool` or only created directly, e.g., by a factory method in test code. When it is rented, creating an instance throws on every path, with or without registered constructor arguments.
 
 ## Motivation
 
