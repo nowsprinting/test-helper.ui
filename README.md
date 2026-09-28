@@ -213,18 +213,17 @@ Alternatively, you can specify the constructor argument `requireRegistration: fa
 You can also rent a paginator by the target component alone.
 `Rent(targetComponent)` selects the registered (or pooled) paginator implementing `IPaginator<TComponent>` whose `TComponent` exactly matches the type of the target component.
 It throws `InvalidOperationException` if no paginator or multiple paginators match.
-Use `CanRent(targetComponent)` to check beforehand whether exactly one paginator matches.
 
 ```csharp
 var pool = new PaginatorPool()
     .Register<UguiScrollbarPaginator>()
     .Register<UguiScrollRectPaginator>();
 
-if (pool.CanRent(scrollRect))
-{
-    var paginator = pool.Rent(scrollRect); // returns UguiScrollRectPaginator
-}
+var paginator = pool.Rent(scrollRect); // returns UguiScrollRectPaginator
 ```
+
+`CanRent(targetComponent)` returns whether the pool has exactly one paginator for the target component, using the same rule as `Rent(targetComponent)`.
+It returns `false` instead of throwing, so you can use it in runtime checks separate from renting, such as determining whether a component is pageable.
 
 
 
