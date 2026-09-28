@@ -155,5 +155,17 @@ namespace TestHelper.UI.Operators
 
             LogAssert.Expect(LogType.Log, "ClickTarget.ReceivePointerClick");
         }
+
+        [Test]
+        [LoadScene("../../Scenes/NewInputSystem.unity")]
+        public async Task OperateAsync_NewInputSystem_InvokeOnClick()
+        {
+            var gameObject = GameObject.Find("UsingOnPointerClickHandler");
+
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            await _sut.OperateAsync(gameObject);
+
+            LogAssert.Expect(LogType.Log, "UsingOnPointerClickHandler.OnPointerClick");
+        }
     }
 }
