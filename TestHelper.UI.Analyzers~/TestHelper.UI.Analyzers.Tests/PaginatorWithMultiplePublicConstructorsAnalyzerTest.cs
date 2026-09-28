@@ -1,32 +1,33 @@
 using System.Threading.Tasks;
 using Xunit;
 using Verifier =
-    TestHelper.UI.Analyzers.Tests.TestDataVerifier<
-        TestHelper.UI.Analyzers.PaginatorWithMultiplePublicConstructorsAnalyzer>;
+    TestHelper.UI.Analyzers.Tests.TestDataVerifier<TestHelper.UI.Analyzers.PaginatorWithMultiplePublicConstructorsAnalyzer>;
 
 namespace TestHelper.UI.Analyzers.Tests
 {
     public class PaginatorWithMultiplePublicConstructorsAnalyzerTest
     {
         [Theory]
-        [InlineData("MultiplePublicConstructors", 8, 18)]
-        [InlineData("ImplementsPaginatorDirectly", 8, 18)]
-        [InlineData("InheritsPaginatorBase", 21, 18)]
-        [InlineData("PartialWithConstructorsInEachPart", 8, 26)]
-        public async Task MultiplePublicConstructors_ReportsOnceAtClass(string caseName, int line, int column)
+        [InlineData("NoArgs", 12, 18, "NoArgsPaginator")]
+        [InlineData("NullArgs", 12, 18, "NullArgsPaginator")]
+        [InlineData("DefaultArgs", 12, 18, "DefaultArgsPaginator")]
+        [InlineData("EmptyArrayArgs", 12, 18, "EmptyArrayArgsPaginator")]
+        [InlineData("EmptyArrayInitializerArgs", 12, 18, "EmptyArrayInitializerArgsPaginator")]
+        [InlineData("PartialWithConstructorsInEachPart", 12, 18, "PartialWithConstructorsInEachPartPaginator")]
+        public async Task MultiplePublicConstructorsWithoutArgs_ReportsAtRegister(string caseName, int line, int column, string typeName)
         {
-            var expected = Verifier.Diagnostic().WithLocation(line, column).WithArguments(caseName);
+            var expected = Verifier.Diagnostic().WithLocation(line, column).WithArguments(typeName);
             await Verifier.VerifyAsync($"TestHelperUI4009/{caseName}.cs", expected);
         }
 
         [Theory]
+        [InlineData("WithArgs")]
+        [InlineData("ArgsArrayVariable")]
         [InlineData("SinglePublicConstructor")]
         [InlineData("PublicAndNonPublicConstructors")]
-        [InlineData("BaseClassHasMultiplePublicConstructors")]
+        [InlineData("StaticAndPublicConstructors")]
         [InlineData("NoPublicConstructor")]
-        [InlineData("AbstractPaginator")]
-        [InlineData("NotPaginator")]
-        public async Task SinglePublicConstructorOrOutOfScope_ReportsNothing(string caseName)
+        public async Task ExplicitArgsOrSingleConstructor_ReportsNothing(string caseName)
         {
             await Verifier.VerifyAsync($"TestHelperUI4009/{caseName}.cs");
         }

@@ -711,16 +711,18 @@ Rules for authors of custom operators, matchers, and paginators.
 
 | Id | Title | Severity |
 |----|-------|----------|
-| [TestHelperUI4001](Documentation~/rules/TestHelperUI4001.md) | IOperator implementation has no public constructor | ⚠️ |
-| [TestHelperUI4002](Documentation~/rules/TestHelperUI4002.md) | Constructor parameter of IOperator implementation has no default value | ⚠️ |
-| [TestHelperUI4003](Documentation~/rules/TestHelperUI4003.md) | Public constructor of IOperator implementation is not preserved | ⚠️ |
-| [TestHelperUI4004](Documentation~/rules/TestHelperUI4004.md) | IOperator implementation has multiple public constructors | ⚠️ |
+| [TestHelperUI4001](Documentation~/rules/TestHelperUI4001.md) | IOperator registered to OperatorPool has no usable public constructor | ❌ |
+| [TestHelperUI4002](Documentation~/rules/TestHelperUI4002.md) | Constructor parameter of IOperator registered without arguments cannot be resolved | ❌ |
+| [TestHelperUI4003](Documentation~/rules/TestHelperUI4003.md) | Constructor of IOperator registered to OperatorPool is not preserved | ⚠️ |
+| [TestHelperUI4004](Documentation~/rules/TestHelperUI4004.md) | IOperator with multiple public constructors is registered without arguments | ❌ |
 | [TestHelperUI4005](Documentation~/rules/TestHelperUI4005.md) | IOperator implementation does not implement a sub-interface | ℹ️ |
-| [TestHelperUI4006](Documentation~/rules/TestHelperUI4006.md) | IPaginator implementation has no public constructor | ⚠️ |
-| [TestHelperUI4007](Documentation~/rules/TestHelperUI4007.md) | Constructor parameter of IPaginator implementation has no default value | ⚠️ |
-| [TestHelperUI4008](Documentation~/rules/TestHelperUI4008.md) | Public constructor of IPaginator implementation is not preserved | ⚠️ |
-| [TestHelperUI4009](Documentation~/rules/TestHelperUI4009.md) | IPaginator implementation has multiple public constructors | ⚠️ |
+| [TestHelperUI4006](Documentation~/rules/TestHelperUI4006.md) | IPaginator registered to PaginatorPool has no usable public constructor | ❌ |
+| [TestHelperUI4007](Documentation~/rules/TestHelperUI4007.md) | Constructor parameter of IPaginator registered without arguments cannot be resolved | ❌ |
+| [TestHelperUI4008](Documentation~/rules/TestHelperUI4008.md) | Constructor of IPaginator registered to PaginatorPool is not preserved | ⚠️ |
+| [TestHelperUI4009](Documentation~/rules/TestHelperUI4009.md) | IPaginator with multiple public constructors is registered without arguments | ❌ |
 | [TestHelperUI4010](Documentation~/rules/TestHelperUI4010.md) | IPaginator implementation does not implement IPaginator&lt;TComponent&gt; | ⚠️ |
+| [TestHelperUI4011](Documentation~/rules/TestHelperUI4011.md) | No public constructor of IOperator matches the arguments of OperatorPool.Register | ❌ |
+| [TestHelperUI4012](Documentation~/rules/TestHelperUI4012.md) | No public constructor of IPaginator matches the arguments of PaginatorPool.Register | ❌ |
 
 
 

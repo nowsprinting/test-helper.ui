@@ -12,7 +12,7 @@ namespace TestHelper.UI.Analyzers
 
         private static readonly DiagnosticDescriptor s_rule = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Public constructor of IOperator implementation is not preserved",
+            title: "Constructor of IOperator registered to OperatorPool is not preserved",
             messageFormat:
             "The public constructor of '{0}' is not preserved: managed code stripping can remove the constructor from the Player, and the operator cannot be rented there. Apply 'Preserve' to the constructor.",
             category: "Extensibility",
@@ -30,45 +30,8 @@ namespace TestHelper.UI.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterCompilationStartAction(compilationContext =>
-            {
-                var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
-                if (operatorType == null)
-                {
-                    return;
-                }
-
-                compilationContext.RegisterSymbolAction(
-                    symbolContext => AnalyzeNamedType(symbolContext, operatorType),
-                    SymbolKind.NamedType);
-            });
-        }
-
-        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol operatorType)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            var type = (INamedTypeSymbol)context.Symbol;
-            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType))
-            {
-                return;
-            }
-
-            var isTypePreserved = PooledTypeSymbols.HasPreserveAttribute(type);
-            // LINQ is rejected for boxing the ImmutableArray enumerator on every call.
-            foreach (var constructor in type.InstanceConstructors)
-            {
-                if (constructor.DeclaredAccessibility != Accessibility.Public ||
-                    PooledTypeSymbols.HasPreserveAttribute(constructor) ||
-                    (isTypePreserved && constructor.Parameters.IsEmpty))
-                {
-                    continue;
-                }
-
-                // The implicit default constructor has no syntax to point at, and the fix may go on the class.
-                var location = constructor.IsImplicitlyDeclared ? type.Locations[0] : constructor.Locations[0];
-                context.ReportDiagnostic(Diagnostic.Create(s_rule, location, type.Name));
-            }
+            PoolRegistration.RegisterRuleAction(context, PooledTypeSymbols.OperatorPoolMetadataName,
+                PoolRegistrationRule.NotPreserved, s_rule);
         }
     }
 }

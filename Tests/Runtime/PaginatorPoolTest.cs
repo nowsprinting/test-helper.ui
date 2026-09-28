@@ -45,7 +45,11 @@ namespace TestHelper.UI
         public void Rent_RegisteredTypeWithoutPublicConstructor_ThrowsInvalidOperationException()
         {
             var pool = new PaginatorPool();
+            // Registering a valid type is rejected: this test verifies that the pool throws when renting
+            // a type that has no public constructor.
+#pragma warning disable TestHelperUI4006
             pool.Register<FakePaginatorWithoutPublicConstructor>();
+#pragma warning restore TestHelperUI4006
 
             Assert.That(() => pool.Rent<FakePaginatorWithoutPublicConstructor>(),
                 Throws.InvalidOperationException
@@ -56,7 +60,11 @@ namespace TestHelper.UI
         public void Rent_RegisteredTypeWithMultiplePublicConstructorsAndNoArgs_ThrowsInvalidOperationException()
         {
             var pool = new PaginatorPool();
+            // Registering a valid type is rejected: this test verifies that the pool throws when renting
+            // a type that has multiple public constructors.
+#pragma warning disable TestHelperUI4009
             pool.Register<FakePaginatorWithMultiplePublicConstructors>();
+#pragma warning restore TestHelperUI4009
 
             Assert.That(() => pool.Rent<FakePaginatorWithMultiplePublicConstructors>(),
                 Throws.InvalidOperationException
@@ -81,7 +89,11 @@ namespace TestHelper.UI
         public void Rent_RegisteredTypeWithRequiredParameter_ThrowsInvalidOperationException()
         {
             var pool = new PaginatorPool();
+            // Registering a valid type is rejected: this test verifies that the pool throws when renting
+            // a type that has a constructor parameter without a default value.
+#pragma warning disable TestHelperUI4007
             pool.Register<FakePaginatorWithRequiredParam>();
+#pragma warning restore TestHelperUI4007
 
             Assert.That(() => pool.Rent<FakePaginatorWithRequiredParam>(),
                 Throws.InvalidOperationException

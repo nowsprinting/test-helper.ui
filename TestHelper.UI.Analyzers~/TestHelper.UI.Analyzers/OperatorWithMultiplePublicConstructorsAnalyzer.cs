@@ -12,14 +12,14 @@ namespace TestHelper.UI.Analyzers
 
         private static readonly DiagnosticDescriptor s_rule = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "IOperator implementation has multiple public constructors",
+            title: "IOperator with multiple public constructors is registered without arguments",
             messageFormat:
-            "'{0}' has multiple public constructors: the operator cannot be rented unless it is registered with constructor arguments. Keep only one public constructor.",
+            "'{0}' has multiple public constructors. Register with explicit constructor arguments.",
             category: "Extensibility",
-            defaultSeverity: DiagnosticSeverity.Warning,
+            defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description:
-            "OperatorPool does not choose among multiple public constructors, so renting such an operator throws unless it is registered with explicit constructor arguments.",
+            "OperatorPool does not choose among multiple public constructors, so renting a operator registered without constructor arguments always throws.",
             helpLinkUri:
             "https://github.com/nowsprinting/test-helper.ui/tree/master/Documentation~/rules/TestHelperUI4004.md");
 
@@ -30,32 +30,8 @@ namespace TestHelper.UI.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterCompilationStartAction(compilationContext =>
-            {
-                var operatorType =
-                    compilationContext.Compilation.GetTypeByMetadataName(PooledTypeSymbols.IOperatorMetadataName);
-                if (operatorType == null)
-                {
-                    return;
-                }
-
-                compilationContext.RegisterSymbolAction(
-                    symbolContext => AnalyzeNamedType(symbolContext, operatorType),
-                    SymbolKind.NamedType);
-            });
-        }
-
-        private static void AnalyzeNamedType(SymbolAnalysisContext context, INamedTypeSymbol operatorType)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            var type = (INamedTypeSymbol)context.Symbol;
-            if (!PooledTypeSymbols.IsConcreteImplementation(type, operatorType) ||
-                PooledTypeSymbols.CountPublicConstructors(type, out _) < 2)
-            {
-                return;
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, type.Locations[0], type.Name));
+            PoolRegistration.RegisterRuleAction(context, PooledTypeSymbols.OperatorPoolMetadataName,
+                PoolRegistrationRule.MultiplePublicConstructors, s_rule);
         }
     }
 }

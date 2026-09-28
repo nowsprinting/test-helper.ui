@@ -9,6 +9,8 @@ namespace TestHelper.UI.Analyzers.Utilities
     /// </summary>
     internal static class PooledTypeSymbols
     {
+        public const string OperatorPoolMetadataName = "TestHelper.UI.OperatorPool";
+        public const string PaginatorPoolMetadataName = "TestHelper.UI.PaginatorPool";
         public const string IOperatorMetadataName = "TestHelper.UI.Operators.IOperator";
         public const string IPaginatorMetadataName = "TestHelper.UI.Paginators.IPaginator";
         public const string GenericIPaginatorMetadataName = "TestHelper.UI.Paginators.IPaginator`1";
@@ -17,11 +19,6 @@ namespace TestHelper.UI.Analyzers.Utilities
         /// Whether <paramref name="type"/> is a class that a pool can instantiate as <paramref name="interfaceType"/>:
         /// non-abstract and implementing <paramref name="interfaceType"/> directly, through a sub-interface, or through a base class.
         /// </summary>
-        /// <remarks>
-        /// Call this before <see cref="CountPublicConstructors"/>. Checking the constructors first is rejected:
-        /// <c>InstanceConstructors</c> builds a new array on every access while <c>AllInterfaces</c> is cached,
-        /// so rejecting other types by interface first is about twice as fast.
-        /// </remarks>
         public static bool IsConcreteImplementation(INamedTypeSymbol type, INamedTypeSymbol interfaceType)
         {
             return type.TypeKind == TypeKind.Class && !type.IsAbstract && Implements(type, interfaceType);

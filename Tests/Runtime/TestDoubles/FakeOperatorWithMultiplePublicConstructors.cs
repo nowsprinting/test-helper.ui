@@ -16,9 +16,7 @@ namespace TestHelper.UI.TestDoubles
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     // Keeping only one public constructor is rejected: this fake verifies that OperatorPool
     // rejects renting an IOperator type with multiple public constructors.
-#pragma warning disable TestHelperUI4004
     public class FakeOperatorWithMultiplePublicConstructors : IOperator
-#pragma warning restore TestHelperUI4004
     {
         public int IntValue { get; }
 

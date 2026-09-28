@@ -7,15 +7,21 @@ using UnityEngine.EventSystems;
 
 namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4004
 {
-    public class SinglePublicConstructor : IClickOperator
+    public class SinglePublicConstructor
     {
-        public SinglePublicConstructor(int value = 0)
+        public void Register(OperatorPool pool)
         {
+            pool.Register<SinglePublicConstructorOperator>();
         }
+    }
 
-        public ILogger? Logger { get; set; }
-        public ScreenshotOptions? ScreenshotOptions { get; set; }
-        public IVisualizer? Visualizer { get; set; }
+    public class SinglePublicConstructorOperator : IOperator
+    {
+        public SinglePublicConstructorOperator() { }
+
+        public ILogger Logger { set { } }
+        public ScreenshotOptions ScreenshotOptions { set { } }
+        public IVisualizer Visualizer { set { } }
 
         public bool CanOperate(GameObject gameObject) => throw new System.NotImplementedException();
 

@@ -5,17 +5,19 @@ using UnityEngine;
 
 namespace TestHelper.UI.Analyzers.Tests.TestData.TestHelperUI4009
 {
-    public class NoPublicConstructor : IPaginator<MonoBehaviour>
+    public class NoPublicConstructor
     {
-        private NoPublicConstructor()
+        public void Register(PaginatorPool pool)
         {
+            pool.Register<NoPublicConstructorPaginator>();
         }
+    }
 
-        private NoPublicConstructor(int value)
-        {
-        }
+    public class NoPublicConstructorPaginator : IPaginator
+    {
+        private NoPublicConstructorPaginator() { }
 
-        public MonoBehaviour? TargetComponent { get; set; }
+        public MonoBehaviour TargetComponent { set { } }
 
         public UniTask ResetAsync(CancellationToken cancellationToken = default) =>
             throw new System.NotImplementedException();

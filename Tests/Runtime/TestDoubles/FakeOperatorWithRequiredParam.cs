@@ -25,9 +25,7 @@ namespace TestHelper.UI.TestDoubles
         // A default value is rejected: this fake verifies that OperatorPool rejects renting an
         // IOperator type whose constructor parameter can be neither injected nor defaulted.
         [Preserve]
-#pragma warning disable TestHelperUI4002
         public FakeOperatorWithRequiredParam(string requiredParam)
-#pragma warning restore TestHelperUI4002
         {
             RequiredParam = requiredParam;
         }
