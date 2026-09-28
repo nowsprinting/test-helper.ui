@@ -142,7 +142,9 @@ namespace TestHelper.UI
         /// <returns>True if a paginator for <paramref name="targetComponent"/> can be selected; false if <paramref name="targetComponent"/> is null, or no paginator or multiple paginators match</returns>
         public bool CanRent(MonoBehaviour targetComponent)
         {
-            return false;
+            return targetComponent != null
+                   && _paginatorTypesByComponentType.TryGetValue(targetComponent.GetType(), out var paginatorTypes)
+                   && paginatorTypes.Count == 1;
         }
 
         // Resolving by MakeGenericType(componentType) on each Rent is rejected: it allocates on every call, and on
