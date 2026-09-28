@@ -131,6 +131,22 @@ namespace TestHelper.UI
             return Rent(paginatorTypes[0], targetComponent);
         }
 
+        /// <summary>
+        /// Returns whether <see cref="Rent(MonoBehaviour)"/> can select a paginator for <paramref name="targetComponent"/>,
+        /// that is, exactly one registered or pooled paginator's target component type exactly matches the type of <paramref name="targetComponent"/>.
+        /// </summary>
+        /// <remarks>
+        /// Does not check whether the paginator can be created; constructor and registration errors are reported by <c>Rent</c>.
+        /// </remarks>
+        /// <param name="targetComponent">The pageable component to be controlled by the paginator</param>
+        /// <returns>True if a paginator for <paramref name="targetComponent"/> can be selected; false if <paramref name="targetComponent"/> is null, or no paginator or multiple paginators match</returns>
+        public bool CanRent(MonoBehaviour targetComponent)
+        {
+            return targetComponent != null
+                   && _paginatorTypesByComponentType.TryGetValue(targetComponent.GetType(), out var paginatorTypes)
+                   && paginatorTypes.Count == 1;
+        }
+
         // Resolving by MakeGenericType(componentType) on each Rent is rejected: it allocates on every call, and on
         // IL2CPP it can fail for a component type whose IPaginator<> instantiation is not in the Player build.
         private void AddPaginatorTypeByComponentType(Type paginatorType)

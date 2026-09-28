@@ -372,6 +372,116 @@ namespace TestHelper.UI
         }
 
         [Test]
+        [CreateScene]
+        [Category("Acceptance")]
+        public void CanRent_TargetComponentWithMatchingPaginator_ReturnsTrue()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<UguiScrollbarPaginator>();
+            pool.Register<FakePaginator>();
+
+            var actual = pool.CanRent(targetComponent);
+
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanRent_TargetComponentOfReturnedPaginatorType_NotRequireRegistration_ReturnsTrue()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool(requireRegistration: false);
+            pool.Return(new FakePaginator());
+
+            var actual = pool.CanRent(targetComponent);
+
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanRent_TargetComponentWithMatchingPaginatorHavingMultiplePublicConstructors_ReturnsTrue()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            // Registering with explicit constructor arguments is rejected: this test verifies that CanRent does not
+            // check whether the paginator can be created.
+#pragma warning disable TestHelperUI4009
+            pool.Register<FakePaginatorWithMultiplePublicConstructors>();
+#pragma warning restore TestHelperUI4009
+
+            var actual = pool.CanRent(targetComponent);
+
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        public void CanRent_NullTargetComponent_ReturnsFalse()
+        {
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+
+            var actual = pool.CanRent(null);
+
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanRent_DestroyedTargetComponent_ReturnsFalse()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+            UnityEngine.Object.DestroyImmediate(targetComponent);
+
+            var actual = pool.CanRent(targetComponent);
+
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanRent_TargetComponentWithoutMatchingPaginator_ReturnsFalse()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<UguiScrollbarPaginator>();
+
+            var actual = pool.CanRent(targetComponent);
+
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanRent_TargetComponentOfDerivedType_ReturnsFalse()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeDerivedComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+
+            var actual = pool.CanRent(targetComponent);
+
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [CreateScene]
+        public void CanRent_TargetComponentWithMultipleMatchingPaginators_ReturnsFalse()
+        {
+            var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
+            var pool = new PaginatorPool();
+            pool.Register<FakePaginator>();
+            pool.Register<FakePaginatorWithMultiplePublicConstructors>(42);
+
+            var actual = pool.CanRent(targetComponent);
+
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
         public void Return_NullInstance_ThrowsArgumentNullException()
         {
             var pool = new PaginatorPool();
