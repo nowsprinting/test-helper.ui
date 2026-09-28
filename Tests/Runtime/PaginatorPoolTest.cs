@@ -392,8 +392,7 @@ namespace TestHelper.UI
         {
             var targetComponent = new GameObject("Target").AddComponent<FakeComponent>();
             var pool = new PaginatorPool(requireRegistration: false);
-            var instance = pool.Rent<FakePaginator>();
-            pool.Return(instance);
+            pool.Return(new FakePaginator());
 
             var actual = pool.CanRent(targetComponent);
 
